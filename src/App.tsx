@@ -7,19 +7,6 @@ function App() {
   try {
     const response = await fetch("https://localhost:11101/", {
       method: "RDSERVICE", // Custom RDService method (uncommon but required by L1 RD)
-      headers: {
-        "Accept": "*/*",
-        "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-        "Connection": "keep-alive",
-        "Origin": "null",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "cross-site",
-        // "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
-        // "sec-ch-ua": "\"Google Chrome\";v=\"137\", \"Chromium\";v=\"137\", \"Not/A)Brand\";v=\"24\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-      },
     });
 
     if (!response.ok) {
@@ -28,15 +15,6 @@ function App() {
     console.log("RD Service Raw Response:", response);
     const text = await response.text();
     console.log("RD Service Raw Response:", text);
-
-    // You can parse the XML here to extract <RDService status="READY" ... />
-    // Example:
-    // const parser = new DOMParser();
-    // const xml = parser.parseFromString(text, "text/xml");
-    // const status = xml.getElementsByTagName("RDService")[0]?.getAttribute("status");
-
-    // return fetchFakeData("READY"); // Replace with actual parsed status
-
   } catch (err) {
     console.error("Error while calling RD service:", err);
   }
@@ -46,19 +24,6 @@ const getDeviceInfo = async () => {
   try {
     const response = await fetch("https://localhost:11101/getDeviceInfo", {
       method: "DEVICEINFO", // Custom method for RD Service
-      headers: {
-        "Accept": "*/*",
-        "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-        "Connection": "keep-alive",
-        "Origin": "null",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "cross-site",
-        // "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
-        // "sec-ch-ua": `"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"`,
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": `"Windows"`
-      }
     });
 
     if (!response.ok) {
@@ -80,20 +45,6 @@ const getDeviceInfo = async () => {
 
     const response = await fetch("https://localhost:11101/capture", {
       method: "CAPTURE", // Custom method used by RD Service
-      headers: {
-        "Accept": "text/xml",
-        "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
-        "Connection": "keep-alive",
-        "Content-Type": "text/xml",
-        "Origin": "null",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "cross-site",
-        // "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
-        // "sec-ch-ua": `"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"`,
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": `"Windows"`,
-      },
       body: xmlBody,
     });
 
