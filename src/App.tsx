@@ -45,6 +45,20 @@ const getDeviceInfo = async () => {
 
     const response = await fetch("https://localhost:11101/capture", {
       method: "CAPTURE", // Custom method used by RD Service
+      headers: {
+        "Accept": "text/xml",
+        "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
+        "Connection": "keep-alive",
+        "Content-Type": "text/xml",
+        "Origin": "null",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "cross-site",
+        // "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+        // "sec-ch-ua": `"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"`,
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": `"Windows"`,
+      },
       body: xmlBody,
     });
 
