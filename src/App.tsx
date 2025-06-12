@@ -14,8 +14,10 @@ function App() {
     }
     console.log("RD Service Raw Response:", response);
     const text = await response.text();
+    alert("RD Service Raw Response: " + text);
     console.log("RD Service Raw Response:", text);
   } catch (err) {
+    alert("RD Service Raw error Response: " + err);
     console.error("Error while calling RD service:", err);
   }
 };
@@ -31,9 +33,11 @@ const getDeviceInfo = async () => {
     }
     console.log("Device Info Response:", response);
     const text = await response.text();
+    alert("Device infor Response: " + text);
     console.log("Device Info Response XML:", text);
     // parse or return text as needed
   } catch (error) {
+     alert("Device infor error Response: " + error);
     console.error("Error getting device info:", error);
   }
 };
@@ -54,12 +58,14 @@ const getDeviceInfo = async () => {
 
     console.log("Capture Response:", response);
     const text = await response.text();
+     alert("Capture Response: " + text);
     console.log("Capture Response XML:", text);
 
     // You can parse `text` using DOMParser if needed
     // return text;
 
   } catch (error) {
+    alert("Capture error Response: " + error);
     console.error("Error during RD capture:", error);
   }
 };
