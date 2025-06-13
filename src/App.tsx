@@ -93,7 +93,7 @@ const callFlutterMethod = async (method:string, args:{serviceId:string}) => {
       try {
         const response = await window.NativeCallback.sendRequest(method, args);
         console.log('React App: Received successful response from Flutter:', response);
-        setResponseMessage(`Success: ${response.message || 'Operation completed.'}`);
+        setResponseMessage(`Success: ${response.response || 'Operation completed.'}`);
         setResponseType('success');
         // You can now use response.data (e.g., transactionId, billRef)
       } catch (errorResponse: unknown) {
@@ -112,8 +112,16 @@ const callFlutterMethod = async (method:string, args:{serviceId:string}) => {
     }
   };
 
-  const handleTransferFundsClick = () => {
-    callFlutterMethod('callBankingService', { serviceId: 'transfer_funds'});
+  const checkServiceStatus = () => {
+    callFlutterMethod('callingBiometricServices', { serviceId: 'SERVICE_STATUS'});
+  };
+
+   const checkDeviceStatus = () => {
+    callFlutterMethod('callingBiometricServices', { serviceId: 'DEVICE_STATUS'});
+  };
+
+   const captureFingerPrint = () => {
+    callFlutterMethod('callingBiometricServices', { serviceId: 'CAPTURE_FINGERPRINT' });
   };
 
 
@@ -129,9 +137,9 @@ const callFlutterMethod = async (method:string, args:{serviceId:string}) => {
         </div>
         <div>
         <h2>Android Application</h2>
-        <button  onClick={()=> handleTransferFundsClick()}>Check Service Status</button>
-          {/* <button onClick={()=> handleAndroidDeviceCalls('DEVICE_STATUS')}>Check Device Status</button>
-        <button onClick={()=> handleAndroidDeviceCalls('CAPTURE_FINGERPRINT')}>Capture Fingerprint</button> */}
+        <button  onClick={checkServiceStatus}>Check Service Status</button>
+          <button onClick={checkDeviceStatus}>Check Device Status</button>
+        <button onClick={captureFingerPrint}>Capture Fingerprint</button>
         </div>
         </div>
         <div className='response-message'>
