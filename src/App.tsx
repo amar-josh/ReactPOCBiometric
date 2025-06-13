@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import './App.css'
+import DeviceDetect from './deviceDetect';
 
 // Extend the Window interface to include NativeCallback
 declare global {
@@ -129,6 +130,7 @@ const callFlutterMethod = async (method:string, args:{serviceId:string}) => {
     <>
       <div>
          <div className='d-flex justify-content-center align-items-center vh-100' > 
+          <div><DeviceDetect/></div>
           <div>
         <h2>Web Application</h2>
          <button  onClick={getDeviceStatus}>Check Service Status</button>
