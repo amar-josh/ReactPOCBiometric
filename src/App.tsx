@@ -84,7 +84,7 @@ const getDeviceInfo = async () => {
   }
 };
 
-const callFlutterMethod = async (method, args) => {
+const callFlutterMethod = async (method:string, args:{serviceId:string}) => {
     setResponseMessage('Calling Flutter...');
     setResponseType('');
 
@@ -96,9 +96,12 @@ const callFlutterMethod = async (method, args) => {
         setResponseMessage(`Success: ${response.message || 'Operation completed.'}`);
         setResponseType('success');
         // You can now use response.data (e.g., transactionId, billRef)
-      } catch (errorResponse) {
+      } catch (errorResponse: unknown) {
         console.error('React App: Received error response from Flutter:', errorResponse);
-        setResponseMessage(`Error: ${errorResponse.message || 'Operation failed.'}`);
+        const errorMsg = (errorResponse && typeof errorResponse === 'object' && 'message' in errorResponse)
+          ? (errorResponse as { message?: string }).message
+          : (errorResponse instanceof Error ? errorResponse.message : undefined);
+        setResponseMessage(`Error: ${errorMsg || 'Operation failed.'}`);
         setResponseType('error');
         // Handle errorResponse.data (e.g., errorCode)
       }
@@ -110,9 +113,8 @@ const callFlutterMethod = async (method, args) => {
   };
 
   const handleTransferFundsClick = () => {
-    callFlutterMethod('callBankingService', { serviceId: 'transfer_funds', amount: 1000, toAccount: 'XYZ123' });
+    callFlutterMethod('callBankingService', { serviceId: 'transfer_funds'});
   };
-
 
 
   return (
