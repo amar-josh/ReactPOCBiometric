@@ -1,7 +1,21 @@
 
+import { useState } from 'react';
 import './App.css'
 
+// Extend the Window interface to include NativeCallback
+declare global {
+  interface Window {
+    NativeCallback?: {
+      sendRequest?: (method: string, args: any) => Promise<any>;
+    };
+  }
+}
+
+
 function App() {
+
+   const [responseMessage, setResponseMessage] = useState('');
+  const [responseType, setResponseType] = useState(''); 
 
  const getDeviceStatus = async () => {
   try {
@@ -70,13 +84,62 @@ const getDeviceInfo = async () => {
   }
 };
 
+const callFlutterMethod = async (method, args) => {
+    setResponseMessage('Calling Flutter...');
+    setResponseType('');
+
+    // Check if the communication bridge is ready
+    if (window.NativeCallback && typeof window.NativeCallback.sendRequest === 'function') {
+      try {
+        const response = await window.NativeCallback.sendRequest(method, args);
+        console.log('React App: Received successful response from Flutter:', response);
+        setResponseMessage(`Success: ${response.message || 'Operation completed.'}`);
+        setResponseType('success');
+        // You can now use response.data (e.g., transactionId, billRef)
+      } catch (errorResponse) {
+        console.error('React App: Received error response from Flutter:', errorResponse);
+        setResponseMessage(`Error: ${errorResponse.message || 'Operation failed.'}`);
+        setResponseType('error');
+        // Handle errorResponse.data (e.g., errorCode)
+      }
+    } else {
+      console.warn('React App: NativeCallback is not available or not correctly injected.');
+      setResponseMessage('Error: Not in Flutter WebView environment or communication not set up.');
+      setResponseType('error');
+    }
+  };
+
+  const handleTransferFundsClick = () => {
+    callFlutterMethod('callBankingService', { serviceId: 'transfer_funds', amount: 1000, toAccount: 'XYZ123' });
+  };
+
 
 
   return (
     <>
-      <div onClick={getDeviceStatus}>check status</div>
-       <div onClick={getDeviceInfo}>Device info</div>
-      <div onClick={captureBiometric}>capture</div>
+      <div>
+         <div className='d-flex justify-content-center align-items-center vh-100' > 
+          <div>
+        <h2>Web Application</h2>
+         <button  onClick={getDeviceStatus}>Check Service Status</button>
+          <button onClick={getDeviceInfo}>Check Device Status</button>
+        <button onClick={captureBiometric}>Capture Fingerprint</button>
+        </div>
+        <div>
+        <h2>Android Application</h2>
+        <button  onClick={()=> handleTransferFundsClick()}>Check Service Status</button>
+          {/* <button onClick={()=> handleAndroidDeviceCalls('DEVICE_STATUS')}>Check Device Status</button>
+        <button onClick={()=> handleAndroidDeviceCalls('CAPTURE_FINGERPRINT')}>Capture Fingerprint</button> */}
+        </div>
+        </div>
+        <div className='response-message'>
+          {responseMessage && (
+            <div className={`alert alert-${responseType}`}>
+              {responseMessage}
+            </div>
+          )}
+          </div>
+      </div>
     </>
   )
 }
