@@ -7,7 +7,7 @@ import DeviceDetect from './deviceDetect';
 declare global {
   interface Window {
     NativeCallback?: {
-      sendRequest?: (method: string, args: any) => Promise<any>;
+      sendRequest?: ( serviceId: string) => Promise<any>;
     };
   }
 }
@@ -85,14 +85,14 @@ const getDeviceInfo = async () => {
   }
 };
 
-const callFlutterMethod = async (method:string, args:{serviceId:string}) => {
+const callFlutterMethod = async (serviceId:string) => {
     setResponseMessage('Calling Flutter...');
     setResponseType('');
 
     // Check if the communication bridge is ready
     if (window.NativeCallback && typeof window.NativeCallback.sendRequest === 'function') {
       try {
-        const response = await window.NativeCallback.sendRequest(method, args);
+        const response = await window.NativeCallback.sendRequest(serviceId);
         console.log('React App: Received successful response from Flutter:', response);
         setResponseMessage(`Success: ${response.response || 'Operation completed.'}`);
         setResponseType('success');
@@ -113,16 +113,12 @@ const callFlutterMethod = async (method:string, args:{serviceId:string}) => {
     }
   };
 
-  const checkServiceStatus = () => {
-    callFlutterMethod('callingBiometricServices', { serviceId: 'SERVICE_STATUS'});
-  };
-
    const checkDeviceStatus = () => {
-    callFlutterMethod('callingBiometricServices', { serviceId: 'DEVICE_STATUS'});
+    callFlutterMethod('DEVICE_STATUS');
   };
 
    const captureFingerPrint = () => {
-    callFlutterMethod('callingBiometricServices', { serviceId: 'CAPTURE_FINGERPRINT' });
+    callFlutterMethod('CAPTURE_FINGERPRINT');
   };
 
 
@@ -139,7 +135,6 @@ const callFlutterMethod = async (method:string, args:{serviceId:string}) => {
         </div>
         <div>
         <h2>Android Application</h2>
-        <button  onClick={checkServiceStatus}>Check Service Status</button>
           <button onClick={checkDeviceStatus}>Check Device Status</button>
         <button onClick={captureFingerPrint}>Capture Fingerprint</button>
         </div>
