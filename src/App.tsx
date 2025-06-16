@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import './App.css'
 import DeviceDetect from './deviceDetect';
+import { convertXML } from "simple-xml-to-json";
+
 
 // Extend the Window interface to include NativeCallback
 declare global {
@@ -29,8 +31,10 @@ function App() {
     }
     console.log("RD Service Raw Response:", response);
     const text = await response.text();
+    const jsonData = convertXML(text);
+
     alert("RD Service Raw Response: " + text);
-    console.log("RD Service Raw Response:", text);
+    console.log("RD Service Raw Response:", jsonData);
   } catch (err) {
     alert("RD Service Raw error Response: " + err);
     console.error("Error while calling RD service:", err);
@@ -94,7 +98,9 @@ const callFlutterMethod = async (serviceId:string) => {
       try {
         const response = await window.NativeCallback.sendRequest(serviceId);
         console.log('React App: Received successful response from Flutter:', response);
-        setResponseMessage(`Success: ${response.response || 'Operation completed.'}`);
+        setResponseMessage(`Success: ${response || 'Operation completed.'}`);
+        console.log('Response Data:', response.data);
+        console.log('converted to JSON:', convertXML(response.data));
         setResponseType('success');
         // You can now use response.data (e.g., transactionId, billRef)
       } catch (errorResponse: unknown) {
