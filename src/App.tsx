@@ -100,7 +100,7 @@ const callFlutterMethod = async (serviceId:string) => {
         console.log('React App: Received successful response from Flutter:', response);
         setResponseMessage(`Success: ${response || 'Operation completed.'}`);
         console.log('Response Data:', response.data);
-        console.log('converted to JSON:', convertXML(response.data));
+        // console.log('converted to JSON:', convertXML(response.data));
         setResponseType('success');
         // You can now use response.data (e.g., transactionId, billRef)
       } catch (errorResponse: unknown) {
