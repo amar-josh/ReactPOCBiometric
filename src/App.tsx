@@ -143,7 +143,7 @@ const callFlutterMethod = async (serviceId:string) => {
         <button onClick={captureBiometric}>Capture Fingerprint</button>
         </div>}
         
-        { !isAndroidWebView &&
+        {isAndroidWebView &&
         <>
         <div>
         <h2>Android Application</h2>
