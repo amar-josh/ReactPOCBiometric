@@ -21,7 +21,7 @@ function Layout() {
 
   const handleLogout = () => {
     // TODO:replace this with logout api
-    navigate(ROUTES.LOGIN);
+    navigate(ROUTES.RE_KYC);
   };
 
   //TODO:replace hardcoded value with api response
