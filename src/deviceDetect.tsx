@@ -2,42 +2,6 @@
 // hooks/useDeviceDetection.js
 import { useState, useEffect } from 'react';
 
-function DeviceDetect() {
-  const { deviceType, isDesktop, isAndroid, isAndroidWebView, isMobile } = useDeviceDetection();
-
-  if (deviceType === 'loading') {
-    return <p>Detecting device type...</p>;
-  }
-
-  return (
-    <div style={{ padding: '20px', textAlign: 'center' }}>
-      <p>Current Device Type: <strong>{deviceType}</strong></p>
-
-      {isDesktop && (
-        <p>You are using a <strong>Desktop</strong> browser.</p>
-      )}
-
-      {isAndroid && !isAndroidWebView && (
-        <p>You are using a <strong>Native Android Browser</strong>.</p>
-      )}
-
-      {isAndroidWebView && (
-        <p>You are using an <strong>Android App's WebView</strong>.</p>
-      )}
-
-      {isMobile && (
-        <p>This is a <strong>Mobile Device</strong>.</p>
-      )}
-
-      
-    </div>
-  );
-}
-
-
-export default DeviceDetect;
-
-
 const getDeviceType = () => {
   const ua = navigator.userAgent;
 
@@ -65,32 +29,17 @@ const getDeviceType = () => {
   return 'unknown';
 };
 
-const useDeviceDetection = () => {
+export const useDeviceDetection = () => {
   const [deviceType, setDeviceType] = useState('loading'); // Initial state
 
   useEffect(() => {
     // Set the device type once on component mount
     setDeviceType(getDeviceType());
-
-    // Optional: Add listeners for window resize if you want to react to orientation changes
-    // or if you want to re-evaluate on very rare cases where UA might dynamically change (unlikely)
-    // const handleResize = () => setDeviceType(getDeviceType());
-    // window.addEventListener('resize', handleResize);
-    // return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Return boolean flags for convenience
-  const isDesktop = deviceType === 'desktop';
-  const isAndroid = deviceType === 'android_device' || deviceType === 'android_webview';
   const isAndroidWebView = deviceType === 'android_webview';
-  const isMobile = isAndroid || deviceType === 'ios_device'; // Include iOS for a general 'mobile' flag
 
   return {
-    deviceType,
-    isDesktop,
-    isAndroid,
     isAndroidWebView,
-    isMobile,
-    // Add other flags if you need to distinguish iOS, etc.
   };
 }

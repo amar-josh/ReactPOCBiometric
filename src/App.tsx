@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import './App.css'
-import DeviceDetect from './deviceDetect';
+import { useDeviceDetection } from './deviceDetect';
 import { convertXML } from "simple-xml-to-json";
 
 
@@ -19,6 +19,7 @@ function App() {
 
    const [responseMessage, setResponseMessage] = useState('');
   const [responseType, setResponseType] = useState(''); 
+    const { isAndroidWebView } = useDeviceDetection();
 
  const getDeviceStatus = async () => {
   try {
@@ -98,9 +99,11 @@ const callFlutterMethod = async (serviceId:string) => {
       try {
         const response = await window.NativeCallback.sendRequest(serviceId);
         console.log('React App: Received successful response from Flutter:', response);
-        setResponseMessage(`Success: ${response || 'Operation completed.'}`);
+        
         console.log('Response Data:', response.data);
-        // console.log('converted to JSON:', convertXML(response.data));
+        console.log('converted to JSON:', convertXML(response.data));
+        const jsonData = convertXML(response.data)
+        setResponseMessage(`Success: ${JSON.stringify(jsonData) || 'Operation completed.'}`);
         setResponseType('success');
         // You can now use response.data (e.g., transactionId, billRef)
       } catch (errorResponse: unknown) {
@@ -132,18 +135,20 @@ const callFlutterMethod = async (serviceId:string) => {
     <>
       <div>
          <div className='d-flex justify-content-center align-items-center vh-100' > 
-          <div><DeviceDetect/></div>
-          <div>
-        <h2>Web Application</h2>
+          <div></div>
+          { !isAndroidWebView && <div>
+          <h2>Web Application</h2>
          <button  onClick={getDeviceStatus}>Check Service Status</button>
           <button onClick={getDeviceInfo}>Check Device Status</button>
         <button onClick={captureBiometric}>Capture Fingerprint</button>
-        </div>
+        </div>}
+        
+        { !isAndroidWebView &&
+        <>
         <div>
         <h2>Android Application</h2>
           <button onClick={checkDeviceStatus}>Check Device Status</button>
         <button onClick={captureFingerPrint}>Capture Fingerprint</button>
-        </div>
         </div>
         <div className='response-message'>
           {responseMessage && (
@@ -152,6 +157,9 @@ const callFlutterMethod = async (serviceId:string) => {
             </div>
           )}
           </div>
+          </>
+          }
+      </div>
       </div>
     </>
   )
