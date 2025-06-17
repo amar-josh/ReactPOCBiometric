@@ -18,6 +18,7 @@ import {
   IValidateFingerPrintRequest,
   IValidateFingerPrintResponse,
 } from "@/features/re-kyc/types";
+import { useDeviceDetection } from "@/hooks/useDeviceDetection";
 
 import BiometricVerificationComponent from "./components/BiometricVerification";
 import {
@@ -64,6 +65,7 @@ const BiometricFlow = ({
   setBiometricStatus,
   mobileNo,
 }: IBiometricFlowProps) => {
+  const { isAndroidWebView } = useDeviceDetection();
   const [isBiometricFlowDone, setIsBiometricFlowDone] = useState(false); // step 3 has 2 parts biometric modals and viewmode table and end card
   const [biometricCount, setBiometricCount] = useState(3); // only 3 chances
   const [isBiometricModalOpen, setIsBiometricModalOpen] = useState(false); // biometric modal flow
@@ -192,8 +194,12 @@ const BiometricFlow = ({
   const handleConsentApproved = () => {
     setIsAadhaarConsentOpen(false);
     setIsBiometricModalOpen(true);
-    resetRDServiceStatus();
-    checkRDServiceStatus();
+    if (isAndroidWebView) {
+      retryDeviceNotReady();
+    } else {
+      resetRDServiceStatus();
+      checkRDServiceStatus();
+    }
   };
 
   const handleFingerPrintCaptureError = useCallback(
