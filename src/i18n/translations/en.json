@@ -1,0 +1,213 @@
+{
+  "login": {
+    "bandhan": "Bandhan",
+    "bank": "Bank",
+    "bbInstaServices": "Bandhan Bank Insta Services",
+    "cantAccessYourAccount": "Can't access your account",
+    "regainAccountAccess": "To regain account access please contact"
+  },
+  "header": {
+    "logout": "Logout",
+    "branchOrBu": "Branch/BU ID"
+  },
+  "home": {
+    "welcome": "Welcome",
+    "subTitle": "What do you want to do today?"
+  },
+  "reKyc": {
+    "title": "Re-KYC",
+    "home": "Home",
+    "searchWith": "Search With",
+    "updateCommunicationAddress": "Update Communication Address",
+    "eSign": "eSign",
+    "reKycDetails": "Re-KYC details",
+    "otherDetails": "Other Details",
+    "accountRelatedToCIF": "Accounts related to CIF Id",
+    "accountNumber": "Account number",
+    "personalDetails": "Personal Details",
+    "email": "Email",
+    "mobileNumber": "Mobile Number",
+    "searchCustomer": "Search Customer",
+    "biometricVerification": "Bio-metric Verification",
+    "verifyAadhaarInformation": "Please verify your Aadhaar information",
+    "aadhaarNumber": "Aadhaar Number",
+    "thankYou": "Thank you!",
+    "rekycUpdateFailed": " Re-KYC Update failed",
+    "allAccountsMappedGetsUpdated": "All accounts mapped to the customer ID will be updated.",
+    "nonIndividualAccounts": "Non-Individual Accounts",
+    "accountRelatedToCif": "Accounts associated to CIF Id:",
+    "agreeAddressUpdate": "I agree that this address will be updated across all accounts.",
+    "customerName": "Customer Name:",
+    "placeholder": {
+      "mobileNumber": "Type mobile number e.g. 1234567890",
+      "cif": "Type 9 digit CIF Id e.g. 123456789",
+      "accountNumber": "Type 14 digit account number e.g. 11111111111111"
+    },
+    "modal": {
+      "aadhaarConsentText": "Aadhaar Consent",
+      "noChangeInKYCDetails": "No-Change in KYC details",
+      "reKYCWithAddressUpdate": "Re-KYC with Communication Address Update",
+      "proceedWithAadhaarBiometric": "Proceed with Aadhaar Biometric",
+      "checkBoxText": "By clicking the check box, I hereby agree to proceed with the biometric authentication.",
+      "noChangeInKYCDetailsPopUpMessage": "The Customer has verified the existing KYC information present in the bank records and confirmed that there is no change in KYC information. Further, the customer hereby, has agreed to indemnify and keep the Bank indemnified at all times from and against any and all losses, expenses, damages, claims and/or costs that may be incurred by the Bank with regard to acceptance of this declaration. In case any of the above information is found to be false or untrue or misleading or misrepresenting, the customer has been made aware that he/she/they may be held liable for it. In the event of further change in KYC information, the customer has agreed to intimate the bank about the same. Also, the customer has been made aware that he/she/they accept the above declaration by agreeing to verify his/her/their identity using Aadhaar biometric authentication for the purpose of Re-KYC.",
+      "updateCommunicationAddressPopUpMessage": "The Customer has verified the existing KYC information present in the bank records and intends to update communication address only, confirming that there is no change in remaining KYC information. Further, the customer hereby, has agreed to indemnify and keep the Bank indemnified at all times from and against any and all losses, expenses, damages, claims and/or costs that may be incurred by the Bank with regard to acceptance of this declaration. In case any of the above information is found to be false or untrue or misleading or misrepresenting, the customer has been made aware that he/she/they may be held liable for it. In the event of further change in KYC information, the customer has agreed to intimate the bank about the same. Also, the customer has been made aware that he/she/they accept the above declaration by agreeing to verify his/her/their identity using Aadhaar biometric authentication for the purpose of Re-KYC and communication address update.",
+      "proceedWithAadhaarBiometricPopUpMessage": "Customer states that, I/We hereby state that I/we have no objection in authenticating myself/ourselves with Aadhaar based authentication system and consent to providing my/our Aadhaar Number and(One Time Pin) OTP data (and/or any similar authentication mechanism) to Bandhan Bank for Aadhaar based authentication for the purposes of availing banking service from Bandhan Bank.",
+      "proceedWithAadhaarBiometricPopUpMessage2": "I/We understand that my/our information submitted to  Bandhan Bank herewith shall not be used for any purpose other than mentioned hereinabove. I/We hereby declare that all the above information voluntarily furnished by me/us is true, correct and complete. I/We understand and agree that Bandhan Bank may disclose information about my/our account(s), with or without notice/intimation, if required or permitted by law, rule or regulations, or at the request of any public or regulatory authority or if such disclosure is required for the purposes of preventing frauds or in public interest, without requiring further specific permission from me/us and I/we hereby provide unconditional consent for the same.",
+      "dormantAccount": "KYC update required for dormant account. 'No change in KYC details' option not allowed."
+    },
+    "errorMessages": {
+      "occupationRequired": "Occupation is required",
+      "residenceTypeRequired": "Resident Type is required",
+      "annualIncomeRequired": "Gross Annual Income is required",
+      "somethingWentWrong": "Something went wrong!",
+      "tryAgain": "Try Again"
+    },
+    "biometric": {
+      "confirmUsingFingerprint": "Confirm Using Your Fingerprint",
+      "touchFingerprintSensor": "Touch the fingerprint sensor",
+      "connectBiometricDevice": "Please connect bio-metric device",
+      "biometricServiceChcek": "Searching for RD service... Please wait...",
+      "biometricServiceNotFoundMessage": "RD service not found. Please ensure the RD service is running and try again.",
+      "aadhaarAuthFailed": "Aadhaar authentication failed",
+      "aadhaarAuthFailedOnce": "Aadhaar verification failed. Only 2 attempts left",
+      "aadhaarAuthFailedTwice": "Aadhaar verification failed. Only 1 attempts left",
+      "formBasedProcess": "Please try again or continue with form based process",
+      "verified": "Verified",
+      "verifiedSuccess": "Verified successfully!",
+      "previousAddress": "Previous Address (as per bank records)",
+      "newAddress": "New Communication Address (to be updated)",
+      "confirmAddress": "Confirm Communication Address and Re-KYC"
+    },
+    "reKycSuccessTitle": "Re-KYC Successful",
+    "reKycSuccessText": "Your Re-KYC process has been successfully completed"
+  },
+  "instaServiceEligibilityCard": {
+    "title": "Eligibility for Insta Services",
+    "eligibilityOne": "Allowed for Individual accounts",
+    "eligibilityTwo": "Aadhaar and PAN/form 60 available in bank records",
+    "eligibilityThree": "Low risk customers"
+  },
+  "mobileNumberUpdate": {
+    "title": "Mobile Number Update",
+    "numberUpdateForAboveAccount": "Your number will be updated for the above account",
+    "cif": "CIF:",
+    "searchCustomer": "Search Customer",
+    "updateDetails": "Update details",
+    "bioMetricVerification": "Bio-metric Verification",
+    "verifyMobile": "Verify Mobile",
+    "enterMobileNumber": "Enter new mobile number",
+    "updateForSelectedCif": "Your number will be updated for all the banking applications related to the selected CIF Id",
+    "verificationLinkSend": "Dear customer, a verification link has been sent to your new mobile number which is valid for 5 minutes. Please click on the link to verify your mobile. You will have 3 attempts.",
+    "successfulVerified": "Mobile number successfully verified.",
+    "attemptsExceeds": "Mobile number verification maximum attempts exceeded! please try again after 24 hours",
+    "numberWillUpdate": "Your mobile number change request will be processed within 24 hrs",
+    "tryWithFormBasedProcess": "Please try again or continue with form based process.",
+    "oldMobileNumber": "Old Mobile Number:",
+    "newMobileNumber": "New Mobile Number:",
+    "requestNumber": "Request Number:",
+    "linkVerification": "Link Verification",
+    "maximumThreeAttempts": "Maximum 3 attempts",
+    "tryAgainIn": "Try again in",
+    "tryAgain": "Try Again",
+    "maximumAttemptsExceeded": "Maximum number of clicks reached",
+    "thankYou": "Thank You",
+    "sorry": "Sorry",
+    "errorMessages": {
+      "aadhaarRequired": "Aadhaar is required",
+      "aadhaarRequiredMessage": "Aadhaar is required to proceed with mobile number update",
+      "aadharMustLinked": "To update your mobile number, ensure your Aadhaar is linked to your bank account. Visit your nearest branch to link it if not done."
+    }
+  },
+  "button": {
+    "next": "Next",
+    "proceed": "Proceed",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "esign": "eSign",
+    "reKycNext": "Next: Re-KYC",
+    "searchCustomer": "Search Customer",
+    "ok": "Ok",
+    "backToHome": "Back to home",
+    "recapture": "Re-Capture",
+    "retry": "Retry",
+    "close": "Close",
+    "noChangeInKyc": "No-Change in KYC details",
+    "continueToEsign": "Continue to eSign",
+    "updateCommunicationAddress": "Update Communication Address",
+    "checkStatus": "Check Status",
+    "backToLogin": "Back To Login"
+  },
+  "formFields": {
+    "customerName": "Customer Name",
+    "nameOfOVD": "Name of OVD",
+    "customerID": "Customer ID",
+    "accountNumber": "Account Number",
+    "mobileNumber": "Mobile Number",
+    "emailId": "Email ID",
+    "permanentAddress": "Permanent Address",
+    "communicationAddress": "Communication Address",
+    "occupationRequired": "Occupation (Required)",
+    "grossAnnualIncomeRequired": "Gross Annual Income (Required)",
+    "residenceTypeRequired": "Residence Type (Required)",
+    "occupation": "Occupation",
+    "grossAnnualIncome": "Gross Annual Income",
+    "residenceType": "Residence Type",
+    "other": "Other"
+  },
+  "checkpoints": {
+    "notEligibleForInstaTitle": "Not Eligible for Insta Service Request",
+    "notEligibleForInstaMessage": "Customer is not eligible for the Insta Service Request,please proceed with form based process.",
+    "mobileNumberMissingTitle": "Email or Mobile number is missing!",
+    "aadhaarDetailsMissingTitle": "Aadhaar details are missing!",
+    "aadhaarNotAvailable": "Customer Aadhaar details are not available in bank records.",
+    "accountDormant": "Customer account is dormant.",
+    "accountInactiveOrBlocked": "Customer account is inactive or blocked.",
+    "mobileNumberUpdateNeededMessage": "Mobile number needs to be updated first, before proceeding with Re-KYC."
+  },
+  "validations": {
+    "email": {
+      "required": "Required",
+      "type": "Invalid Email",
+      "enterValidEmail": "Please enter a valid email address (e.g., user@example.com)"
+    },
+    "number": {
+      "type": "Must include digits",
+      "required": "Required"
+    },
+    "string": {
+      "required": "Required"
+    },
+    "searchBy": {
+      "required": "Search option is required"
+    },
+    "mobileNumber": {
+      "matchesRegex": "Enter a valid 10-digit mobile number",
+      "required": "Mobile number is required",
+      "valid": "Please enter a valid mobile number"
+    },
+    "cif": {
+      "matchesRegex": "Enter a valid 9-digit cif number",
+      "required": "CIF is required"
+    },
+    "account": {
+      "matchesRegex": "Enter a valid 14-digit account number",
+      "required": "Account number is required"
+    }
+  },
+  "sessionExpired": {
+    "message": "Your session has been expired."
+  },
+  "unauthorized": {
+    "title": "Unauthorized",
+    "message": "Your session has ended. Please log in again to continue."
+  },
+  "refreshEvent": {
+    "title": "Are you sure, you want to leave?"
+  },
+  "pageNotFound": {
+    "title": "Page Not Found",
+    "message": "The requested URL was not found on this server."
+  },
+  "footer": "© 2025 Bandhan Bank. All Rights Reserved"
+}

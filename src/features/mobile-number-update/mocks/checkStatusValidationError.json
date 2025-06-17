@@ -1,0 +1,14 @@
+{
+  "statusCode": 400,
+  "status": "Bad Request",
+  "message": "Validation failed",
+  "errors": [
+    {
+      "type": "field",
+      "value": "",
+      "msg": "Service Request Number Should Not Be Empty",
+      "path": "requestNumber",
+      "location": "body"
+    }
+  ]
+}

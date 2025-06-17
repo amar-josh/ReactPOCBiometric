@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<RDService status="READY" info="IDEMIA_L1_RDSERVICE">
+  <Interface id="CAPTURE" path="/capture"/>
+  <Interface id="DEVICEINFO" path="/getDeviceInfo"/>
+</RDService>

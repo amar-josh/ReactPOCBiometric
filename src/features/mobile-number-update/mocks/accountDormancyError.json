@@ -1,0 +1,9 @@
+{
+  "statusCode": 422,
+  "message": "",
+  "status": "failed",
+  "data": {
+    "action": "pop-up",
+    "actionCode": "ACCOUNT_DORMANCY"
+  }
+}

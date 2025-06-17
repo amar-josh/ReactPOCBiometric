@@ -1,0 +1,10 @@
+{
+  "statusCode": 200,
+  "status": "OK",
+  "message": "Data fetch successfully",
+  "data": {
+    "id": "42ae5acb-f14e-4d45-ad89-feb8d868f54d",
+    "service_request_number": "830892980613",
+    "is_verified": true
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "statusCode": 200,
+  "status": "success",
+  "message": "Data fetched successfully",
+  "data": [
+    {
+      "custDetails": {
+        "customerId": "324203728",
+        "customerName": "AMNAMIKA HAJHA OYOY",
+        "mobileNumber": "8373924018",
+        "aadharNumber": "666352640402"
+      },
+      "accDetails": [
+        {
+          "accountNumber": "20200033861589",
+          "productName": "504-SB Standard - 5000 AQB",
+          "isAccountDormant": false,
+          "isAccountInactive": false,
+          "accountOpenDate": "2025-05-07"
+        },
+        {
+          "accountNumber": "82000047836422",
+          "productName": "1003-FD Advantage Cumulative",
+          "isAccountDormant": false,
+          "isAccountInactive": false,
+          "accountOpenDate": "2025-05-31"
+        }
+      ],
+      "requestNumber": "BIS-MBUS-NIQ766Cs"
+    }
+  ]
+}

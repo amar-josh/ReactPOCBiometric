@@ -1,0 +1,26 @@
+{
+  "message": "",
+  "statusCode": 0,
+  "status": "success",
+  "data": {
+    "instaServices": [
+      {
+        "categoryId": 1,
+        "categoryName": "Banking",
+        "categoryDesc": "",
+        "categoryKey": "",
+        "categoryOrderValue": "",
+        "categoryIsActive": "",
+        "modules": [
+          {
+            "moduleId": 2,
+            "moduleName": "Re-KYC",
+            "moduleDesc": "Simplified & Aadhaar-linked address update based Re-KYC Journey for Individual Customers",
+            "moduleKey": "re_kyc",
+            "moduleOrderValue": ""
+          }
+        ]
+      }
+    ]
+  }
+}
