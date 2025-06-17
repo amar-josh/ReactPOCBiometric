@@ -26,7 +26,7 @@ import {
   reKycFormSchema,
 } from "../utils";
 import OtherDetailsForm from "./OtherDetailsForm";
-import ReKYCDetailsForm from "./ReKYCDetailsForm";
+import ReKYCDetailsForm from "./reKYCDetailsForm";
 
 interface IReKYCDetailsProps {
   reKYCDetails: IReKYCData;
