@@ -214,11 +214,7 @@ const BiometricFlow = ({
         return;
       }
 
-      if (
-        (errCode === "700" || errCode === "730") &&
-        (errInfo === "Capture timed out" ||
-          errInfo === "Capture Failed : Fake Finger Detected")
-      ) {
+      if (errCode === "700" || errCode === "730") {
         setBiometricDetails(
           getBiometricCardDetails({
             statusKey: BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
@@ -257,6 +253,9 @@ const BiometricFlow = ({
         // Handle error codes from finger print capture
         const { errCode, errInfo } =
           fingerPrintData?.PidData?.children?.[0]?.Resp || {};
+        alert(
+          `Error Data, ${JSON.stringify(fingerPrintData?.PidData?.children?.[0]?.Resp)}`
+        );
         if (errCode && errCode !== "0") {
           return handleFingerPrintCaptureError(errCode, errInfo);
         }

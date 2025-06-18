@@ -45,10 +45,10 @@ const ReKYC = () => {
   const { isAndroidWebView } = useDeviceDetection();
   const customerSearchRef = useRef<{ resetForm: () => void }>(null);
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(3);
   const [completed, setCompleted] = useState<{ [k: number]: boolean }>({
-    1: false,
-    2: false,
+    1: true,
+    2: true,
     3: false,
   });
 
