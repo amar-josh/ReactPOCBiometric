@@ -99,6 +99,7 @@ const BiometricFlow = ({
   const {
     mutate: captureFingerPrint,
     data: fingerPrintData,
+    isSuccess: isFingerPrintCaptureSuccess,
     isPending: isFingerPrintCaptureLoading,
     reset: resetCaptureFingerPrint,
     isError: isFingerPrintCaptureError,
@@ -248,10 +249,10 @@ const BiometricFlow = ({
   );
 
   useEffect(() => {
-    if (!isFingerPrintCaptureLoading) {
+    if (!isFingerPrintCaptureLoading && isFingerPrintCaptureSuccess) {
       if (fingerPrintData) {
         alert(
-          `Fingerprint in component ${JSON.stringify(fingerPrintData.PidData.children[0])}`
+          `Fingerprint in component ${JSON.stringify(fingerPrintData.PidData.children)}`
         );
         // Handle error codes from finger print capture
         const { errCode, errInfo } =
@@ -289,6 +290,7 @@ const BiometricFlow = ({
     handleFingerPrintCaptureSuccess,
     isFingerPrintCaptureError,
     biometricCount,
+    isFingerPrintCaptureSuccess
   ]);
 
   // check device status and update biometric status
