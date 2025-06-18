@@ -33,7 +33,9 @@ export const getBiometricDeviceStatusInWebView = async () => {
     console.log("response", response);
     const xmlText = response.data;
     const jsonData = convertXML(xmlText);
-    alert(`device status ${JSON.stringify(jsonData)}`);
+    alert(
+      `device status ${JSON.stringify(jsonData?.DeviceInfo?.dpId)} ${JSON.stringify(jsonData?.DeviceInfo?.rdsId)}`
+    );
     if (jsonData?.DeviceInfo?.dpId && jsonData?.DeviceInfo?.rdsId) {
       return "READY";
     } else {
