@@ -1,5 +1,5 @@
 const AES_ENCRYPTION_KEY_BASE64 = import.meta.env.VITE_ENCRYPTION_KEY;
-console.log("ENV FILE", AES_ENCRYPTION_KEY_BASE64);
+
 class AesDecryptionException extends Error {
   constructor(message: string, originalError?: Error) {
     super(message);
