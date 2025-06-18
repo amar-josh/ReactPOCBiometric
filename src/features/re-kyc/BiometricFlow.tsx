@@ -251,7 +251,7 @@ const BiometricFlow = ({
     if (!isFingerPrintCaptureLoading) {
       if (fingerPrintData) {
         alert(
-          `Fingerprint in component ${JSON.stringify(fingerPrintData?.PidData?.children)}`
+          `Fingerprint in component ${JSON.stringify(fingerPrintData?.PidData?.children[0])}`
         );
         // Handle error codes from finger print capture
         const { errCode, errInfo } =
