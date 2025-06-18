@@ -53,7 +53,8 @@ export const captureFingerPrintInWebView = async () => {
 
     const xmlText = response.data;
     const jsonData = convertXML(xmlText);
-    // alert(`FingerPrintcapture ${JSON.stringify(jsonData)}`);
+    alert(`XML ${xmlText}`);
+    // alert(`FingerPrintcapture ${JSON.stringify(jsonData.PidData)}`);
     return jsonData;
   } catch (err) {
     return err;
