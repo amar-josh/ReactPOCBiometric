@@ -4,7 +4,10 @@ import Layout from "@/layout";
 
 import PrivateRoute from "./components/PrivateRoutes";
 import { privateRoutes, publicRoute } from "./routesConfig";
-console.log("import.meta.env.VITE_BASE_URL", import.meta.env.VITE_BASE_URL);
+console.log(
+  "import.meta.env.VITE_BASE_URL in route file",
+  import.meta.env.VITE_BASE_URL
+);
 const RoutesComponent = () => {
   return (
     <BrowserRouter basename={import.meta.env.VITE_BASE_URL}>

@@ -266,7 +266,7 @@ const BiometricFlow = ({
         // handle success case
         const jsonString = JSON.stringify(fingerPrintData);
         const base64FingerPrintData = btoa(jsonString);
-
+        alert(`response success ${base64FingerPrintData}`);
         handleFingerPrintCaptureSuccess(base64FingerPrintData);
       } else if (isCaptureButtonClicked) {
         setBiometricStatus(BIOMETRIC_OPERATIONS.NO_FINGER_FOUND);
