@@ -6,17 +6,17 @@ import AlertMessage from "@/components/common/AlertMessage";
 import FullScreenLoader from "@/components/common/FullScreenLoader";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { ERROR, SUCCESS } from "@/constants/globalConstant";
-import { useAlertMessage } from "@/hooks/useAlertMessage";
+import { SUCCESS } from "@/constants/globalConstant";
 import translator from "@/i18n/translator";
 import { IAlertMessage } from "@/types";
 
-import { ICif, IGetCustomerSearchRequest } from "../types";
+import { ICustomerSearchResponse, IGetCustomerSearchRequest } from "../types";
 import AccountInfoCard from "./AccountInfoCard";
 import CustomerSearchForm from "./CustomerSearchForm";
 import EligibilityCard from "./EligibilityCard";
 
 interface ISearchCustomerComponentProps {
+  customerDetailsReset: () => void;
   customerSearchRef: RefObject<{
     resetForm: () => void;
   } | null>;
@@ -25,7 +25,7 @@ interface ISearchCustomerComponentProps {
   handleResetCustomerSearchAPI: () => void;
   isCustomerSearchSuccess: boolean;
   customerSearchAlertMessage: IAlertMessage;
-  accountDetails: ICif[] | undefined;
+  accountDetails: ICustomerSearchResponse[] | undefined;
   selected: string | undefined;
   setSelected: Dispatch<SetStateAction<string | undefined>>;
   hasDormantAccount: boolean | undefined;
@@ -95,7 +95,7 @@ const CustomerSearch = ({
             onValueChange={setSelected}
             className="flex flex-col gap-6"
           >
-            {accountDetails.map((data, index) => {
+            {accountDetails?.map((data, index) => {
               return (
                 <AccountInfoCard
                   key={index}
@@ -113,6 +113,12 @@ const CustomerSearch = ({
           <p className="text-sm">
             {translator("reKyc.allAccountsMappedGetsUpdated")}
           </p>
+          {hasDormantAccount && (
+            <AlertMessage
+              type="warning"
+              message={translator("reKyc.modal.dormantAccount")}
+            />
+          )}
           <div className="flex gap-3">
             <Button
               variant="primary"
@@ -129,12 +135,6 @@ const CustomerSearch = ({
             <AlertMessage
               type={customerDetailsErrorMessage.type}
               message={customerDetailsErrorMessage.message}
-            />
-          )}
-          {hasDormantAccount && (
-            <AlertMessage
-              type="warning"
-              message={translator("reKyc.modal.dormantAccount")}
             />
           )}
         </>

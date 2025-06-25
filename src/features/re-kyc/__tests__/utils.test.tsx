@@ -8,7 +8,6 @@ import {
   otherDetailsFormSchema,
   otherDetailsReadOnlySchema,
   otherDetailsValidationSchema,
-  reKYCFailureCheckpoints,
   reKycFormSchema,
 } from "@/features/re-kyc/utils";
 
@@ -59,12 +58,15 @@ describe("formatAddress", () => {
     const formatted = formatAddress({
       addressLine1: "Line 1",
       addressLine2: "Line 2",
+      addressLine3: "Line 3",
       city: "City",
       state: "State",
       country: "Country",
-      pincode: "123456",
+      pincode: 123456,
     });
-    expect(formatted).toBe("Line 1, Line 2, City, State, Country, 123456");
+    expect(formatted).toBe(
+      "Line 1, Line 2, Line 3, City, State, Country, 123456"
+    );
   });
 });
 
@@ -95,8 +97,17 @@ describe("otherDetailsValidationSchema", () => {
         incomeRange: "",
         residentType: "",
       });
-    } catch (e: any) {
-      expect(e.errors.length).toBe(1);
+    } catch (e: unknown) {
+      if (
+        typeof e === "object" &&
+        e !== null &&
+        "errors" in e &&
+        Array.isArray((e as { errors: unknown }).errors)
+      ) {
+        expect((e as { errors: unknown[] }).errors.length).toBe(1);
+      } else {
+        throw e;
+      }
     }
   });
 

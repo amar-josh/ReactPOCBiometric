@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { RadioGroup } from "@/components/ui/radio-group";
 
 import AccountInfoCard from "../components/AccountInfoCard";
+import { ICustomerDetails } from "../types";
 
 vi.mock("@/i18n/translator", () => ({
   default: (key: string) => key,
@@ -46,7 +47,7 @@ describe("AccountInfoCard", () => {
         <AccountInfoCard
           selected={false}
           accounts={mockAccounts}
-          customerDetails={mockCustomer}
+          customerDetails={mockCustomer as ICustomerDetails}
         />
       </RadioGroup>
     );
@@ -64,7 +65,7 @@ describe("AccountInfoCard", () => {
         <AccountInfoCard
           selected={false}
           accounts={mockAccounts}
-          customerDetails={mockCustomer}
+          customerDetails={mockCustomer as ICustomerDetails}
         />
       </RadioGroup>
     );
@@ -82,7 +83,7 @@ describe("AccountInfoCard", () => {
           selected={false}
           accounts={mockAccounts}
           onSelect={onSelect}
-          customerDetails={mockCustomer}
+          customerDetails={mockCustomer as ICustomerDetails}
         />
       </RadioGroup>
     );

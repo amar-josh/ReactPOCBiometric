@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import BiometricVerificationComponent from "../components/BiometricVerification";
+import { IBiometricCardKey } from "../types";
 
 // Mock translator
 vi.mock("@/i18n/translator", () => ({
@@ -11,7 +12,13 @@ vi.mock("@/i18n/translator", () => ({
 // Mock AadhaarConsentModal
 vi.mock("@/components/common/AadhaarConsentModal", () => ({
   __esModule: true,
-  default: ({ handleProceed, onClose }: any) => (
+  default: ({
+    handleProceed,
+    onClose,
+  }: {
+    handleProceed: () => void;
+    onClose: () => void;
+  }) => (
     <div>
       <p>Aadhaar Consent Modal</p>
       <button onClick={handleProceed}>Proceed Consent</button>
@@ -23,7 +30,7 @@ vi.mock("@/components/common/AadhaarConsentModal", () => ({
 // Mock AlertDialogComponent
 vi.mock("@/components/common/AlertDialogComponent", () => ({
   __esModule: true,
-  default: ({ onConfirm }: any) => (
+  default: ({ onConfirm }: { onConfirm: (action: string) => void }) => (
     <div>
       <p>Biometric Modal</p>
       <button onClick={() => onConfirm("proceed")}>Confirm Biometric</button>
@@ -84,12 +91,15 @@ describe("BiometricVerificationComponent", () => {
   });
 
   it("renders Biometric modal when open and calls confirm handler", () => {
+    // Use a valid IBiometricCardKey value for the key property
+    // Import or define IBiometricCardKey if not already imported
+
     const biometricDetails = {
       isError: false,
       title: "Sample Title",
       message: "Sample message",
       icon: "sample-icon",
-      key: "sample-key",
+      key: "success" as IBiometricCardKey, // Use the actual IBiometricCardKey union type
       buttonText: "Proceed",
     };
 

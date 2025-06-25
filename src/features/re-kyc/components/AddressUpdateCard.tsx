@@ -1,17 +1,12 @@
 import { useState } from "react";
 
-import AlertMessage from "@/components/common/AlertMessage";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { ERROR } from "@/constants/globalConstant";
-import { useAlertMessage } from "@/hooks/useAlertMessage";
 import translator from "@/i18n/translator";
-import { IAlertMessage } from "@/types";
 
 import {
   IAddress,
-  IBiometricApiDataSuccess,
   IFormDetailsSchema,
   IPersonalDetails,
   IValidateFingerPrintResponse,
@@ -30,13 +25,9 @@ interface IAddressUpdateCardProps {
   validateFingerPrintResponse: IValidateFingerPrintResponse | undefined;
   handleAddressConfirmed: () => void;
   onCancel: () => void;
-  isUpdateKYCError: boolean;
-  updateKYCError: { message: string };
 }
 
 const AddressUpdateCard = ({
-  isUpdateKYCError,
-  updateKYCError,
   personalDetails,
   formDetails,
   communicationAddress,
@@ -45,12 +36,6 @@ const AddressUpdateCard = ({
   onCancel,
 }: IAddressUpdateCardProps) => {
   const [agreed, setAgreed] = useState<boolean>(false);
-
-  const { alertMessage } = useAlertMessage(
-    ERROR,
-    updateKYCError?.message,
-    isUpdateKYCError
-  );
 
   return (
     <>
@@ -74,15 +59,12 @@ const AddressUpdateCard = ({
       <h4>{translator("formFields.communicationAddress")}</h4>
       <CommunicationAddressComponent
         title={translator("reKyc.biometric.previousAddress")}
-        description={communicationAddress}
+        address={communicationAddress}
         isSelected={false}
       />
       <CommunicationAddressComponent
         title={translator("reKyc.biometric.newAddress")}
-        description={
-          (validateFingerPrintResponse?.data as IBiometricApiDataSuccess)
-            ?.aadhaarAddress
-        }
+        address={validateFingerPrintResponse?.data?.aadhaarAddress}
         isSelected={true}
       />
       <div className="flex items-start gap-2">
@@ -109,9 +91,6 @@ const AddressUpdateCard = ({
           {translator("button.cancel")}
         </Button>
       </div>
-      {alertMessage.message && (
-        <AlertMessage type={alertMessage.type} message={alertMessage.message} />
-      )}
     </>
   );
 };

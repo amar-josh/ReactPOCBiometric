@@ -1,12 +1,5 @@
-import { UseMutateFunction } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   useCaptureFingerprint,
@@ -16,7 +9,6 @@ import {
 import {
   IBiometricCardDetails,
   IValidateFingerPrintRequest,
-  IValidateFingerPrintResponse,
 } from "@/features/re-kyc/types";
 import { useDeviceDetection } from "@/hooks/useDeviceDetection";
 
@@ -33,21 +25,15 @@ interface IBiometricFlowProps {
   updateStep: (success: boolean) => void;
   aadhaarNumber: string;
   isAddressUpdate: boolean;
-  requestNumber: string | null;
-  validateFingerPrintMutate: UseMutateFunction<
-    IValidateFingerPrintResponse,
-    Error,
-    IValidateFingerPrintRequest,
-    unknown
-  >;
+  requestNumber: string;
+  handleValidateFingerPrint: (payload: IValidateFingerPrintRequest) => void;
   handleAddressConfirmed: () => void;
-  biometricStatus: string;
   serviceRequestNumber?: string;
-  setBiometricStatus: Dispatch<SetStateAction<string>>;
   isValidateFingerPrintError: boolean;
   isValidateFingerPrintLoading: boolean;
   validateFingerPrintError: AxiosError | Error | null;
-  mobileNo?: string | undefined;
+  validateFingerPrintReset: () => void;
+  isAadhaarVerificationComplete: boolean;
 }
 
 const BiometricFlow = ({
@@ -59,28 +45,41 @@ const BiometricFlow = ({
   isAddressUpdate,
   isValidateFingerPrintLoading,
   requestNumber,
-  validateFingerPrintMutate,
+  handleValidateFingerPrint,
   handleAddressConfirmed,
-  biometricStatus,
-  setBiometricStatus,
-  mobileNo,
+  validateFingerPrintReset,
+  isAadhaarVerificationComplete,
 }: IBiometricFlowProps) => {
   const { isAndroidWebView } = useDeviceDetection();
-  const [isBiometricFlowDone, setIsBiometricFlowDone] = useState(false); // step 3 has 2 parts biometric modals and viewmode table and end card
-  const [biometricCount, setBiometricCount] = useState(3); // only 3 chances
-  const [isBiometricModalOpen, setIsBiometricModalOpen] = useState(false); // biometric modal flow
-  const [biometricDetails, setBiometricDetails] =
-    useState<IBiometricCardDetails | null>(null);
-  // what to show on biometric modal
-  const [isAadhaarConsentOpen, setIsAadhaarConsentOpen] = useState(false); // aadhaar consent modal
+  const [attemptCount, setAttemptCount] = useState(3);
+  const [isBiometricModalOpen, setIsBiometricModalOpen] = useState(false);
+  const [hasAttemptFailed, setHasAttemptFailed] = useState(false);
+  const [isAadhaarConsentOpen, setIsAadhaarConsentOpen] = useState(false);
+  const [biometricModalDetails, setBiometricModalDetails] =
+    useState<IBiometricCardDetails | null>(
+      getBiometricCardDetails({
+        statusKey: isAndroidWebView
+          ? BIOMETRIC_OPERATIONS.DEVICE_NOT_READY
+          : BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS,
+        count: attemptCount,
+      }) as IBiometricCardDetails
+    );
 
-  const [isCaptureButtonClicked, setIsCaptureButtonClicked] = useState(false);
+  const updateBiometricModalDetails = useCallback(
+    (statusKey: string, count: number) => {
+      setBiometricModalDetails(
+        getBiometricCardDetails({ statusKey, count }) as IBiometricCardDetails
+      );
+    },
+    []
+  );
 
   // Check RD service status hook
   const {
     mutate: getRDServiceStatus,
     data: rdServiceStatusData,
     isPending: isRDServiceStatusLoading,
+    isSuccess: isRDServiceStatusSuccess,
     isError: isRDServiceStatusError,
     error: rdServiceStatusError,
     reset: resetRDServiceStatus,
@@ -91,6 +90,7 @@ const BiometricFlow = ({
     mutate: getDeviceStatus,
     data: deviceStatusData,
     isPending: isDeviceStatusLoading,
+    isSuccess: isDeviceStatusSuccess,
     reset: resetDeviceStatus,
     isError: isDeviceStatusError,
   } = useGetDeviceStatus();
@@ -99,78 +99,105 @@ const BiometricFlow = ({
   const {
     mutate: captureFingerPrint,
     data: fingerPrintData,
-    isSuccess: isFingerPrintCaptureSuccess,
     isPending: isFingerPrintCaptureLoading,
-    reset: resetCaptureFingerPrint,
+    isSuccess: isFingerPrintCaptureSuccess,
     isError: isFingerPrintCaptureError,
+    reset: resetCaptureFingerPrint,
   } = useCaptureFingerprint();
 
-  // check if RD service is available
-  const checkRDServiceStatus = () => {
-    getRDServiceStatus();
-    setBiometricDetails(
-      getBiometricCardDetails({
-        statusKey: BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS,
-        count: biometricCount,
-      }) as IBiometricCardDetails
+  // retry to get Device Status
+  const retryDeviceStatus = () => getDeviceStatus();
+
+  const handleCheckRDServiceStatus = () => {
+    resetRDServiceStatus();
+    updateBiometricModalDetails(
+      BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS,
+      attemptCount
     );
+    getRDServiceStatus();
   };
 
-  useEffect(() => {
-    if (rdServiceStatusData && !isRDServiceStatusLoading) {
-      if (rdServiceStatusData) {
-        // RD service is available, checking device status
-        resetRDServiceStatus();
-        getDeviceStatus();
-      }
+  const handleConsentApproved = () => {
+    setIsAadhaarConsentOpen(false);
+    setIsBiometricModalOpen(true);
+    if (isAndroidWebView) {
+      retryDeviceStatus();
+    } else {
+      resetRDServiceStatus();
+      getRDServiceStatus();
     }
+  };
 
-    if (isRDServiceStatusError && rdServiceStatusError) {
-      // RD service not available, show error
-      setBiometricDetails(
-        getBiometricCardDetails({
-          statusKey: BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_ERROR,
-          count: biometricCount,
-        }) as IBiometricCardDetails
-      );
+  // RD service is available, checking device status
+  useEffect(() => {
+    if (isRDServiceStatusSuccess && rdServiceStatusData) {
+      resetRDServiceStatus();
+      getDeviceStatus();
     }
   }, [
-    rdServiceStatusData,
-    isRDServiceStatusLoading,
-    rdServiceStatusError,
     getDeviceStatus,
-    biometricCount,
-    setBiometricStatus,
-    isRDServiceStatusError,
+    isRDServiceStatusSuccess,
+    rdServiceStatusData,
     resetRDServiceStatus,
   ]);
 
-  // retry to get Device Status
-  const retryDeviceNotReady = () => {
-    getDeviceStatus();
-  };
+  // RD service not available
+  useEffect(() => {
+    if (isRDServiceStatusError && rdServiceStatusError) {
+      updateBiometricModalDetails(
+        BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_ERROR,
+        attemptCount
+      );
+    }
+  }, [
+    attemptCount,
+    isRDServiceStatusError,
+    rdServiceStatusError,
+    updateBiometricModalDetails,
+  ]);
+
+  // Handle Device Status
+  useEffect(() => {
+    if (hasAttemptFailed) return;
+    if (isDeviceStatusSuccess && deviceStatusData) {
+      const operationMode =
+        deviceStatusData === BIOMETRIC_DEVICE_STATUS.READY
+          ? BIOMETRIC_OPERATIONS.READY_TO_CAPTURE
+          : BIOMETRIC_OPERATIONS.DEVICE_NOT_READY;
+      updateBiometricModalDetails(operationMode, attemptCount);
+    }
+    if (isDeviceStatusError) {
+      updateBiometricModalDetails(
+        BIOMETRIC_OPERATIONS.DEVICE_NOT_READY,
+        attemptCount
+      );
+    }
+  }, [
+    attemptCount,
+    deviceStatusData,
+    hasAttemptFailed,
+    isDeviceStatusError,
+    isDeviceStatusSuccess,
+    updateBiometricModalDetails,
+  ]);
 
   const handleBiometricModalAction = (action: string) => {
+    setHasAttemptFailed(false);
     switch (action) {
       case BIOMETRIC_MODAL_ACTIONS.RETRY_RD_SERVICE:
-        resetRDServiceStatus();
-        checkRDServiceStatus();
+        handleCheckRDServiceStatus();
         break;
+      case BIOMETRIC_MODAL_ACTIONS.RECAPTURE:
       case BIOMETRIC_MODAL_ACTIONS.RETRY_DEVICE:
         resetCaptureFingerPrint();
         resetDeviceStatus();
-        retryDeviceNotReady();
+        retryDeviceStatus();
         break;
       case BIOMETRIC_MODAL_ACTIONS.CLOSE:
         onClose();
         break;
       case BIOMETRIC_MODAL_ACTIONS.CAPTURE:
         captureFingerPrint();
-        setIsCaptureButtonClicked(true); // when button clicked, updating to avoid showing no finger found initially
-        setBiometricCount((prev) => prev - 1);
-        break;
-      case BIOMETRIC_MODAL_ACTIONS.RECAPTURE:
-        retryDeviceNotReady();
         break;
       case BIOMETRIC_MODAL_ACTIONS.HOME:
         onCancel();
@@ -183,6 +210,7 @@ const BiometricFlow = ({
   // only in case of success, clsoe the modal and show the profile, tabel and address
   const onClose = () => {
     setIsBiometricModalOpen(false);
+    updateStep(true);
     if (!isAddressUpdate) {
       handleAddressConfirmed();
     }
@@ -192,162 +220,108 @@ const BiometricFlow = ({
     setIsAadhaarConsentOpen(true);
   };
 
-  const handleConsentApproved = () => {
-    setIsAadhaarConsentOpen(false);
-    setIsBiometricModalOpen(true);
-    if (isAndroidWebView) {
-      retryDeviceNotReady();
-    } else {
-      resetRDServiceStatus();
-      checkRDServiceStatus();
-    }
-  };
-
-  const handleFingerPrintCaptureError = useCallback(
-    (errCode: string, errInfo: string) => {
-      if (errCode === "720" && errInfo === "Device Not Ready") {
-        setBiometricDetails(
-          getBiometricCardDetails({
-            statusKey: BIOMETRIC_OPERATIONS.DEVICE_NOT_READY,
-            count: biometricCount,
-          }) as IBiometricCardDetails
-        );
-        return;
-      }
-
-      if (errCode === "700" || errCode === "730") {
-        setBiometricDetails(
-          getBiometricCardDetails({
-            statusKey: BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
-            count: biometricCount,
-          }) as IBiometricCardDetails
-        );
-        return;
-      }
-      // If any other error occurs than above, handled in generic way
-      setBiometricDetails(
-        getBiometricCardDetails({
-          statusKey: "default",
-          count: biometricCount,
-        }) as IBiometricCardDetails
-      );
-    },
-    [biometricCount]
-  );
-
   const handleFingerPrintCaptureSuccess = useCallback(
     (base64FingerPrintData: string) => {
       const payload = {
         aadhaarNumber: aadhaarNumber,
         rdServiceData: base64FingerPrintData,
         requestNumber: requestNumber,
-        ...(mobileNo && { mobileNo }),
       };
-      validateFingerPrintMutate(payload as IValidateFingerPrintRequest);
+      handleValidateFingerPrint(payload);
     },
-    [aadhaarNumber, mobileNo, requestNumber, validateFingerPrintMutate]
+    [aadhaarNumber, handleValidateFingerPrint, requestNumber]
   );
 
   useEffect(() => {
-    if (!isFingerPrintCaptureLoading && isFingerPrintCaptureSuccess) {
-      if (fingerPrintData) {
-        alert(
-          `Fingerprint in component ${JSON.stringify(fingerPrintData.PidData.children)}`
-        );
-        // Handle error codes from finger print capture
-        const { errCode, errInfo } =
-          fingerPrintData?.PidData?.children?.[0]?.Resp || {};
-        alert(
-          `Error Data, ${JSON.stringify(fingerPrintData?.PidData?.children?.[0]?.Resp)}`
-        );
-        if (errCode && errCode !== "0") {
-          return handleFingerPrintCaptureError(errCode, errInfo);
-        }
+    if (isAadhaarVerificationComplete) {
+      updateBiometricModalDetails(BIOMETRIC_OPERATIONS.SUCCESS, attemptCount);
+    }
+  }, [
+    attemptCount,
+    isAadhaarVerificationComplete,
+    updateBiometricModalDetails,
+  ]);
 
-        // handle success case
+  const processCaptureError = useCallback(
+    (code: string) => {
+      const operationMap: Record<string, string> = {
+        "720": BIOMETRIC_OPERATIONS.DEVICE_NOT_READY,
+        "700": BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
+        "730": BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
+        "710": BIOMETRIC_OPERATIONS.DEVICE_USED_BY_ANOTHER_APPLICATION,
+      };
+      updateBiometricModalDetails(
+        operationMap[code] || BIOMETRIC_OPERATIONS.DEFAULT,
+        attemptCount
+      );
+    },
+    [attemptCount, updateBiometricModalDetails]
+  );
+
+  // Handle fingerprint capture success
+  useEffect(() => {
+    if (isFingerPrintCaptureSuccess && fingerPrintData) {
+      let errCode = null;
+      const childrenArray = fingerPrintData?.PidData?.children;
+
+      if (childrenArray && Array.isArray(childrenArray)) {
+        const respContainer = childrenArray.find((child) => child.Resp);
+        if (respContainer && respContainer.Resp) {
+          errCode = respContainer.Resp.errCode;
+        }
+      }
+
+      // Handle error code which comes in fingerprint capture success response
+      if (errCode && errCode !== "0") {
+        resetCaptureFingerPrint();
+        processCaptureError(errCode);
+      } else {
+        // Handle success case
         const jsonString = JSON.stringify(fingerPrintData);
         const base64FingerPrintData = btoa(jsonString);
-        alert(`response success ${base64FingerPrintData}`);
         handleFingerPrintCaptureSuccess(base64FingerPrintData);
-      } else if (isCaptureButtonClicked) {
-        setBiometricStatus(BIOMETRIC_OPERATIONS.NO_FINGER_FOUND);
+        resetCaptureFingerPrint();
       }
     }
-    if (isFingerPrintCaptureError) {
-      setBiometricDetails(
-        getBiometricCardDetails({
-          statusKey: "default",
-          count: biometricCount,
-        }) as IBiometricCardDetails
-      );
-    }
   }, [
-    isFingerPrintCaptureLoading,
+    isFingerPrintCaptureSuccess,
     fingerPrintData,
-    isCaptureButtonClicked,
-    setBiometricStatus,
-    handleFingerPrintCaptureError,
     handleFingerPrintCaptureSuccess,
-    isFingerPrintCaptureError,
-    biometricCount,
-    isFingerPrintCaptureSuccess
+    resetCaptureFingerPrint,
+    processCaptureError,
   ]);
 
-  // check device status and update biometric status
+  // Handle fingerprint capture error response
   useEffect(() => {
-    if (deviceStatusData && !isDeviceStatusLoading) {
-      if (deviceStatusData === BIOMETRIC_DEVICE_STATUS.NOT_READY) {
-        setBiometricStatus(BIOMETRIC_OPERATIONS.DEVICE_NOT_READY);
-      }
-      if (deviceStatusData === BIOMETRIC_DEVICE_STATUS.READY) {
-        setBiometricStatus(BIOMETRIC_OPERATIONS.READY_TO_CAPTURE);
-      }
+    if (isFingerPrintCaptureError) {
+      updateBiometricModalDetails(BIOMETRIC_OPERATIONS.DEFAULT, attemptCount);
     }
-    if (isDeviceStatusError) {
-      setBiometricStatus(BIOMETRIC_OPERATIONS.DEVICE_NOT_READY);
-    }
-  }, [
-    biometricCount,
-    deviceStatusData,
-    isDeviceStatusError,
-    isDeviceStatusLoading,
-    setBiometricStatus,
-  ]);
+  }, [attemptCount, isFingerPrintCaptureError, updateBiometricModalDetails]);
 
+  // Handle validate fingerprint error
   useEffect(() => {
     if (isValidateFingerPrintError) {
-      setBiometricDetails(
-        getBiometricCardDetails({
-          statusKey: validateFingerPrintError?.message,
-          count: biometricCount,
-        }) as IBiometricCardDetails
-      );
-    } else {
-      setBiometricDetails(
-        getBiometricCardDetails({
-          statusKey: biometricStatus,
-          count: biometricCount,
-        }) as IBiometricCardDetails
-      );
+      setHasAttemptFailed(true);
+      const isAttemptFailedPopUp =
+        (validateFingerPrintError as any)?.data?.action === "pop-up";
+      if (isAttemptFailedPopUp) {
+        setAttemptCount((prev) => prev - 1);
+        updateBiometricModalDetails(
+          BIOMETRIC_OPERATIONS.ATTEMPT_FAILED,
+          attemptCount - 1
+        );
+      } else {
+        updateBiometricModalDetails(BIOMETRIC_OPERATIONS.DEFAULT, attemptCount);
+      }
+      validateFingerPrintReset();
     }
   }, [
-    biometricStatus,
-    biometricCount,
+    attemptCount,
     isValidateFingerPrintError,
-    validateFingerPrintError?.message,
+    updateBiometricModalDetails,
+    validateFingerPrintError,
+    validateFingerPrintReset,
   ]);
-
-  useEffect(() => {
-    if (!isBiometricModalOpen && isCaptureButtonClicked) {
-      setIsBiometricFlowDone(true);
-    }
-  }, [isBiometricModalOpen, isCaptureButtonClicked]);
-
-  useEffect(() => {
-    if (isBiometricFlowDone) {
-      updateStep(true);
-    }
-  }, [isBiometricFlowDone, updateStep]);
 
   return (
     <BiometricVerificationComponent
@@ -358,9 +332,10 @@ const BiometricFlow = ({
       setIsAadhaarConsentOpen={setIsAadhaarConsentOpen}
       isBiometricModalOpen={isBiometricModalOpen}
       isAadhaarConsentOpen={isAadhaarConsentOpen}
-      biometricDetails={biometricDetails}
+      biometricDetails={biometricModalDetails}
       handleBiometricModalAction={handleBiometricModalAction}
       isPending={
+        isRDServiceStatusLoading ||
         isDeviceStatusLoading ||
         isFingerPrintCaptureLoading ||
         isValidateFingerPrintLoading

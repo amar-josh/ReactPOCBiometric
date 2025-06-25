@@ -1,17 +1,19 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   useCaptureFingerprint,
   useCustomerDetails,
   useCustomerSearch,
-  useGetDeviceStatus,
   useGetOtherDropdownDetails,
   useUpdateKYC,
   useValidateFingerprint,
 } from "@/features/re-kyc/hooks";
-import * as service from "@/features/re-kyc/services";
+import * as services from "@/features/re-kyc/services";
+
+import otherDetailsMockData from "./../mocks/otherDetails.json";
+import reKYCDetailMockData from "./../mocks/reKYCDetails.json";
 
 const createWrapper = () => {
   const queryClient = new QueryClient();
@@ -20,43 +22,118 @@ const createWrapper = () => {
   );
 };
 
+vi.mock("../services", () => ({
+  getCustomerSearchService: vi.fn(),
+  updateKYC: vi.fn(),
+  captureFingerPrint: vi.fn(),
+  validateFingerprint: vi.fn(),
+  getCustomerDetailsService: vi.fn(),
+  getOtherDetailsDropdownService: vi.fn(),
+}));
+
 describe("Re-KYC Custom Hooks", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it("calls getCustomerSearchService via useCustomerSearch", async () => {
-    const mockResponse = { customerId: "123" };
-    vi.spyOn(service, "getCustomerSearchService").mockResolvedValue(
-      mockResponse
-    );
+    const mockResponse = {
+      customerId: "123",
+      custDetails: {
+        customerId: "123",
+        customerName: "John Doe",
+        mobileNumber: "9876543210",
+        email: "john.doe@example.com",
+        isIndividual: true,
+      },
+      accDetails: [],
+    };
+    (services.getCustomerSearchService as any).mockResolvedValue(mockResponse);
 
     const { result } = renderHook(() => useCustomerSearch(), {
       wrapper: createWrapper(),
     });
 
-    result.current.mutate({ cif: "123" });
+    const payload = { customerID: 123 };
+    await act(() => result.current.mutateAsync(payload));
 
-    await waitFor(() => {
-      expect(service.getCustomerSearchService).toHaveBeenCalledWith({
-        cif: "123",
-      });
-    });
+    await waitFor(() => expect(result.current.data).toEqual(mockResponse));
+    expect(services.getCustomerSearchService).toHaveBeenCalledWith(payload);
   });
 
   it("calls updateKYC via useUpdateKYC", async () => {
-    const mockResponse = { status: "success" };
-    vi.spyOn(service, "updateKYC").mockResolvedValue(mockResponse);
-
+    const mockResponse = {
+      message: "KYC updated successfully",
+      statusCode: 200,
+      status: "success",
+      timestamp: new Date().toISOString(),
+      path: "/update-kyc",
+      data: { requestNumber: "REQ123" },
+    };
+    (services.updateKYC as any).mockResolvedValue(mockResponse);
     const { result } = renderHook(() => useUpdateKYC(), {
       wrapper: createWrapper(),
     });
+    const mockReKYCRequest = {
+      requestNumber: "REQ1234567890",
+      makerDetails: {
+        initiatedBy: "John Doe",
+        empId: "EMP00123",
+        empBranchCode: "BR1234",
+      },
+      isOtherDetailsChange: true,
+      kycNoChange: false,
+      rekycDetails: {
+        customerName: "Jane Smith",
+        aadhaarNumber: "1234-5678-9012",
+        aadhaarRefNumber: "REF9876543210",
+        customerID: "CUST0001",
+        mobileNo: "9876543210",
+        emailId: "jane.smith@example.com",
+        permanentAddress: {
+          addressLine1: "123 Main Street",
+          addressLine2: "Apt 4B",
+          addressLine3: "Apt 4B",
+          landmark: "Near City Park",
+          city: "Mumbai",
+          district: "Mumbai",
+          state: "Maharashtra",
+          pincode: 400001,
+          country: "India",
+        },
+        communicationAddress: {
+          addressLine1: "456 Secondary Street",
+          addressLine2: "Suite 12",
+          addressLine3: "Suite 12",
+          landmark: "Opposite Mall",
+          city: "Pune",
+          district: "Pune",
+          state: "Maharashtra",
+          pincode: 411001,
+          country: "India",
+        },
+        aadhaarCommunicationAddress: {
+          addressLine1: "789 Aadhaar Lane",
+          addressLine2: "",
+          addressLine3: "",
+          landmark: "Near Government Office",
+          city: "Nagpur",
+          district: "Nagpur",
+          state: "Maharashtra",
+          pincode: 440001,
+          country: "India",
+        },
+        otherDetails: {
+          occupation: 2,
+          incomeRange: 3,
+          residentType: 1,
+        },
+      },
+    };
+    await act(() => result.current.mutateAsync(mockReKYCRequest));
 
-    result.current.mutate({ cif: "999" });
-
-    await waitFor(() => {
-      expect(service.updateKYC).toHaveBeenCalledWith({ cif: "999" });
-    });
+    await waitFor(() => expect(result.current.data).toEqual(mockResponse));
+    expect(services.updateKYC).toHaveBeenCalledWith(mockReKYCRequest);
   });
 
   // TODO -  undefined is not a spy or a call to a spy!
@@ -76,72 +153,104 @@ describe("Re-KYC Custom Hooks", () => {
   // });
 
   it("calls captureFingerPrint via useCaptureFingerprint", async () => {
-    const mockResponse = { status: "captured" };
-    vi.spyOn(service, "captureFingerPrint").mockResolvedValue(mockResponse);
+    const mockResponse = { xml: "captured" };
+    (services.captureFingerPrint as any).mockResolvedValue(mockResponse);
 
     const { result } = renderHook(() => useCaptureFingerprint(), {
       wrapper: createWrapper(),
     });
 
-    result.current.mutate({ deviceId: "xyz" });
-
-    await waitFor(() => {
-      expect(service.captureFingerPrint).toHaveBeenCalledWith({
-        deviceId: "xyz",
-      });
+    await act(async () => {
+      await result.current.mutateAsync();
     });
+
+    await waitFor(() => expect(result.current.data).toEqual(mockResponse));
+
+    expect(services.captureFingerPrint).toHaveBeenCalled();
   });
 
   it("calls validateFingerprint via useValidateFingerprint", async () => {
-    const mockResponse = { valid: true };
-    vi.spyOn(service, "validateFingerprint").mockResolvedValue(mockResponse);
+    const mockAadhaarVerificationResponse = {
+      message: "Aadhaar verification successful",
+      statusCode: 200,
+      status: "SUCCESS",
+      data: {
+        aadhaarVerification: "VERIFIED",
+        requestNumber: "REQ1234567890",
+        aadhaarAddress: {
+          addressLine1: "789 Aadhaar Lane",
+          addressLine2: "",
+          addressLine3: "",
+          landmark: "Near Government Office",
+          city: "Nagpur",
+          district: "Nagpur",
+          state: "Maharashtra",
+          pincode: 440001,
+          country: "India",
+        },
+      },
+    };
+
+    const mockAadhaarRequestPayload = {
+      aadhaarNumber: "1234-5678-9012",
+      rdServiceData: "<RDService><DeviceInfo>...</DeviceInfo></RDService>",
+      requestNumber: "REQ1234567890",
+      mobileNo: "9876543210",
+    };
+
+    (services.validateFingerprint as any).mockResolvedValue(
+      mockAadhaarVerificationResponse
+    );
 
     const { result } = renderHook(() => useValidateFingerprint(), {
       wrapper: createWrapper(),
     });
 
-    result.current.mutate({ fingerprintData: "123abc" });
+    await act(() => result.current.mutateAsync(mockAadhaarRequestPayload));
 
-    await waitFor(() => {
-      expect(service.validateFingerprint).toHaveBeenCalledWith({
-        fingerprintData: "123abc",
-      });
-    });
+    await waitFor(() =>
+      expect(result.current.data).toEqual(mockAadhaarVerificationResponse)
+    );
+    expect(services.validateFingerprint).toHaveBeenCalledWith(
+      mockAadhaarRequestPayload
+    );
   });
 
   it("calls getCustomerDetailsService via useCustomerDetails", async () => {
-    const mockResponse = { name: "John Doe" };
-    vi.spyOn(service, "getCustomerDetailsService").mockResolvedValue(
-      mockResponse
+    (services.getCustomerDetailsService as any).mockResolvedValue(
+      reKYCDetailMockData
     );
 
     const { result } = renderHook(() => useCustomerDetails(), {
       wrapper: createWrapper(),
     });
 
-    result.current.mutate({ customerId: "abc" });
+    const payload = {
+      customerID: "adsfas",
+    };
+    await act(() => result.current.mutateAsync(payload));
 
-    await waitFor(() => {
-      expect(service.getCustomerDetailsService).toHaveBeenCalledWith({
-        customerId: "abc",
-      });
-    });
+    await waitFor(() =>
+      expect(result.current.data).toEqual(reKYCDetailMockData)
+    );
+    expect(services.getCustomerDetailsService).toHaveBeenCalledWith(payload);
   });
 
   it("calls getOtherDetailsDropdownService via useGetOtherDropdownDetails", async () => {
-    const mockResponse = { data: ["option1", "option2"] };
-    vi.spyOn(service, "getOtherDetailsDropdownService").mockResolvedValue(
-      mockResponse
+    (services.getOtherDetailsDropdownService as any).mockResolvedValue(
+      otherDetailsMockData
     );
 
     const { result } = renderHook(() => useGetOtherDropdownDetails(), {
       wrapper: createWrapper(),
     });
 
-    result.current.mutate();
-
-    await waitFor(() => {
-      expect(service.getOtherDetailsDropdownService).toHaveBeenCalled();
+    await act(async () => {
+      await result.current.mutateAsync();
     });
+    await waitFor(() =>
+      expect(result.current.data).toEqual(otherDetailsMockData)
+    );
+    expect(services.getOtherDetailsDropdownService).toHaveBeenCalled();
   });
 });

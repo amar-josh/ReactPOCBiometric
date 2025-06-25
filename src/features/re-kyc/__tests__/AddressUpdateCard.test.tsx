@@ -36,18 +36,35 @@ describe("AddressUpdateCard", () => {
     },
     communicationAddress: {
       addressLine1: "Old Address Line 1",
+      addressLine2: "new lane",
+      addressLine3: "",
+      city: "Mumbai",
+      state: "Maharashtra",
+      pincode: 400001,
+      country: "India",
     },
     validateFingerPrintResponse: {
       data: {
+        aadhaarVerification: "verified",
+        requestNumber: "REQ123456",
         aadhaarAddress: {
           addressLine1: "New Address Line 1",
+          addressLine2: "New Address Line 2",
+          addressLine3: "",
+          city: "New City",
+          state: "New State",
+          pincode: 123456,
+          country: "India",
         },
       },
+      message: "",
+      statusCode: 200,
+      status: "success",
     },
     handleAddressConfirmed: vi.fn(),
     onCancel: vi.fn(),
     isUpdateKYCError: false,
-    updateKYCError: { message: "" },
+    updateKYCError: { name: "Error", message: "" },
   };
 
   it("renders all sections correctly", () => {
@@ -99,17 +116,5 @@ describe("AddressUpdateCard", () => {
     // Click cancel
     fireEvent.click(screen.getByRole("button", { name: "button.cancel" }));
     expect(defaultProps.onCancel).toHaveBeenCalled();
-  });
-
-  it("shows alert when there is an update KYC error", () => {
-    render(
-      <AddressUpdateCard
-        {...defaultProps}
-        isUpdateKYCError={true}
-        updateKYCError={{ message: "Something went wrong" }}
-      />
-    );
-
-    expect(screen.getByText("Something went wrong")).toBeInTheDocument();
   });
 });

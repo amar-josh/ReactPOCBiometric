@@ -34,7 +34,10 @@ interface IOtherDetailsFormValues {
 }
 
 const Wrapper = (
-  props: Partial<{ selectOptions: any; selectedOccupation: string }>
+  props: Partial<{
+    selectOptions: Record<string, { label: string; value: string | number }[]>;
+    selectedOccupation: string;
+  }>
 ) => {
   const { control } = useForm<IOtherDetailsFormValues>({
     defaultValues: {
@@ -45,7 +48,6 @@ const Wrapper = (
 
   return (
     <OtherDetailsForm
-      selectedOccupation={props.selectedOccupation ?? ""}
       selectOptions={
         props.selectOptions ?? {
           field2: [{ label: "Option 1", value: 1 }],
@@ -56,15 +58,10 @@ const Wrapper = (
   );
 };
 
-describe.skip("OtherDetailsForm", () => {
-  it("renders the title", () => {
-    render(<Wrapper />);
-    expect(screen.getByText("Other Details")).toBeInTheDocument();
-  });
-
+describe("OtherDetailsForm", () => {
   it("renders correct number of form fields occupation, gross income and residenttype", () => {
     render(<Wrapper />);
-    expect(screen.getAllByTestId("form-field")).toHaveLength(3);
+    expect(screen.getAllByTestId("form-field")).toHaveLength(2);
   });
 
   it("renders the Card wrapper", () => {

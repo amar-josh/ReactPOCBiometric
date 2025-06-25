@@ -16,7 +16,6 @@ import {
 import { useAlertMessage } from "@/hooks/useAlertMessage";
 import translator from "@/i18n/translator";
 import { convertToLabelValue } from "@/lib/utils";
-import { IAlertMessage } from "@/types";
 
 import { ESIGN, UPDATE } from "../constants";
 import {
@@ -34,9 +33,9 @@ interface IReKYCDetailsProps {
   handleUpdateCommunicationAddress: () => void;
   setOtherDetails: React.Dispatch<
     React.SetStateAction<{
-      occupation: { label: string; value: string };
-      residentType: { label: string; value: string };
-      incomeRange: { label: string; value: string };
+      occupation: ILabelValue;
+      residentType: ILabelValue;
+      incomeRange: ILabelValue;
     }>
   >;
   onCancel?: () => void;
@@ -95,11 +94,19 @@ const ReKYCDetails = ({
         const key = curr.value;
 
         const formatAddress = (addressObj: IAddress) => {
-          const { addressLine1, addressLine2, city, state, country, pincode } =
-            addressObj || {};
+          const {
+            addressLine1,
+            addressLine2,
+            addressLine3,
+            city,
+            state,
+            country,
+            pincode,
+          } = addressObj || {};
           return [
             addressLine1,
             addressLine2,
+            addressLine3,
             city,
             state,
             country,
@@ -107,8 +114,10 @@ const ReKYCDetails = ({
           ].join(", ");
         };
 
-        if (["permenantAddress", "communicationAddress"].includes(key)) {
-          acc[key] = formatAddress(reKYCDetails?.rekycDetails?.[key]);
+        if (["permanentAddress", "communicationAddress"].includes(key)) {
+          acc[key] = formatAddress(
+            reKYCDetails?.rekycDetails?.[key] as IAddress
+          );
         } else {
           acc[key] =
             reKYCDetails?.rekycDetails?.[key] ?? curr.defaultValue ?? "";
@@ -129,6 +138,8 @@ const ReKYCDetails = ({
       },
       {} as Record<string, any>
     ),
+    //   TODO:fix onSubmit type issue
+    // @ts-expect-error:fixes
     resolver: yupResolver(otherDetailsValidationSchema),
   });
 
@@ -193,6 +204,8 @@ const ReKYCDetails = ({
       </Form>
 
       <Form {...otherDetailsForm}>
+        {/* TODO:fix onSubmit type issue */}
+        {/*  @ts-expect-error:fixes */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <OtherDetailsForm
             isOtherDropdownDetailsError={isOtherDropdownDetailsError}

@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import ReKYC from "..";
@@ -79,7 +78,7 @@ vi.mock("../hooks", async () => {
   };
 });
 
-describe.skip("ReKYC", () => {
+describe("ReKYC", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

@@ -1,6 +1,6 @@
 {
   "message": "",
-  "statusCode": "200",
+  "statusCode": 200,
   "status": "failed",
   "timestamp": "2025-04-17T15:45:30",
   "path": "/api/your-endpoint",

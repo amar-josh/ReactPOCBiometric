@@ -55,31 +55,51 @@ vi.mock("@/components/ui/form", async () => {
 import ReKYCDetails from "../components/ReKYCDetails";
 
 // TODO - need to update the testcases
-describe.skip("ReKYCDetails Component", () => {
+describe("ReKYCDetails Component", () => {
   const mockProps = {
     reKYCDetails: {
       rekycDetails: {
-        permenantAddress: {
+        customerName: "John Doe",
+        aadhaarNumber: "123412341234",
+        aadhaarRefNumber: "REF123456",
+        customerID: "CUST123456",
+        dob: "1990-01-01",
+        gender: "Male",
+        mobileNumber: "9876543210",
+        email: "john.doe@example.com",
+        permanentAddress: {
           addressLine1: "Line1",
           addressLine2: "Line2",
+          addressLine3: "Line3",
           city: "City",
           state: "State",
           country: "Country",
-          pincode: "123456",
+          pincode: 123456,
         },
         communicationAddress: {
           addressLine1: "CLine1",
           addressLine2: "CLine2",
+          addressLine3: "Line3",
           city: "CCity",
           state: "CState",
           country: "CCountry",
-          pincode: "654321",
+          pincode: 654321,
         },
+        accountNumber: 123456,
+        mobileNo: "9876543210",
+        emailId: "john.doe@example.com",
+        nameOfOVD: "Passport",
       },
       otherDetails: {
-        occupation: { name: "Salaried", code: 1 },
-        residentType: { name: "Owned", code: 2 },
+        occupation: 1,
+        residentType: 2,
         incomeRange: 500000,
+      },
+      requestNumber: "REQ123456",
+      metaData: {
+        noChangeEnabled: true,
+        updateAddressEnabled: true,
+        message: "",
       },
     },
     setIsWithAddressUpdate: vi.fn(),
@@ -87,6 +107,9 @@ describe.skip("ReKYCDetails Component", () => {
     setOtherDetails: vi.fn(),
     setRequestNumber: vi.fn(),
     cif: "1234567890",
+    handleContinueToEsign: vi.fn(),
+    handleUpdateCommunicationAddress: vi.fn(),
+    setIsOtherDetailsChange: vi.fn(),
   };
 
   it("should render the component and subcomponents", () => {

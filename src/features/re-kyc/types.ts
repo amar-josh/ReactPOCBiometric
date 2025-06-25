@@ -11,7 +11,7 @@ export interface IFormDetailsSchema {
     | "textarea"
     | "email"
     | "combobox"; // extendable
-  defaultValue: string | null;
+  defaultValue: number | string | null;
   validation?: yup.AnySchema;
   readOnly?: boolean;
   className?: string;
@@ -40,7 +40,7 @@ export interface IGetCustomerSearchRequest {
 }
 
 export interface IAccountDetail {
-  accountNumber: number;
+  accountNumber: string;
   productName: string;
   isAccountDormant: boolean;
   isDebitFreeze?: boolean;
@@ -61,7 +61,7 @@ export interface IPersonalDetails {
 }
 
 export interface ICustomerDetails {
-  customerId: number | string;
+  customerId: string;
   customerName: string;
   mobileNumber: string;
   email: string;
@@ -72,11 +72,23 @@ export interface ICustomerSearchResponse {
   accDetails: IAccountDetail[];
 }
 
+export interface IFetchRecordError {
+  action: string;
+  actionCode: string;
+}
+
+export interface ICheckpointFailure {
+  message: string;
+  statusCode: number;
+  status: string;
+  data: IFetchRecordError;
+}
+
 export interface IGetCustomerSearchResponse {
   message: string;
   statusCode: number;
   status: string;
-  data: ICustomerSearchResponse;
+  data: ICustomerSearchResponse[];
 }
 
 export interface IAddress {
@@ -90,22 +102,23 @@ export interface IAddress {
 }
 export interface IreKYCDetails {
   customerName: string;
-  aadhaarNumber: number;
-  customerID: number;
+  aadhaarNumber: string;
+  aadhaarRefNumber: string;
+  customerID: string;
   accountNumber: number;
-  mobileNo: number;
+  mobileNo: string;
   emailId: string;
   nameOfOVD: string;
-  permenantAddress: IAddress;
+  permanentAddress: IAddress;
   communicationAddress: IAddress;
-  [key: string]: any;
+  [key: string]: string | number | IAddress | undefined;
 }
 
 export interface IOtherDetails {
-  occupation: string;
+  occupation: number;
   incomeRange: number;
-  residentType: string;
-  [key: string]: string | number;
+  residentType: number;
+  [key: string]: number | undefined;
 }
 
 export interface IReKYCData {
@@ -120,7 +133,7 @@ export interface IReKYCData {
 }
 
 export interface IGetCustomerDetailsRequest {
-  customerID: number;
+  customerID: string;
 }
 
 export interface IReKYCCheckpointFailureResponse {
@@ -132,7 +145,7 @@ export interface IGetCustomerDetailsResponse {
   message: string;
   statusCode: number;
   status: string;
-  data: IReKYCData | IReKYCCheckpointFailureResponse;
+  data: IReKYCData;
 }
 
 export interface ISelectOptions {
@@ -140,28 +153,34 @@ export interface ISelectOptions {
   code: number;
 }
 
-export interface IreKYCFailureCheckpointElment {
+export interface IOtherDetailsValues {
+  occupation: ILabelValue;
+  residentType: ILabelValue;
+  incomeRange: ILabelValue;
+}
+
+export interface IreKYCFailureCheckpointElement {
   title: string;
   message: string;
   icon: string;
 }
 
 export interface IreKYCFailureCheckpoints {
-  [key: string]: IreKYCFailureCheckpointElment;
+  [key: string]: IreKYCFailureCheckpointElement;
 }
 
 // For biometric capture finger print request
 export interface IValidateFingerPrintRequest {
   aadhaarNumber: string;
   rdServiceData: string;
-  requestNumber?: string;
-  mobileNo: string;
+  requestNumber: string;
+  mobileNo?: string;
 }
 
 // For biometric capture finger print response
 export interface IBiometricApiDataSuccess {
   message: string;
-  statusCode: string;
+  statusCode: number;
   status: string;
   data: {
     aadhaarVerification: string;
@@ -176,32 +195,48 @@ export interface IBiometricApiDataFailure {
 
 export interface IBiometricApiBaseResponse<T> {
   message: string;
-  statusCode: string;
+  statusCode: number;
   status: string;
   timestamp: string;
   path: string;
   data: T;
 }
 
-export type IValidateFingerPrintResponse =
-  | IBiometricApiBaseResponse<IBiometricApiDataSuccess>
-  | IBiometricApiBaseResponse<IBiometricApiDataFailure>;
+export type IValidateFingerPrintResponse = {
+  message: string;
+  statusCode: number;
+  status: string;
+  data: {
+    aadhaarVerification: string;
+    requestNumber: string;
+    aadhaarAddress: IAddress;
+  };
+};
 
 export type IUpdateKYCRequest = {
   requestNumber: string;
   makerDetails: {
-    initiated_by: string;
-    emp_id: string | number;
-    emp_branchcode: string;
+    initiatedBy: string;
+    empId: string;
+    empBranchCode: string;
   };
+  isOtherDetailsChange: boolean;
   kycNoChange: boolean;
-  kycDetails: IreKYCDetails & {
-    otherDetails: {
-      occupation: number | string;
-      residentType: number | string;
-      incomeRange: number | string;
-    };
+  rekycDetails: {
+    customerName: string;
+    aadhaarNumber: string;
+    aadhaarRefNumber: string;
+    customerID: string;
+    mobileNo: string;
+    emailId: string;
+    permanentAddress: IAddress;
+    communicationAddress: IAddress;
     aadhaarCommunicationAddress?: IAddress;
+    otherDetails: {
+      occupation: number;
+      incomeRange: number;
+      residentType: number;
+    };
   };
 };
 
@@ -212,7 +247,7 @@ export interface IUpdateKYCData {
 
 export interface IUpdateKYCResponse {
   message: string;
-  statusCode: string;
+  statusCode: number;
   status: "success" | "failure";
   timestamp: string;
   path: string;

@@ -3,8 +3,10 @@ import AadhaarConsentModal from "@/components/common/AadhaarConsentModal";
 import AlertDialogComponent from "@/components/common/AlertDialogComponent";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MASKED_KEY } from "@/constants/globalConstant";
 import { IBiometricCardDetails } from "@/features/re-kyc/types";
 import translator from "@/i18n/translator";
+import { maskData } from "@/lib/maskData";
 
 interface IBiometricVerificationComponentProps {
   handleAadhaarConsentModal: () => void;
@@ -31,6 +33,7 @@ const BiometricVerificationComponent = ({
   isPending,
   aadhaarNumber,
 }: IBiometricVerificationComponentProps) => {
+  const maskedAadhaarNumber = maskData(aadhaarNumber, MASKED_KEY.AADHAAR);
   return (
     <div className="max-w-sm space-y-4">
       <h2 className="text-xl font-semibold">
@@ -45,7 +48,7 @@ const BiometricVerificationComponent = ({
           {translator("reKyc.aadhaarNumber")}
         </label>
         <Input
-          value={aadhaarNumber}
+          value={maskedAadhaarNumber}
           readOnly
           autoComplete="off"
           className="bg-gray-100 cursor-not-allowed text-gray-600"
@@ -69,7 +72,7 @@ const BiometricVerificationComponent = ({
       )}
       {isBiometricModalOpen && (
         <AlertDialogComponent
-          type={biometricDetails?.isError ? "error" : ""}
+          type={biometricDetails?.isError ? "error" : undefined}
           title={biometricDetails?.title ?? ""}
           message={biometricDetails?.message ?? ""}
           icon={biometricDetails?.icon ?? ""}

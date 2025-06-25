@@ -9,7 +9,7 @@ import CustomerSearchForm from "../components/CustomerSearchForm";
 // Mocks
 vi.mock("@/components/common/AlertMessage", () => ({
   __esModule: true,
-  default: ({ type, message }: any) => (
+  default: ({ type, message }: { type: string; message: string }) => (
     <div data-testid={`alert-${type}`}>{message}</div>
   ),
 }));
@@ -18,26 +18,42 @@ vi.mock("@/components/common/FullScreenLoader", () => ({
   default: () => <div data-testid="loader" />,
 }));
 vi.mock("@/components/ui/button", () => ({
-  Button: ({ children, ...props }: any) => (
-    <button {...props}>{children}</button>
-  ),
+  Button: ({
+    children,
+    ...props
+  }: React.PropsWithChildren<
+    React.ButtonHTMLAttributes<HTMLButtonElement>
+  >) => <button {...props}>{children}</button>,
 }));
 vi.mock("@/components/ui/separator", () => ({
   Separator: () => <hr data-testid="separator" />,
 }));
-vi.mock("@/features/re-kyc/components/AccountInfoCard", () => ({
-  __esModule: true,
-  default: ({ selected, onSelect, customerDetails, isDisabled }: any) => (
-    <div
-      data-testid="account-info-card"
-      data-selected={selected}
-      data-disabled={isDisabled}
-      onClick={onSelect}
-    >
-      {customerDetails?.customerId}
-    </div>
-  ),
-}));
+vi.mock("@/features/re-kyc/components/AccountInfoCard", () => {
+  type AccountInfoCardProps = {
+    selected: boolean;
+    onSelect: () => void;
+    customerDetails: { customerId?: string };
+    isDisabled: boolean;
+  };
+  return {
+    __esModule: true,
+    default: ({
+      selected,
+      onSelect,
+      customerDetails,
+      isDisabled,
+    }: AccountInfoCardProps) => (
+      <div
+        data-testid="account-info-card"
+        data-selected={selected}
+        data-disabled={isDisabled}
+        onClick={onSelect}
+      >
+        {customerDetails?.customerId}
+      </div>
+    ),
+  };
+});
 vi.mock("../components/EligibilityCard", () => ({
   __esModule: true,
   default: () => <div data-testid="eligibility-card">EligibilityCard</div>,
@@ -59,6 +75,9 @@ const defaultProps = {
       custDetails: {
         customerId: "123",
         isIndividual: false,
+        customerName: "John Doe",
+        mobileNumber: "1234567890",
+        email: "john.doe@example.com",
       },
       accDetails: [],
     },
@@ -72,6 +91,7 @@ const defaultProps = {
   isCustomerDetailsError: false,
   customerDetailsErrorMessage: { type: ERROR, message: "Something went wrong" },
   setCustomerDetailsErrorAlertMessage: vi.fn(),
+  customerDetailsReset: vi.fn(),
 };
 
 describe("CustomerSearch", () => {

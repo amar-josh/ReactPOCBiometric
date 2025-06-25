@@ -42,21 +42,29 @@ export const getBiometricCardDetails = ({
     case BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS:
       return {
         title: "Searching RD Service",
-        message: "reKyc.biometric.biometricServiceChcek",
+        message: "reKyc.biometric.biometricServiceCheck",
         icon: fingerprint,
         key: "retryRDService",
       };
     case BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_ERROR:
       return {
         title: "RD Service Not Available",
-        message: "reKyc.biometric.biometricServiceNotFoundMessage",
+        message: "reKyc.biometric.biometricServiceNotFound",
+        icon: fingerprintFailure,
+        buttonText: "Retry",
+        key: "retryRDService",
+      };
+    case BIOMETRIC_OPERATIONS.DEVICE_USED_BY_ANOTHER_APPLICATION:
+      return {
+        title: "Device Not Found",
+        message: "reKyc.biometric.deviceUsedByOtherApp",
         icon: fingerprintFailure,
         buttonText: "Retry",
         key: "retryRDService",
       };
     case BIOMETRIC_OPERATIONS.DEVICE_NOT_READY:
       return {
-        title: "reKyc.biometric.confirmUsingFingerprint",
+        title: "Device Not Found",
         message: "reKyc.biometric.connectBiometricDevice",
         icon: fingerprintFailure,
         buttonText: "Retry",
@@ -104,7 +112,7 @@ export const getBiometricCardDetails = ({
           buttonText: "Re-Capture",
           key: "recapture",
         };
-      } else if (count === 0) {
+      } else {
         return {
           title: "reKyc.biometric.aadhaarAuthFailed",
           message: "reKyc.biometric.formBasedProcess",
@@ -112,8 +120,6 @@ export const getBiometricCardDetails = ({
           buttonText: "Back to home",
           key: "home",
         };
-      } else {
-        return {};
       }
     case BIOMETRIC_OPERATIONS.ATTEMPT_LIMIT_CROSSED:
       return {
@@ -129,7 +135,7 @@ export const getBiometricCardDetails = ({
         message: "reKyc.errorMessages.somethingWentWrong",
         icon: xicon,
         buttonText: "Re-capture",
-        key: "capture",
+        key: "retryDevice",
         isError: true,
       };
   }
@@ -142,9 +148,24 @@ export const getLabelBasedOnValue = (
   optionsList.find((option: ILabelValue) => option.value == value)?.label || "";
 
 export const formatAddress = (addressObj: IAddress) => {
-  const { addressLine1, addressLine2, city, state, country, pincode } =
-    addressObj || {};
-  return [addressLine1, addressLine2, city, state, country, pincode].join(", ");
+  const {
+    addressLine1,
+    addressLine2,
+    addressLine3,
+    city,
+    state,
+    country,
+    pincode,
+  } = addressObj || {};
+  return [
+    addressLine1,
+    addressLine2,
+    addressLine3,
+    city,
+    state,
+    country,
+    pincode,
+  ].join(", ");
 };
 
 export const reKycFormSchema: IFormDetailsSchema[] = [
@@ -178,7 +199,7 @@ export const reKycFormSchema: IFormDetailsSchema[] = [
   },
   {
     label: "formFields.permanentAddress",
-    value: "permenantAddress",
+    value: "permanentAddress",
     type: "textarea",
     defaultValue: "",
     readOnly: true,
@@ -213,18 +234,27 @@ export const otherDetailsFormSchema: IFormDetailsSchema[] = [
   },
 ];
 
-export const otherDetailsReadOnlySchema: ILabelValue[] = [
+export const otherDetailsReadOnlySchema: IFormDetailsSchema[] = [
   {
+    type: "text",
     label: "formFields.occupation",
     value: "occupation",
+    defaultValue: "",
+    readOnly: true,
   },
   {
+    type: "text",
     label: "formFields.grossAnnualIncome",
     value: "incomeRange",
+    defaultValue: "",
+    readOnly: true,
   },
   {
+    type: "text",
     label: "formFields.residenceType",
     value: "residentType",
+    defaultValue: "",
+    readOnly: true,
   },
 ];
 

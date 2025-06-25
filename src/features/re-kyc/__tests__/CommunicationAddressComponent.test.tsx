@@ -15,16 +15,18 @@ describe("CommunicationAddressComponent", () => {
   const mockAddress: IAddress = {
     addressLine1: "123 Main Street",
     addressLine2: "Apt 4B",
+    addressLine3: "",
     city: "Mumbai",
     state: "Maharashtra",
-    pincode: "400001",
+    country: "India",
+    pincode: 400001,
   };
 
   it("renders the title and formatted address", () => {
     render(
       <CommunicationAddressComponent
         title="Previous Address"
-        description={mockAddress}
+        address={mockAddress}
         isSelected={false}
       />
     );
@@ -45,7 +47,7 @@ describe("CommunicationAddressComponent", () => {
     const { container } = render(
       <CommunicationAddressComponent
         title="New Address"
-        description={mockAddress}
+        address={mockAddress}
         isSelected={true}
       />
     );
@@ -58,7 +60,7 @@ describe("CommunicationAddressComponent", () => {
     const { container } = render(
       <CommunicationAddressComponent
         title="New Address"
-        description={mockAddress}
+        address={mockAddress}
         isSelected={false}
       />
     );

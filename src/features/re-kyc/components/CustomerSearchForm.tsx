@@ -81,6 +81,7 @@ const CustomerSearchForm = forwardRef(
     ref: React.Ref<{ resetForm: () => void }>
   ) => {
     const form = useForm<FormSchemaType>({
+      // @ts-expect-error: yupResolver type mismatch with react-hook-form expected resolver, safe to ignore as per project setup
       resolver: yupResolver(formSchema),
       defaultValues: {
         searchBy: "mobile",
@@ -99,7 +100,7 @@ const CustomerSearchForm = forwardRef(
         });
       } else if (data.searchBy === "cif") {
         onSearch({
-          cifId: Number(data.cif),
+          customerID: Number(data.cif),
         });
       } else if (data.searchBy === "account") {
         onSearch({

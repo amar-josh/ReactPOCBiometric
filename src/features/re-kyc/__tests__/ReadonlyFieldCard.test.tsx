@@ -2,14 +2,14 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import ReadonlyFieldCard from "../components/ReadonlyFieldCard";
-
+import { IFormDetailsSchema } from "../types";
 // Mock translator
 vi.mock("@/i18n/translator", () => ({
   default: (key: string) => `translated(${key})`,
 }));
 
 describe("ReadonlyFieldCard", () => {
-  const mockFields = [
+  const mockFields: IFormDetailsSchema[] = [
     {
       label: "reKyc.firstName",
       type: "text",

@@ -38,6 +38,8 @@ export const BIOMETRIC_OPERATIONS = {
   NO_FINGER_FOUND: "notFound",
   ATTEMPT_FAILED: "attemptFailed",
   ATTEMPT_LIMIT_CROSSED: "attemptLimitCrossed",
+  DEVICE_USED_BY_ANOTHER_APPLICATION: "usedByOtherApplication",
+  DEFAULT: "default",
 };
 
 export const BIOMETRIC_DEVICE_STATUS = {
@@ -65,3 +67,15 @@ export const ACCOUNT_STATUS_LABELS = {
 };
 
 export const CIF_LENGTH = 9;
+
+export const INITIAL_STEP_STATUS = {
+  1: false,
+  2: false,
+  3: false,
+};
+
+export const INITIAL_OTHER_DETAILS_DATA = {
+  occupation: { label: "", value: "" },
+  residentType: { label: "", value: "" },
+  incomeRange: { label: "", value: "" },
+};

@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import React from "react";
 import { BrowserRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -17,7 +16,7 @@ vi.mock("../hooks", () => ({
 vi.mock("react-router", async (importOriginal) => {
   const actual = await importOriginal();
   return {
-    ...actual,
+    ...(actual as object),
     useNavigate: vi.fn(),
   };
 });
@@ -47,7 +46,13 @@ vi.mock("@/components/common/FullScreenLoader", () => ({
 }));
 
 vi.mock("../../components/common/Stepper", () => ({
-  default: ({ steps, currentStep, completed }) => (
+  default: ({
+    steps,
+    currentStep,
+  }: {
+    steps: unknown[];
+    currentStep: number;
+  }) => (
     <div data-testid="stepper">
       Step {currentStep} of {steps.length}
     </div>
@@ -55,15 +60,27 @@ vi.mock("../../components/common/Stepper", () => ({
 }));
 
 vi.mock("../mobile-number-update/components/MobileStepper", () => ({
-  default: ({ steps, currentStep }) => (
+  default: ({
+    steps,
+    currentStep,
+  }: {
+    steps: unknown[];
+    currentStep: number;
+  }) => (
     <div data-testid="mobile-stepper">
       Mobile Step {currentStep} of {steps.length}
     </div>
   ),
 }));
 
+interface CustomerSearchProps {
+  handleSearch: (params: { searchTerm: string }) => void;
+  handleReKYCNext: () => void;
+  selected?: boolean;
+}
+
 vi.mock("./components/CustomerSearch", () => ({
-  default: (props) => (
+  default: (props: CustomerSearchProps) => (
     <div data-testid="customer-search">
       <button
         onClick={() => props.handleSearch({ searchTerm: "test" })}
@@ -82,8 +99,13 @@ vi.mock("./components/CustomerSearch", () => ({
   ),
 }));
 
+interface ReKYCDetailsProps {
+  handleContinueToEsign: () => void;
+  handleUpdateCommunicationAddress: () => void;
+}
+
 vi.mock("./components/ReKYCDetails", () => ({
-  default: (props) => (
+  default: (props: ReKYCDetailsProps) => (
     <div data-testid="rekyc-details">
       <button
         onClick={props.handleContinueToEsign}
@@ -101,8 +123,12 @@ vi.mock("./components/ReKYCDetails", () => ({
   ),
 }));
 
+interface BiometricFlowProps {
+  updateStep: () => void;
+}
+
 vi.mock("./BiometricFlow", () => ({
-  default: (props) => (
+  default: (props: BiometricFlowProps) => (
     <div data-testid="biometric-flow">
       <button
         onClick={() => props.updateStep()}
@@ -114,8 +140,12 @@ vi.mock("./BiometricFlow", () => ({
   ),
 }));
 
+interface AddressUpdateCardProps {
+  handleAddressConfirmed: () => void;
+}
+
 vi.mock("./components/AddressUpdateCard", () => ({
-  default: (props) => (
+  default: (props: AddressUpdateCardProps) => (
     <div data-testid="address-update-card">
       <button
         onClick={props.handleAddressConfirmed}
@@ -128,7 +158,15 @@ vi.mock("./components/AddressUpdateCard", () => ({
 }));
 
 vi.mock("@/components/common/ResponseStatusComponent", () => ({
-  default: ({ status, title, message }) => (
+  default: ({
+    status,
+    title,
+    message,
+  }: {
+    status: string;
+    title: string;
+    message: string;
+  }) => (
     <div data-testid="response-status">
       <div data-testid="status">{status}</div>
       <div data-testid="title">{title}</div>
@@ -138,7 +176,17 @@ vi.mock("@/components/common/ResponseStatusComponent", () => ({
 }));
 
 vi.mock("../../components/common/AlertDialogComponent", () => ({
-  default: ({ open, title, message, onConfirm }) =>
+  default: ({
+    open,
+    title,
+    message,
+    onConfirm,
+  }: {
+    open: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }) =>
     open ? (
       <div data-testid="alert-dialog">
         <div data-testid="alert-title">{title}</div>
@@ -153,47 +201,47 @@ vi.mock("../../components/common/AlertDialogComponent", () => ({
 // Import the actual hooks to get their types
 import { useNavigate } from "react-router";
 
-import {
-  useCustomerDetails,
-  useCustomerSearch,
-  useUpdateKYC,
-  useValidateFingerprint,
-} from "../hooks";
+// import {
+//   useCustomerDetails,
+//   useCustomerSearch,
+//   useUpdateKYC,
+//   useValidateFingerprint,
+// } from "../hooks";
 
 describe("ReKYC Component", () => {
   const mockNavigate = vi.fn();
-  const mockCustomerSearch = {
-    mutate: vi.fn(),
-    data: null,
-    isSuccess: false,
-    error: null,
-    isError: false,
-    isPending: false,
-    reset: vi.fn(),
-  };
-  const mockCustomerDetails = {
-    mutate: vi.fn(),
-    data: null,
-    reset: vi.fn(),
-    error: null,
-    isError: false,
-    isPending: false,
-  };
-  const mockUpdateKYC = {
-    mutate: vi.fn(),
-    isSuccess: false,
-    isPending: false,
-    data: null,
-    error: null,
-    isError: false,
-  };
-  const mockValidateFingerprint = {
-    mutate: vi.fn(),
-    isPending: false,
-    data: null,
-    error: null,
-    isError: false,
-  };
+  // const mockCustomerSearch = {
+  //   mutate: vi.fn(),
+  //   data: null,
+  //   isSuccess: false,
+  //   error: null,
+  //   isError: false,
+  //   isPending: false,
+  //   reset: vi.fn(),
+  // };
+  // const mockCustomerDetails = {
+  //   mutate: vi.fn(),
+  //   data: null,
+  //   reset: vi.fn(),
+  //   error: null,
+  //   isError: false,
+  //   isPending: false,
+  // };
+  // const mockUpdateKYC = {
+  //   mutate: vi.fn(),
+  //   isSuccess: false,
+  //   isPending: false,
+  //   data: null,
+  //   error: null,
+  //   isError: false,
+  // };
+  // const mockValidateFingerprint = {
+  //   mutate: vi.fn(),
+  //   isPending: false,
+  //   data: null,
+  //   error: null,
+  //   isError: false,
+  // };
 
   const renderComponent = () => {
     return render(
@@ -205,17 +253,17 @@ describe("ReKYC Component", () => {
 
   beforeEach(() => {
     vi.mocked(useNavigate).mockReturnValue(mockNavigate);
-    vi.mocked(useCustomerSearch).mockReturnValue(mockCustomerSearch);
-    vi.mocked(useCustomerDetails).mockReturnValue(mockCustomerDetails);
-    vi.mocked(useUpdateKYC).mockReturnValue(mockUpdateKYC);
-    vi.mocked(useValidateFingerprint).mockReturnValue(mockValidateFingerprint);
+    // vi.mocked(useCustomerSearch).mockReturnValue(mockCustomerSearch);
+    // vi.mocked(useCustomerDetails).mockReturnValue(mockCustomerDetails);
+    // vi.mocked(useUpdateKYC).mockReturnValue(mockUpdateKYC);
+    // vi.mocked(useValidateFingerprint).mockReturnValue(mockValidateFingerprint);
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  // TODO -- Too many dependencies to mock, failing test cases are commented. 
+  // TODO -- Too many dependencies to mock, failing test cases are commented.
   describe("Initial Render", () => {
     // it("should render the component with initial state", () => {
     //   renderComponent();
