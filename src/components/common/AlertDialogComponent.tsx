@@ -57,7 +57,7 @@ const AlertDialogComponent = ({
               type === "error" && "text-danger"
             )}
           >
-            {translator(message)}
+            {translator(message || "")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -22,7 +22,7 @@ describe("mobileNumberUpdateFailureCheckpoints", () => {
       "ACCOUNT_INACTIVE_OR_BLOCKED",
     ]);
 
-    for (const [key, value] of Object.entries(checkpoints)) {
+    for (const [, value] of Object.entries(checkpoints)) {
       expect(value).toHaveProperty(
         "title",
         "checkpoints.notEligibleForInstaTitle"

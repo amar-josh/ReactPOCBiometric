@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -14,6 +14,16 @@ import {
 } from "../hooks"; // adjust path as needed
 import * as services from "../services"; // mocks come from this module
 
+vi.mock("../services", () => ({
+  getCustomerSearchService: vi.fn(),
+  getVerifyNumberService: vi.fn(),
+  getUpdateNumberService: vi.fn(),
+  getFetchRecordsService: vi.fn(),
+  getCheckStatusService: vi.fn(),
+  getGenerateLinkService: vi.fn(),
+  getVerifyLinkService: vi.fn(),
+  getBioMetricVerificationService: vi.fn(),
+}));
 const wrapper = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient();
   return (
@@ -23,108 +33,276 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
 
 describe("Mobile number update Hooks", () => {
   it("should call getCustomerSearchService when useCustomerSearch is triggered", async () => {
-    const mockFn = vi
-      .spyOn(services, "getCustomerSearchService")
-      .mockResolvedValue("ok");
+    const mockGetCustomerSearchResponse = {
+      statusCode: 200,
+      status: "SUCCESS",
+      message: "Customer search successful",
+      data: [
+        {
+          custDetails: {
+            customerId: "CUST0001",
+            customerName: "Jane Smith",
+            mobileNumber: "9876543210",
+            email: "jane.smith@example.com",
+            isIndividual: true,
+          },
+          accDetails: [
+            {
+              accountNumber: "ACC1234567890",
+              productName: "Savings Account",
+              isAccountDormant: false,
+              accountOpenDate: "2015-06-15",
+            },
+            {
+              accountNumber: "ACC0987654321",
+              productName: "Fixed Deposit",
+              isAccountDormant: true,
+              accountOpenDate: "2020-01-01",
+            },
+          ],
+        },
+      ],
+    };
+
+    (services.getCustomerSearchService as any).mockResolvedValue(
+      mockGetCustomerSearchResponse
+    );
 
     const { result } = renderHook(() => useCustomerSearch(), { wrapper });
 
-    await result.current.mutateAsync({ dummy: "data" });
+    const payload = {
+      cif: "CIF0012345",
+      accountNumber: 1234567890,
+      branchCode: "BR1234",
+      employeeId: "EMP5678",
+      employeeName: "Anita Sharma",
+      mobileNumber: "9876543210",
+    };
 
-    expect(mockFn).toHaveBeenCalledWith({ dummy: "data" });
-    mockFn.mockRestore();
+    await act(() => result.current.mutateAsync(payload));
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual(mockGetCustomerSearchResponse)
+    );
+    expect(services.getCustomerSearchService).toHaveBeenCalledWith(payload);
   });
 
   it("should call getVerifyNumberService when useVerifyNumber is triggered", async () => {
-    const mockFn = vi
-      .spyOn(services, "getVerifyNumberService")
-      .mockResolvedValue("ok");
+    const mockGenericResponse = {
+      statusCode: 200,
+      status: "SUCCESS",
+      message: "Operation completed successfully",
+    };
+
+    (services.getVerifyNumberService as any).mockResolvedValue(
+      mockGenericResponse
+    );
 
     const { result } = renderHook(() => useVerifyNumber(), { wrapper });
 
-    await result.current.mutateAsync("9876543210");
+    const payload = {
+      mobileNumber: "9876543210",
+      requestNumber: "REQ1234567890",
+    };
 
-    expect(mockFn).toHaveBeenCalledWith("9876543210");
-    mockFn.mockRestore();
+    await act(() => result.current.mutateAsync(payload));
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual(mockGenericResponse)
+    );
+    expect(services.getVerifyNumberService).toHaveBeenCalledWith(payload);
   });
 
   it("should call getUpdateNumberService when useUpdateNumber is triggered", async () => {
-    const mockFn = vi
-      .spyOn(services, "getUpdateNumberService")
-      .mockResolvedValue("ok");
+    const mockUpdateNumberResponse = {
+      statusCode: 200,
+      status: "success",
+      message: "ok",
+      data: {
+        oldMobileNumber: "9999999999",
+        newMobileNumber: "9999999999",
+        requestNumber: "9999999999",
+      },
+    };
+    (services.getUpdateNumberService as any).mockResolvedValue(
+      mockUpdateNumberResponse
+    );
 
     const { result } = renderHook(() => useUpdateNumber(), { wrapper });
 
-    await result.current.mutateAsync({ newNumber: "9999999999" });
+    const payload = {
+      branchCode: "BR1001",
+      customerId: "CUST7890",
+      customerName: "Rajesh Kumar",
+      custUpdatedMobileNumber: "9123456789",
+      requestNumber: "REQ4567890123",
+      type: "MOBILE_UPDATE",
+    };
 
-    expect(mockFn).toHaveBeenCalledWith({ newNumber: "9999999999" });
-    mockFn.mockRestore();
+    await act(() => result.current.mutateAsync(payload));
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual(mockUpdateNumberResponse)
+    );
+    expect(services.getUpdateNumberService).toHaveBeenCalledWith(payload);
   });
 
   it("should call getFetchRecordsService when useFetchRecords is triggered", async () => {
-    const mockFn = vi
-      .spyOn(services, "getFetchRecordsService")
-      .mockResolvedValue("ok");
+    const fetchRecordsResponse = {
+      statusCode: 200,
+      status: "success",
+      message: "ok",
+      data: {
+        statusCode: 200,
+        status: "success",
+        message: "ok",
+      },
+    };
+    (services.getFetchRecordsService as any).mockResolvedValue(
+      fetchRecordsResponse
+    );
 
     const { result } = renderHook(() => useFetchRecords(), { wrapper });
 
-    await result.current.mutateAsync("CID123");
+    const payload = {
+      branchCode: "BR2025",
+      cif: "CIF789654123",
+      employeeId: "EMP4521",
+      employeeName: "Sneha Rane",
+    };
 
-    expect(mockFn).toHaveBeenCalledWith("CID123");
-    mockFn.mockRestore();
+    await act(() => result.current.mutateAsync(payload));
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual(fetchRecordsResponse)
+    );
+    expect(services.getFetchRecordsService).toHaveBeenCalledWith(payload);
   });
 
   it("should call getCheckStatusService when useCheckStatus is triggered", async () => {
-    const mockFn = vi
-      .spyOn(services, "getCheckStatusService")
-      .mockResolvedValue("ok");
+    const mockVerificationStatus = {
+      statusCode: 200,
+      status: "success",
+      message: "ok",
+      data: {
+        id: "VERIF123456",
+        requestNumber: "REQ1234567890",
+        is_verified: true,
+      },
+    };
+    (services.getCheckStatusService as any).mockResolvedValue(
+      mockVerificationStatus
+    );
 
     const { result } = renderHook(() => useCheckStatus(), { wrapper });
 
-    await result.current.mutateAsync({ requestNumber: "REQ123" });
+    const payload = { requestNumber: "REQ123" };
 
-    expect(mockFn).toHaveBeenCalledWith({ requestNumber: "REQ123" });
-    mockFn.mockRestore();
+    await act(() => result.current.mutateAsync(payload));
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual(mockVerificationStatus)
+    );
+    expect(services.getCheckStatusService).toHaveBeenCalledWith(payload);
   });
 
   it("should call getGenerateLinkService when useGenerateLink is triggered", async () => {
-    const mockFn = vi
-      .spyOn(services, "getGenerateLinkService")
-      .mockResolvedValue("ok");
+    const mockGenerateResponseData = {
+      statusCode: 200,
+      status: "success",
+      message: "ok",
+      data: {
+        shortUrl: "https://short.ly/abc123",
+        totalClicks: 42,
+      },
+    };
+
+    (services.getGenerateLinkService as any).mockResolvedValue(
+      mockGenerateResponseData
+    );
 
     const { result } = renderHook(() => useGenerateLink(), { wrapper });
 
-    await result.current.mutateAsync({ id: "USER123" });
+    const payload = {
+      channel: "WEB_PORTAL",
+      mobileNumber: "9876543210",
+      requestNumber: "REQ1234567890",
+    };
 
-    expect(mockFn).toHaveBeenCalledWith({ id: "USER123" });
-    mockFn.mockRestore();
+    await act(() => result.current.mutateAsync(payload));
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual(mockGenerateResponseData)
+    );
+    expect(services.getGenerateLinkService).toHaveBeenCalledWith(payload);
   });
 
   it("should call getVerifyLinkService when useVerifyLink is triggered", async () => {
-    const mockFn = vi
-      .spyOn(services, "getVerifyLinkService")
-      .mockResolvedValue("ok");
+    const mockStatusResponse = {
+      statusCode: 200,
+      msg: "Operation completed successfully",
+    };
+
+    (services.getVerifyLinkService as any).mockResolvedValue(
+      mockStatusResponse
+    );
 
     const { result } = renderHook(() => useVerifyLink(), { wrapper });
 
-    await result.current.mutateAsync("link-token");
+    const payload = { shortCode: "asdf" };
 
-    expect(mockFn).toHaveBeenCalledWith("link-token");
-    mockFn.mockRestore();
+    await act(() => result.current.mutateAsync(payload));
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual(mockStatusResponse)
+    );
+    expect(services.getVerifyLinkService).toHaveBeenCalledWith(payload);
   });
 
   it("should call getBioMetricVerificationService when useBioMetricVerification is triggered", async () => {
-    const mockFn = vi
-      .spyOn(services, "getBioMetricVerificationService")
-      .mockResolvedValue("ok");
+    const mockAadhaarVerificationResponse = {
+      message: "Aadhaar verification successful",
+      statusCode: "200",
+      status: "SUCCESS",
+      data: {
+        aadhaarVerification: "VERIFIED",
+        requestNumber: "REQ1234567890",
+        aadhaarAddress: {
+          addressLine1: "123 Aadhaar Nagar",
+          addressLine2: "Sector 5",
+          addressLine3: "sector5",
+          landmark: "Near Post Office",
+          city: "Pune",
+          district: "Pune",
+          state: "Maharashtra",
+          pincode: 411001,
+          country: "India",
+        },
+      },
+    };
+
+    (services.getBioMetricVerificationService as any).mockResolvedValue(
+      mockAadhaarVerificationResponse
+    );
 
     const { result } = renderHook(() => useBioMetricVerification(), {
       wrapper,
     });
 
-    await result.current.mutateAsync({ fingerprintData: "base64data" });
+    const payload = {
+      aadhaarNumber: "1234-5678-9012",
+      rdServiceData:
+        "<RDService><DeviceInfo><name>MockDevice</name></DeviceInfo></RDService>",
+      requestNumber: "REQ1234567890",
+    };
 
-    expect(mockFn).toHaveBeenCalledWith({ fingerprintData: "base64data" });
-    mockFn.mockRestore();
+    await act(() => result.current.mutateAsync(payload));
+
+    await waitFor(() =>
+      expect(result.current.data).toEqual(mockAadhaarVerificationResponse)
+    );
+    expect(services.getBioMetricVerificationService).toHaveBeenCalledWith(
+      payload
+    );
   });
 });

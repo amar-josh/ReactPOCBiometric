@@ -1,32 +1,72 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import RoutesComponent from "../RoutesComponent";
 
-vi.mock("@/layout", () => ({
-  default: () => <div>Mock Layout</div>,
+// --- Mocks ---
+vi.mock("@/components/common/ErrorBoundaryWrapper", () => ({
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div>Mock ErrorBoundary: {children}</div>
+  ),
 }));
 
-const renderWithRoute = (path: string) => {
-  const base = import.meta.env.VITE_BASE_URL || "/";
-  const fullPath = `${base.replace(/\/$/, "")}${path}`;
-  window.history.pushState({}, "Test Page", fullPath);
-  return render(<RoutesComponent />);
+vi.mock("@/components/common/FullScreenLoader", () => ({
+  default: () => <div>Loading...</div>,
+}));
+
+vi.mock("@/features/login", () => ({
+  default: () => <div>Login Page</div>,
+}));
+
+vi.mock("@/layout/PublicLayout", () => ({
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div>
+      Public Layout
+      {children}
+    </div>
+  ),
+}));
+
+vi.mock("@/layout/PrivateLayout", () => ({
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div>
+      Private Layout
+      {children}
+    </div>
+  ),
+}));
+
+vi.mock("../components/PrivateRoutes", () => ({
+  default: ({ element }: { element: React.ReactNode }) => (
+    <div>Private Route: {element}</div>
+  ),
+}));
+
+vi.mock("../routesConfig", () => ({
+  publicRoute: [{ path: "about", element: <div>About Page</div> }],
+  privateRoutes: [{ path: "dashboard", element: <div>Dashboard Page</div> }],
+}));
+
+vi.mock("../constants", () => ({
+  ROUTES: {
+    LOGIN: "/login",
+  },
+}));
+
+// --- Helper ---
+const setPath = (path: string) => {
+  window.history.pushState({}, "Test page", path);
 };
 
 describe("RoutesComponent", () => {
-  it("renders Layout component", () => {
-    renderWithRoute("/login");
-    expect(screen.getByText("Mock Layout")).toBeInTheDocument();
+  beforeEach(() => {
+    vi.resetModules();
   });
 
-  it("renders public route component", () => {
-    renderWithRoute("/login");
-    expect(screen.getByText("Mock Layout")).toBeInTheDocument();
-  });
-
-  it("renders private route component", () => {
-    renderWithRoute("/dashboard");
-    expect(screen.getByText("Mock Layout")).toBeInTheDocument();
+  it("renders login route with ErrorBoundary", () => {
+    setPath("/stp/login");
+    render(<RoutesComponent />);
+    expect(screen.getByText("Mock ErrorBoundary:")).toBeInTheDocument();
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
   });
 });

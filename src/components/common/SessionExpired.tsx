@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router";
 
 import sessionExpired from "@/assets/images/notAllowed.svg";
-import { SESSION_STORAGE_KEY } from "@/constants/globalConstant";
 import translator from "@/i18n/translator";
 import { ROUTES } from "@/routes/constants";
+import { clearToken } from "@/services/api.service";
 
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -11,7 +11,7 @@ import { Card } from "../ui/card";
 const SessionExpired = () => {
   const navigate = useNavigate();
   const redirectToLogin = () => {
-    sessionStorage.removeItem(SESSION_STORAGE_KEY.TOKEN);
+    clearToken();
     navigate(ROUTES.LOGIN);
   };
 

@@ -3,6 +3,8 @@ import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
+import infoIcon from "@/assets/images/info-black.svg";
+import InfoMessage from "@/components/common/InfoMessage";
 import MobileNumberInput from "@/components/common/MobileNumberInput";
 import RadioGroupComponent from "@/components/common/RadioGroupComponent";
 import { Button } from "@/components/ui/button";
@@ -68,6 +70,7 @@ interface ICustomerSearchProps {
   onReset: () => void;
   onResetCustomerSearchAPI: () => void;
   isSuccess: boolean;
+  showInfoMessage?: boolean;
 }
 
 const CustomerSearchForm = forwardRef(
@@ -77,6 +80,7 @@ const CustomerSearchForm = forwardRef(
       onReset,
       onResetCustomerSearchAPI,
       isSuccess,
+      showInfoMessage,
     }: ICustomerSearchProps,
     ref: React.Ref<{ resetForm: () => void }>
   ) => {
@@ -100,7 +104,7 @@ const CustomerSearchForm = forwardRef(
         });
       } else if (data.searchBy === "cif") {
         onSearch({
-          customerID: Number(data.cif),
+          customerID: data.cif,
         });
       } else if (data.searchBy === "account") {
         onSearch({
@@ -137,12 +141,12 @@ const CustomerSearchForm = forwardRef(
       !form.watch("mobile") && !form.watch("cif") && !form.watch("account");
 
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <h2 className="text-xl font-medium">
           {translator("reKyc.searchWith")}
         </h2>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
               name="searchBy"
@@ -219,6 +223,14 @@ const CustomerSearchForm = forwardRef(
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+            )}
+
+            {showInfoMessage && (
+              <InfoMessage
+                icon={infoIcon}
+                className="mb-5"
+                message={"mobileNumberUpdate.errorMessages.aadharMustLinked"}
               />
             )}
 

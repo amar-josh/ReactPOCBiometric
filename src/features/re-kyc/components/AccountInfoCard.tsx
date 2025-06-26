@@ -66,7 +66,7 @@ const AccountInfoCard = ({
               key={index}
               className="flex justify-between items-center rounded-md"
             >
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-col lg:flex-row gap-2">
                 <p className="text-sm">{translator("reKyc.accountNumber")}:</p>
                 <p className="text-muted-foreground text-sm">
                   {maskData(

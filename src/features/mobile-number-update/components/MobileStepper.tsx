@@ -15,15 +15,7 @@ export default function MobileNumberStepper({
   completed,
 }: IMobileNumberStepperProps) {
   return (
-    <div className="md:px-6 md:pt-6 md:pb-10 px-6 pt-6 flex md:flex-col-reverse flex-col">
-      {/* Left side: Step name */}
-      <div
-        data-testid="current-step-label"
-        className="flex flex-col md:mt-7 md:mb-0  mb-6  items-start  md:py-0 text-xl md:text-2xl font-semibold"
-      >
-        <div>{translator(steps[currentStep - 1])}</div>
-      </div>
-
+    <div className="md:pt-6 md:pb-10 pt-6 flex md:flex-col-reverse flex-col">
       {/* Center: Stepper */}
       <div className="relative flex md:mb-0 mb-6 w-full mx-auto flex-1">
         {steps.map((label, index) => {

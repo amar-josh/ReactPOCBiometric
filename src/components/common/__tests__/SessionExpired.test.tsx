@@ -1,6 +1,11 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  getSessionStorageData,
+  setSessionStorageData,
+} from "@/lib/sessionStorage";
+
 import SessionExpired from "../SessionExpired";
 
 // ✅ Setup: Mock useNavigate and translator
@@ -17,7 +22,7 @@ const SESSION_TOKEN_KEY = "token"; // Or use your actual SESSION_STORAGE_KEY.TOK
 
 describe("SessionExpired", () => {
   beforeEach(() => {
-    sessionStorage.setItem(SESSION_TOKEN_KEY, "dummyToken");
+    setSessionStorageData(SESSION_TOKEN_KEY, "dummyToken");
     mockNavigate.mockClear(); // Reset the mock between tests
   });
 
@@ -37,7 +42,7 @@ describe("SessionExpired", () => {
     const button = screen.getByRole("button", { name: "button.backToLogin" });
     fireEvent.click(button);
 
-    expect(sessionStorage.getItem(SESSION_TOKEN_KEY)).toBeNull();
+    expect(getSessionStorageData<string>(SESSION_TOKEN_KEY)).toBeNull();
     expect(mockNavigate).toHaveBeenCalledWith("/login");
   });
 });

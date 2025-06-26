@@ -6,7 +6,7 @@ import AlertMessage from "@/components/common/AlertMessage";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { ERROR } from "@/constants/globalConstant";
-import { useGetOtherDropdownDetails } from "@/features/re-kyc/hooks";
+import { useGetOtherDropdownDetails } from "@/features/re-kyc/hooks/useRekyc";
 import {
   IAddress,
   ILabelValue,
@@ -228,7 +228,7 @@ const ReKYCDetails = ({
               />
             )}
           </div>
-          <div className="flex justify-items-start mt-5 gap-3">
+          <div className="flex flex-col md:flex-row justify-items-start mt-5 gap-3">
             <Button
               variant="primary"
               type="submit"

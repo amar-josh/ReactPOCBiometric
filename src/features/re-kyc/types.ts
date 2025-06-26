@@ -34,7 +34,7 @@ export interface IBiometricCardDetails {
 }
 
 export interface IGetCustomerSearchRequest {
-  customerID?: number;
+  customerID?: string;
   mobileNumber?: string;
   accountNumber?: number;
 }

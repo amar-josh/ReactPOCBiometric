@@ -29,7 +29,7 @@ const AccessErrorCard = ({
 }: IAccessErrorCard) => {
   return (
     <div className="flex items-center justify-center h-screen px-4 sm:px-6 lg:px-0 my-10">
-      <Card className="max-w-xl shadow-md">
+      <Card className="w-max shadow-md">
         <div className="flex flex-col items-center justify-center text-center px-6 py-10 sm:px-10 sm:py-12">
           <img
             src={accessDeniedIcon}

@@ -1,34 +1,41 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { axiosInstance } from "@/services/api.service";
+import { ENDPOINTS } from "@/constants/endPoints";
 
-import { clearTokens } from "../services";
+import { generateToken, logout } from "../services";
 
+// Mock POST from api.service
 vi.mock("@/services/api.service", () => ({
-  axiosInstance: {
-    defaults: {
-      headers: {
-        common: {
-          Authorization: "Bearer something",
-        },
-      },
-    },
-  },
+  POST: vi.fn(),
 }));
 
-describe("clearTokens", () => {
-  beforeEach(() => {
-    localStorage.setItem("appToken", "test-token");
-    axiosInstance.defaults.headers.common.Authorization = "Bearer something";
+describe("login/services", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("removes appToken from localStorage", () => {
-    clearTokens();
-    expect(localStorage.getItem("appToken")).toBeNull();
+  describe("generateToken", () => {
+    it("calls POST with correct endpoint and returns response", async () => {
+      const mockResponse = { token: "abc123" };
+      const { POST } = await import("@/services/api.service");
+      (POST as any).mockResolvedValueOnce(mockResponse);
+
+      const result = await generateToken();
+      expect(POST).toHaveBeenCalledWith(ENDPOINTS.GENERATE_TOKEN);
+      expect(result).toBe(mockResponse);
+    });
+
+    it("throws if POST rejects", async () => {
+      const { POST } = await import("@/services/api.service");
+      (POST as any).mockRejectedValueOnce(new Error("fail"));
+
+      await expect(generateToken()).rejects.toThrow("fail");
+    });
   });
 
-  it("clears axiosInstance Authorization header", () => {
-    clearTokens();
-    expect(axiosInstance.defaults.headers.common.Authorization).toBe("");
+  describe("logout", () => {
+    it("is a function (placeholder until implemented)", () => {
+      expect(typeof logout).toBe("function");
+    });
   });
 });

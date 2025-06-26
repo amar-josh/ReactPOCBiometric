@@ -8,12 +8,20 @@ vi.mock("@/i18n/translator", () => ({
   default: (key: string) => key,
 }));
 
+type IButtonProps =
+  | "default"
+  | "destructive"
+  | "outline"
+  | "primary"
+  | "ghost"
+  | "link";
+
 describe("AccessErrorCard", () => {
   const defaultProps = {
     title: "access.denied",
     description: "you.do.not.have.permission",
     primaryButtonText: "go.back",
-    primaryButtonType: "primary",
+    primaryButtonType: "default" as IButtonProps,
     onClickPrimaryButton: vi.fn(),
   };
 

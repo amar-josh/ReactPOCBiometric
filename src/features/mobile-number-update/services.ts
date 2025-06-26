@@ -1,23 +1,9 @@
-import ENDPOINTS from "@/constants/endPoints";
-import { fetchFakeData } from "@/lib/utils";
-import globalFailureMockData from "@/mocks/globalFailure.json";
+import { MOBILE_NUMBER_ENDPOINTS } from "@/constants/endPoints";
 import { POST } from "@/services/api.service";
-import { ICommonSuccessResponse } from "@/types";
 
-import { biometricApiSuccess } from "../re-kyc/mocks/biometricMocks";
-import accountDormancy from "./mocks/accountDormancyError.json";
-import mockData from "./mocks/checkDuplicateNumber.json";
-import checkStatusMockdata from "./mocks/checkStatusSuccess.json";
-import checkStatusFailureMockdata from "./mocks/checkStatusValidationError.json";
-import fetchCheckpointFailure from "./mocks/fetchCheckpointFailure.json";
-import fetchRecordsSuccess from "./mocks/fetchRecordsSuccess.json";
-import getLinkMockData from "./mocks/generateLinkSuccess.json";
-import verifyLinkFailureMockData from "./mocks/linkVerificationError.json";
-import searchCustomer from "./mocks/searchCustomerCIFsuccess.json";
-import updateNumberMockData from "./mocks/updateNumberSuccess.json";
-import verifyLinkSuccessMockData from "./mocks/verifyLinkSuccess.json";
 import {
   IBioMetricVerificationRequest,
+  IBioMetricVerificationResponse,
   IGetCheckStatusRequest,
   IGetCheckStatusResponse,
   IGetCustomerSearchRequest,
@@ -34,75 +20,74 @@ import {
   IGetVerifyNumberResponse,
 } from "./types";
 
-export const getCustomerSearchService =
-  (): // payload: IGetCustomerSearchRequest
-  Promise<IGetCustomerSearchResponse> => {
-    // return POST<IGetCustomerSearchRequest, IGetCustomerSearchResponse>(
-    //   ENDPOINTS.SEARCH_CUSTOMER,
-    //   payload
-    // );
-    return fetchFakeData(searchCustomer);
-  };
-
-export const getVerifyNumberService = (): // payload: any
-Promise<IGetVerifyNumberRequest> => {
-  //   return POST<IGetVerifyNumberRequest, IGetVerifyNumberResponse>(
-  //     ENDPOINTS.VERIFY_NUMBER,
-  //     payload
-  //   );
-  return fetchFakeData(mockData);
+export const getCustomerSearchService = (
+  payload: IGetCustomerSearchRequest
+): Promise<IGetCustomerSearchResponse> => {
+  return POST<IGetCustomerSearchRequest, IGetCustomerSearchResponse>(
+    MOBILE_NUMBER_ENDPOINTS.SEARCH_CUSTOMER,
+    payload
+  );
 };
 
-export const getUpdateNumberService = (): // payload: any
-Promise<IGetUpdateNumberRequest> => {
-  // return POST<IGetUpdateNumberRequest, IGetUpdateNumberResponse>(
-  //   ENDPOINTS.UPDATE_NUMBER,
-  //   payload
-  // );
-  return fetchFakeData(updateNumberMockData);
+export const getVerifyNumberService = (
+  payload: IGetVerifyNumberRequest
+): Promise<IGetVerifyNumberResponse> => {
+  return POST<IGetVerifyNumberRequest, IGetVerifyNumberResponse>(
+    MOBILE_NUMBER_ENDPOINTS.VERIFY_NUMBER,
+    payload
+  );
 };
 
-export const getFetchRecordsService = (): // payload: any
-Promise<IGetRecordRequest> => {
-  //   return POST<IGetRecordRequest, IGetRecordResponse>(
-  //     ENDPOINTS.GET_CUSTOMER_RECORDS,
-  //     payload
-  //   );
-  return fetchFakeData(fetchRecordsSuccess);
+export const getUpdateNumberService = (
+  payload: IGetUpdateNumberRequest
+): Promise<IGetUpdateNumberResponse> => {
+  return POST<IGetUpdateNumberRequest, IGetUpdateNumberResponse>(
+    MOBILE_NUMBER_ENDPOINTS.UPDATE_NUMBER,
+    payload
+  );
 };
 
-export const getCheckStatusService = (): // payload: any
-Promise<IGetCheckStatusRequest> => {
-  // return POST<IGetCheckStatusRequest, IGetCheckStatusResponse>(
-  //   ENDPOINTS.CHECK_STATUS,
-  //   payload
-  // );
-  return fetchFakeData(checkStatusMockdata);
+export const getFetchRecordsService = (
+  payload: IGetRecordRequest
+): Promise<IGetRecordResponse> => {
+  return POST<IGetRecordRequest, IGetRecordResponse>(
+    MOBILE_NUMBER_ENDPOINTS.GET_CUSTOMER_RECORDS,
+    payload
+  );
 };
 
-export const getGenerateLinkService = (): // payload: any
-Promise<IGetGenerateLinkRequest> => {
-  // return POST<IGetGenerateLinkRequest, IGetGenerateLinkResponse>(
-  //   ENDPOINTS.GENERATE_LINK,
-  //   payload
-  // );
-  return fetchFakeData(getLinkMockData);
+export const getCheckStatusService = (
+  payload: IGetCheckStatusRequest
+): Promise<IGetCheckStatusResponse> => {
+  return POST<IGetCheckStatusRequest, IGetCheckStatusResponse>(
+    MOBILE_NUMBER_ENDPOINTS.CHECK_STATUS,
+    payload
+  );
 };
 
-export const getVerifyLinkService = (): // payload: any
-Promise<IGetVerifyLinkRequest> => {
-  // return POST<IGetVerifyLinkRequest, IGetVerifyLinkResponse>(
-  //   ENDPOINTS.VERIFY_LINK,
-  //   payload
-  // );
-  return fetchFakeData(verifyLinkFailureMockData);
+export const getGenerateLinkService = (
+  payload: IGetGenerateLinkRequest
+): Promise<IGetGenerateLinkResponse> => {
+  return POST<IGetGenerateLinkRequest, IGetGenerateLinkResponse>(
+    MOBILE_NUMBER_ENDPOINTS.GENERATE_LINK,
+    payload
+  );
 };
 
-export const getBioMetricVerificationService = (): // payload: any
-Promise<IBioMetricVerificationRequest> => {
-  // return POST<IBioMetricVerificationRequest, ICommonSuccessResponse>(
-  //   ENDPOINTS.BIOMETRIC_VERIFICATION,
-  //   payload
-  // );
-  return fetchFakeData(biometricApiSuccess);
+export const getVerifyLinkService = (
+  payload: IGetVerifyLinkRequest
+): Promise<IGetVerifyLinkResponse> => {
+  return POST<IGetVerifyLinkRequest, IGetVerifyLinkResponse>(
+    MOBILE_NUMBER_ENDPOINTS.VERIFY_LINK,
+    payload
+  );
+};
+
+export const getBioMetricVerificationService = (
+  payload: IBioMetricVerificationRequest
+): Promise<IBioMetricVerificationResponse> => {
+  return POST<IBioMetricVerificationRequest, IBioMetricVerificationResponse>(
+    MOBILE_NUMBER_ENDPOINTS.BIOMETRIC_VERIFICATION,
+    payload
+  );
 };

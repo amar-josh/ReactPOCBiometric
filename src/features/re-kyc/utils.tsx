@@ -41,30 +41,30 @@ export const getBiometricCardDetails = ({
   switch (statusKey) {
     case BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS:
       return {
-        title: "Searching RD Service",
-        message: "reKyc.biometric.biometricServiceCheck",
+        title: "reKyc.biometric.searchingRDService",
+        message: "reKyc.biometric.searchingRDServiceMessage",
         icon: fingerprint,
         key: "retryRDService",
       };
     case BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_ERROR:
       return {
-        title: "RD Service Not Available",
-        message: "reKyc.biometric.biometricServiceNotFound",
+        title: "reKyc.biometric.rdServiceNotFound",
+        message: "reKyc.biometric.rdServiceNotFoundMessage",
         icon: fingerprintFailure,
         buttonText: "Retry",
         key: "retryRDService",
       };
     case BIOMETRIC_OPERATIONS.DEVICE_USED_BY_ANOTHER_APPLICATION:
       return {
-        title: "Device Not Found",
-        message: "reKyc.biometric.deviceUsedByOtherApp",
+        title: "reKyc.biometric.deviceNotFound",
+        message: "reKyc.biometric.deviceUsedByOtherAppMessage",
         icon: fingerprintFailure,
         buttonText: "Retry",
         key: "retryRDService",
       };
     case BIOMETRIC_OPERATIONS.DEVICE_NOT_READY:
       return {
-        title: "Device Not Found",
+        title: "reKyc.biometric.deviceNotFound",
         message: "reKyc.biometric.connectBiometricDevice",
         icon: fingerprintFailure,
         buttonText: "Retry",
@@ -88,7 +88,7 @@ export const getBiometricCardDetails = ({
       };
     case BIOMETRIC_OPERATIONS.NO_FINGER_FOUND:
       return {
-        title: "No Finger found",
+        title: "reKyc.biometric.noFingerFound",
         message:
           "No finger is placed on device, Please make sure to place your finger on the device",
         icon: fingerprintFailure,
@@ -136,7 +136,6 @@ export const getBiometricCardDetails = ({
         icon: xicon,
         buttonText: "Re-capture",
         key: "retryDevice",
-        isError: true,
       };
   }
 };

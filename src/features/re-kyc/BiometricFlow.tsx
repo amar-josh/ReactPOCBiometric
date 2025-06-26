@@ -1,28 +1,25 @@
 import { AxiosError } from "axios";
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  useCaptureFingerprint,
-  useGetDeviceStatus,
-  useGetRDServiceStatus,
-} from "@/features/re-kyc/hooks";
+import { BIOMETRIC_SERVICE_AND_DEVICE_STATUS } from "@/constants/globalConstant";
 import {
   IBiometricCardDetails,
   IValidateFingerPrintRequest,
 } from "@/features/re-kyc/types";
+import {
+  useCaptureFingerprint,
+  useGetDeviceStatus,
+  useGetRDServiceStatus,
+} from "@/hooks/useBiometrics";
 import { useDeviceDetection } from "@/hooks/useDeviceDetection";
 
 import BiometricVerificationComponent from "./components/BiometricVerification";
-import {
-  BIOMETRIC_DEVICE_STATUS,
-  BIOMETRIC_MODAL_ACTIONS,
-  BIOMETRIC_OPERATIONS,
-} from "./constants";
+import { BIOMETRIC_MODAL_ACTIONS, BIOMETRIC_OPERATIONS } from "./constants";
 import { getBiometricCardDetails } from "./utils";
 
 interface IBiometricFlowProps {
   onCancel: () => void;
-  updateStep: (success: boolean) => void;
+  updateStep: () => void;
   aadhaarNumber: string;
   isAddressUpdate: boolean;
   requestNumber: string;
@@ -161,7 +158,7 @@ const BiometricFlow = ({
     if (hasAttemptFailed) return;
     if (isDeviceStatusSuccess && deviceStatusData) {
       const operationMode =
-        deviceStatusData === BIOMETRIC_DEVICE_STATUS.READY
+        deviceStatusData === BIOMETRIC_SERVICE_AND_DEVICE_STATUS.READY
           ? BIOMETRIC_OPERATIONS.READY_TO_CAPTURE
           : BIOMETRIC_OPERATIONS.DEVICE_NOT_READY;
       updateBiometricModalDetails(operationMode, attemptCount);
@@ -210,7 +207,7 @@ const BiometricFlow = ({
   // only in case of success, clsoe the modal and show the profile, tabel and address
   const onClose = () => {
     setIsBiometricModalOpen(false);
-    updateStep(true);
+    updateStep();
     if (!isAddressUpdate) {
       handleAddressConfirmed();
     }

@@ -24,7 +24,7 @@ export default function MobileNumberInput({
   placeholder,
 }: IMobileNumberInputProps) {
   return (
-    <div className="space-y-1 w-full max-w-sm">
+    <div className="w-full max-w-sm">
       {label && (
         <Label htmlFor={name} className="text-sm text-muted-foreground">
           {label} {required && <span className="text-destructive">*</span>}
@@ -33,7 +33,7 @@ export default function MobileNumberInput({
 
       <div
         className={cn(
-          "flex items-stretch border rounded-md bg-white overflow-hidden mb-2",
+          "flex items-stretch border rounded-md bg-white overflow-hidden",
           error
             ? "border-red-500"
             : "border-input focus-within:border-primary focus-visible:ring-[2px]"

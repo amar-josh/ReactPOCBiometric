@@ -34,7 +34,10 @@ export default function Stepper({
               "bg-gray-50 text-gray-400 border-gray-300": nextSteps,
             })}
           >
-            <p>{stepNum}.</p> {translator(label)}
+            <div className="flex gap-1">
+              <p>{stepNum}.</p>
+              {translator(label)}
+            </div>
             <div className="flex-end ml-auto">
               {isActive && !completed[stepNum] && <img src={rightArrow} />}
               {completed[stepNum] && <img src={check} />}

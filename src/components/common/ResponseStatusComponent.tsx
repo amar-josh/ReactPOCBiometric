@@ -37,12 +37,12 @@ const ResponseStatusComponent = ({
           <div className=" p-3 rounded-full">
             <img src={Icon} className="text-white " />
           </div>
-          <h2 className="font-semibold text-xl">{title}</h2>
-          <p className="font-semibold text-lg">{message}</p>
+          <h2 className="font-semibold text-xl">{translator(title)}</h2>
+          <p className="font-semibold text-lg">{translator(message)}</p>
           {requestNumber && (
             <p className="text-sm">
               <span className="text-primary text-lg">
-                {translator("mobileNumberUpdate.requestNumber")}
+                {translator("requestNumber")}
               </span>
               <span className="text-gray-500 px-2">{requestNumber}</span>
             </p>

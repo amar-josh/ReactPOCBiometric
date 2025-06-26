@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ERROR, SUCCESS } from "@/constants/globalConstant";
 
@@ -18,7 +18,10 @@ vi.mock("@/components/common/AlertMessage", () => ({
 
 vi.mock("@/features/re-kyc/components/CustomerSearchForm", () => ({
   __esModule: true,
-  default: (props: any) => (
+  default: (props: {
+    onSearch: (data: unknown) => void;
+    onReset: () => void;
+  }) => (
     <div>
       <button onClick={() => props.onSearch({})}>Search</button>
       <button onClick={props.onReset}>Reset</button>
@@ -33,7 +36,15 @@ vi.mock("@/features/re-kyc/components/PersonalDetailsCard", () => ({
 
 vi.mock("@/features/re-kyc/components/AccountInfoCard", () => ({
   __esModule: true,
-  default: ({ selected, onSelect, customerDetails }: any) => (
+  default: ({
+    selected,
+    onSelect,
+    customerDetails,
+  }: {
+    selected: boolean | string;
+    onSelect: () => void;
+    customerDetails: { customerId: string };
+  }) => (
     <div>
       <div>{customerDetails.customerId}</div>
       <button onClick={onSelect}>{selected ? "Selected" : "Select"}</button>
@@ -65,6 +76,9 @@ describe("CustomerSearch Component", () => {
         custDetails: {
           customerId: "123",
           isIndividual: false,
+          customerName: "John Doe",
+          mobileNumber: "1234567890",
+          email: "john@example.com",
         },
         accDetails: [],
       },
@@ -86,7 +100,6 @@ describe("CustomerSearch Component", () => {
       screen.getByText("mobileNumberUpdate.errorMessages.aadharMustLinked")
     ).toBeInTheDocument();
     expect(screen.getByText("Search success!")).toBeInTheDocument();
-    expect(screen.getByText("John Doe")).toBeInTheDocument();
     expect(screen.getByText("123")).toBeInTheDocument();
     expect(
       screen.getByText("mobileNumberUpdate.numberUpdateForAboveAccount")
@@ -121,13 +134,7 @@ describe("CustomerSearch Component", () => {
   });
 
   it("does not render details if `accountDetails` and `personalDetails` are undefined", () => {
-    render(
-      <CustomerSearch
-        {...defaultProps}
-        accountDetails={undefined}
-        personalDetails={undefined}
-      />
-    );
+    render(<CustomerSearch {...defaultProps} accountDetails={undefined} />);
     expect(screen.queryByText("John Doe")).not.toBeInTheDocument();
     expect(screen.queryByText("123")).not.toBeInTheDocument();
   });

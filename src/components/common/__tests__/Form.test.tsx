@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 // Wrapper component for testing
-const TestForm = ({ defaultValues = { email: "" }, errors = false }) => {
+const TestForm = ({ defaultValues = { email: "" } }) => {
   const methods = useForm({
     defaultValues,
     mode: "onSubmit",

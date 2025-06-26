@@ -25,19 +25,21 @@ vi.mock("@/routes/constants", () => ({
 }));
 
 describe("useHandleProtectedRefreshPage", () => {
-  let addEventListenerSpy: any;
-  let removeEventListenerSpy: any;
-  let setItemSpy: any;
-  let getItemSpy: any;
-  let removeItemSpy: any;
-  let pushStateSpy: any;
+  let addEventListenerSpy: ReturnType<typeof vi.spyOn>;
+  let removeEventListenerSpy: ReturnType<typeof vi.spyOn>;
+  let setItemSpy: ReturnType<typeof vi.spyOn>;
+  let getItemSpy: ReturnType<typeof vi.spyOn>;
+  let removeItemSpy: ReturnType<typeof vi.spyOn>;
+  let pushStateSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
     addEventListenerSpy = vi.spyOn(window, "addEventListener");
     removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
     setItemSpy = vi.spyOn(window.sessionStorage, "setItem");
-    getItemSpy = vi.spyOn(window.sessionStorage, "getItem");
+    getItemSpy = vi.spyOn(window.sessionStorage, "getItem") as ReturnType<
+      typeof vi.spyOn
+    >;
     removeItemSpy = vi.spyOn(window.sessionStorage, "removeItem");
     pushStateSpy = vi.spyOn(window.history, "pushState");
     mockUseLocation.mockReturnValue({ pathname: "/protected" });
@@ -82,11 +84,16 @@ describe("useHandleProtectedRefreshPage", () => {
   it("should not set sessionStorage on beforeunload for non-protected route", () => {
     mockUseLocation.mockReturnValue({ pathname: "/public" });
     renderHook(() => useHandleProtectedRefreshPage());
-    const handler = addEventListenerSpy.mock.calls.find(
-      ([event]) => event === "beforeunload"
-    )[1];
+    const handler =
+      addEventListenerSpy.mock.calls.find(
+        ([event]) => event === "beforeunload"
+      )?.[1] ?? (() => {});
     const event = { preventDefault: vi.fn() };
-    handler(event);
+    if (typeof handler === "function") {
+      if (typeof handler === "function") {
+        handler(event);
+      }
+    }
     expect(setItemSpy).not.toHaveBeenCalled();
   });
 
@@ -115,11 +122,14 @@ describe("useHandleProtectedRefreshPage", () => {
 
   it("should prevent default on popstate", () => {
     renderHook(() => useHandleProtectedRefreshPage());
-    const handler = addEventListenerSpy.mock.calls.find(
-      ([event]) => event === "popstate"
-    )[1];
+    const handler =
+      addEventListenerSpy.mock.calls.find(
+        ([event]) => event === "popstate"
+      )?.[1] ?? (() => {});
     const event = { preventDefault: vi.fn() };
-    handler(event);
+    if (typeof handler === "function") {
+      handler(event);
+    }
     expect(event.preventDefault).toHaveBeenCalled();
     expect(pushStateSpy).toHaveBeenCalled();
   });

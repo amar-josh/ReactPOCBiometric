@@ -8,7 +8,6 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -20,7 +19,6 @@ import { cn } from "@/lib/utils";
 
 interface IComboBoxProps {
   list: ILabelValue[];
-  defaultValue?: string;
   onChange?: (val: ILabelValue | null) => void;
   value?: string | number | null;
   error?: boolean;
@@ -28,7 +26,6 @@ interface IComboBoxProps {
 
 export function ComboBox({
   list,
-  defaultValue,
   onChange,
   value,
   error = false,

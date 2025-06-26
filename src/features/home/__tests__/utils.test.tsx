@@ -28,7 +28,7 @@ describe("getIconBasedOnModuleKey", () => {
   });
 
   it("returns empty string for unknown moduleKey", () => {
-    expect(getIconBasedOnModuleKey("UNKNOWN_KEY")).toBe("");
+    expect(getIconBasedOnModuleKey("UNKNOWN_KEY")).toBe(kyc);
   });
 });
 

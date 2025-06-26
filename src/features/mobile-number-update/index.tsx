@@ -7,12 +7,14 @@ import FullScreenLoader from "@/components/common/FullScreenLoader";
 import ResponseStatusComponent from "@/components/common/ResponseStatusComponent";
 import { Separator } from "@/components/ui/separator";
 import { ERROR, MASKED_KEY, SUCCESS } from "@/constants/globalConstant";
-import { IGetCustomerSearchRequest } from "@/features/re-kyc/types";
+import {
+  ICheckpointFailure,
+  IGetCustomerSearchRequest,
+} from "@/features/re-kyc/types";
 import { useAlertMessage } from "@/hooks/useAlertMessage";
 import translator from "@/i18n/translator";
 import { maskData } from "@/lib/maskData";
 import { ROUTES } from "@/routes/constants";
-import { IAlertMessage } from "@/types";
 
 import Stepper from "../../components/common/Stepper";
 import BiometricFlow from "../re-kyc/BiometricFlow";
@@ -21,7 +23,7 @@ import alertIcon from "./../../assets/images/alert.svg";
 import CustomerSearch from "./components/CustomerSearch";
 import MobileStepper from "./components/MobileStepper";
 import UpdateDetails from "./components/UpdateDetails";
-import { AADHAR_NOT_AVAILABLE, STEPS } from "./constants";
+import { STEPS } from "./constants";
 import {
   useBioMetricVerification,
   useCustomerSearch,
@@ -37,7 +39,7 @@ const MobileNumberUpdate = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAadhaarRequired, setIsAadhaarRequired] = useState(false);
   const [biometricStatus, setBiometricStatus] = useState(
-    BIOMETRIC_OPERATIONS.DEVICE_NOT_READY
+    BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_ERROR
   );
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -47,7 +49,14 @@ const MobileNumberUpdate = () => {
     3: false,
   });
   const [selected, setSelected] = useState<string | undefined>("");
-  const [newMobileNumber, setNewMobileNumber] = useState("");
+  const [newMobileNumber, setNewMobileNumber] = useState<string | undefined>(
+    ""
+  );
+
+  const [actionCode, setActionCode] = useState<string | undefined>("");
+
+  const [isUpdateNumberSuccess, setIsUpdateNumberSuccess] =
+    useState<boolean>(false);
 
   const updateStep = () => {
     setCompleted((prev) => ({ ...prev, [currentStep]: true }));
@@ -77,13 +86,14 @@ const MobileNumberUpdate = () => {
     mutate: updateNumber,
     data: updateNumberResponse,
     isPending: isUpdateNumberLoading,
-    isError: isUpdateNumberError,
   } = useUpdateNumber();
 
   const {
     mutate: bioMetricVerificationMutation,
     isPending: isBioMetricVerificationLoading,
     data: bioMetricVerificationResponse,
+    error: bioMetricVerificationError,
+    isError: isBioMetricVerificationError,
   } = useBioMetricVerification();
 
   const {
@@ -104,14 +114,17 @@ const MobileNumberUpdate = () => {
     isCustomerSearchError
   );
 
-  const actionCode = getRecordsData?.data?.actionCode || "";
+  const requestNumber = Array.isArray(getRecordsData?.data)
+    ? getRecordsData?.data[0]?.requestNumber || ""
+    : "";
 
-  const requestNumber = getRecordsData?.data[0]?.requestNumber || "";
+  const personalDetails = Array.isArray(getRecordsData?.data)
+    ? getRecordsData?.data[0] || {}
+    : {};
 
-  const personalDetails = getRecordsData?.data[0] || {};
-
-  const aadhaarNumber =
-    getRecordsData?.data[0]?.custDetails?.aadharNumber || "";
+  const aadhaarNumber = Array.isArray(getRecordsData?.data)
+    ? getRecordsData?.data[0]?.custDetails?.aadharNumber || ""
+    : "";
 
   const maskedAadhaarNumber = maskData(aadhaarNumber, MASKED_KEY.AADHAAR);
 
@@ -120,18 +133,14 @@ const MobileNumberUpdate = () => {
   // Handle customer search success and default cif selection
   useEffect(() => {
     if (isCustomerSearchSuccess) {
-      if (customerDetailsResponse?.data?.status === AADHAR_NOT_AVAILABLE) {
-        setIsAadhaarRequired(true);
-      } else {
-        setCustomerSearchAlertMessage({
-          type: SUCCESS,
-          message: customerDetailsResponse.message,
-        });
-      }
+      setCustomerSearchAlertMessage({
+        type: SUCCESS,
+        message: customerDetailsResponse.message,
+      });
 
       if (customerDetailsResponse?.data?.length > 0) {
         const enabledCifDetails = customerDetailsResponse?.data?.find(
-          (cifDetails) => !cifDetails.isIndividual
+          (cifDetails) => !cifDetails?.custDetails?.isIndividual
         );
         setSelected(
           enabledCifDetails
@@ -141,7 +150,7 @@ const MobileNumberUpdate = () => {
       }
     }
   }, [
-    customerDetailsResponse?.data.cifs,
+    customerDetailsResponse?.data,
     customerDetailsResponse?.message,
     isCustomerSearchSuccess,
   ]);
@@ -192,7 +201,9 @@ const MobileNumberUpdate = () => {
   );
 
   const handleUpdateMobileNumber = () => {
-    // TODO:Replace hardcoded values with actual data from API
+    if (!selected || !newMobileNumber) {
+      return;
+    }
     const payload = {
       customerId: selected,
       custUpdatedMobileNumber: newMobileNumber,
@@ -201,7 +212,11 @@ const MobileNumberUpdate = () => {
       requestNumber: requestNumber,
       type: "XYZ",
     };
-    updateNumber(payload);
+    updateNumber(payload, {
+      onSuccess: () => {
+        setIsUpdateNumberSuccess(true);
+      },
+    });
   };
 
   const backToHome = () => {
@@ -216,14 +231,19 @@ const MobileNumberUpdate = () => {
         branchCode: "2541",
         employeeId: "281688",
         employeeName: "piyush jain",
-        cif: selected,
+        cif: selected || "",
       },
       {
-        onSuccess: (data) => {
-          if (data?.data?.action === "pop-up") {
+        // TODO:check success or error response
+        onSuccess: () => {
+          updateStep();
+        },
+        onError: (error: Error) => {
+          // Type guard to check if error is ICheckpointFailure
+          const checkpointError = error as unknown as ICheckpointFailure;
+          if (checkpointError?.data?.action === "pop-up") {
             setIsOpen(true);
-          } else {
-            updateStep();
+            setActionCode(checkpointError?.data?.actionCode);
           }
         },
       }
@@ -236,7 +256,7 @@ const MobileNumberUpdate = () => {
       bioMetricVerificationResponse?.data
     ) {
       if (
-        bioMetricVerificationResponse?.data?.aadharVerification ==
+        bioMetricVerificationResponse?.data?.aadhaarVerification ==
         BIOMETRIC_OPERATIONS.SUCCESS
       ) {
         setBiometricStatus(BIOMETRIC_OPERATIONS.SUCCESS);
@@ -245,9 +265,6 @@ const MobileNumberUpdate = () => {
       }
     }
   }, [bioMetricVerificationResponse, isBioMetricVerificationLoading]);
-
-  const isNumberUpdateSuccess =
-    !isUpdateNumberError || updateNumberResponse?.statusCode === 200;
 
   return (
     <div className="p-6">
@@ -301,8 +318,6 @@ const MobileNumberUpdate = () => {
               accountDetails={accountDetails}
               selected={selected}
               setSelected={setSelected}
-              isFetchRecordsError={isFetchRecordsError}
-              fetchRecordsError={fetchRecordsError}
             />
           )}
           {currentStep === 2 && (
@@ -324,29 +339,29 @@ const MobileNumberUpdate = () => {
               biometricStatus={biometricStatus}
               setBiometricStatus={setBiometricStatus}
               handleAddressConfirmed={handleUpdateMobileNumber}
-              captureFingerPrintDetails={bioMetricVerificationMutation}
-              isFingerPrintValidated={isBioMetricVerificationLoading}
+              validateFingerPrintMutate={bioMetricVerificationMutation}
+              isValidateFingerPrintError={isBioMetricVerificationError}
+              validateFingerPrintError={bioMetricVerificationError}
+              isValidateFingerPrintLoading={isBioMetricVerificationLoading}
             />
           )}
           {currentStep === 4 && !isUpdateNumberLoading && (
             <ResponseStatusComponent
-              status={isNumberUpdateSuccess ? "success" : "failure"}
+              status={isUpdateNumberSuccess ? "success" : "failure"}
               title={
-                translator(
-                  isNumberUpdateSuccess
-                    ? "reKyc.thankYou"
-                    : "reKyc.rekycUpdateFailed"
-                ) as string
+                (isUpdateNumberSuccess
+                  ? "reKyc.thankYou"
+                  : "reKyc.rekycUpdateFailed") as string
               }
               message={
-                isNumberUpdateSuccess
-                  ? translator("mobileNumberUpdate.numberWillUpdate")
-                  : translator("mobileNumberUpdate.tryWithFormBasedProcess")
+                isUpdateNumberSuccess
+                  ? "mobileNumberUpdate.numberWillUpdate"
+                  : "mobileNumberUpdate.tryWithFormBasedProcess"
               }
               // TODO: Replace with actual request number from API
               requestNumber={numberUpdateData?.requestNumber || ""}
               newMobileNumber={
-                isNumberUpdateSuccess ? numberUpdateData?.newMobileNumber : ""
+                isUpdateNumberSuccess ? numberUpdateData?.newMobileNumber : ""
               }
               oldMobileNumber={numberUpdateData?.oldMobileNumber || ""}
               backToHome={backToHome}
@@ -355,9 +370,15 @@ const MobileNumberUpdate = () => {
         </div>
       </div>
       <AlertDialogComponent
-        title={mobileNumberUpdateFailureCheckpoints[actionCode]?.title || ""}
+        title={
+          actionCode
+            ? mobileNumberUpdateFailureCheckpoints[actionCode]?.title
+            : ""
+        }
         message={
-          mobileNumberUpdateFailureCheckpoints[actionCode]?.message || ""
+          actionCode
+            ? mobileNumberUpdateFailureCheckpoints[actionCode]?.message
+            : ""
         }
         icon={alertIcon}
         onConfirm={onCancel}

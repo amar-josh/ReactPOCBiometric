@@ -1,9 +1,9 @@
-import { I } from "vitest/dist/chunks/reporters.d.CfRkRKN2.js";
-
 import { ICommonSuccessResponse } from "@/types";
 
+import { IAddress } from "../re-kyc/types";
+
 export interface IGetVerifyNumberRequest {
-  mobileNumber: number;
+  mobileNumber: string;
   requestNumber: string;
 }
 
@@ -55,12 +55,12 @@ export interface IGetRecordResponse {
 }
 
 export interface IGetCheckStatusRequest {
-  requestNumber: number;
+  requestNumber: string;
 }
 
 export interface IGetCheckStatusData {
   id: string;
-  service_request_number: string | number;
+  requestNumber: string;
   is_verified: boolean;
 }
 
@@ -90,7 +90,7 @@ export interface IGetGenerateLinkResponse {
 }
 
 export interface IGetVerifyLinkRequest {
-  shortCode: string;
+  shortCode: string | null;
 }
 
 export interface IGetVerifyLinkResponse {
@@ -99,9 +99,9 @@ export interface IGetVerifyLinkResponse {
 }
 
 export interface IGetCustomerSearchRequest {
-  branchCode: string;
-  employeeId: string | number;
-  employeeName: string;
+  branchCode?: string;
+  employeeId?: string | number;
+  employeeName?: string;
   cif?: string;
   mobileNumber?: string;
   accountNumber?: number;
@@ -110,9 +110,9 @@ export interface IGetCustomerSearchRequest {
 export interface ICustomerDetails {
   customerId: string;
   customerName: string;
-  mobileNumber: string | number;
+  mobileNumber: string;
   email: string;
-  isIndividual?: boolean;
+  isIndividual: boolean;
 }
 
 export interface IAccountDetail {
@@ -135,9 +135,20 @@ export interface IGetCustomerSearchResponse {
 }
 
 export interface IBioMetricVerificationRequest {
-  aadharNumber: string;
+  aadhaarNumber: string;
   rdServiceData: string;
   requestNumber: string;
+}
+
+export interface IBioMetricVerificationResponse {
+  message: string;
+  statusCode: string;
+  status: string;
+  data: {
+    aadhaarVerification: string;
+    requestNumber: string;
+    aadhaarAddress: IAddress;
+  };
 }
 
 export interface IMobileNumberUpdateFailureCheckpointElement {
@@ -147,5 +158,6 @@ export interface IMobileNumberUpdateFailureCheckpointElement {
 }
 
 export interface IMobileNumberUpdateFailureCheckpoints {
+  AADHAR_NOT_AVAILABLE: IMobileNumberUpdateFailureCheckpointElement;
   [key: string]: IMobileNumberUpdateFailureCheckpointElement;
 }

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { useSearchParams } from "react-router";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 
 import LinkVerification from "../components/LinkVerification";
 import { useVerifyLink } from "../hooks";
@@ -26,11 +26,11 @@ describe("LinkVerification", () => {
   });
 
   it("calls linkVerificationMutation with token on mount", () => {
-    (useSearchParams as unknown as vi.Mock).mockReturnValue([
+    (useSearchParams as unknown as Mock).mockReturnValue([
       new URLSearchParams("token=xyz"),
     ]);
 
-    (useVerifyLink as vi.Mock).mockReturnValue({
+    (useVerifyLink as unknown as Mock).mockReturnValue({
       mutate: mockMutate,
       data: null,
       isPending: false,
@@ -42,11 +42,11 @@ describe("LinkVerification", () => {
   });
 
   it("renders success UI when statusCode is 200", () => {
-    (useSearchParams as unknown as vi.Mock).mockReturnValue([
+    (useSearchParams as unknown as Mock).mockReturnValue([
       new URLSearchParams("token=abc123"),
     ]);
 
-    (useVerifyLink as vi.Mock).mockReturnValue({
+    (useVerifyLink as unknown as Mock).mockReturnValue({
       mutate: mockMutate,
       isPending: false,
       data: {
@@ -62,11 +62,11 @@ describe("LinkVerification", () => {
   });
 
   it("renders error UI when verification fails", () => {
-    (useSearchParams as unknown as vi.Mock).mockReturnValue([
+    (useSearchParams as unknown as Mock).mockReturnValue([
       new URLSearchParams("token=invalid"),
     ]);
 
-    (useVerifyLink as vi.Mock).mockReturnValue({
+    (useVerifyLink as unknown as Mock).mockReturnValue({
       mutate: mockMutate,
       isPending: false,
       data: null,
@@ -79,11 +79,11 @@ describe("LinkVerification", () => {
   });
 
   it("treats 401 as success and shows proper message", () => {
-    (useSearchParams as unknown as vi.Mock).mockReturnValue([
+    (useSearchParams as unknown as Mock).mockReturnValue([
       new URLSearchParams("token=abc"),
     ]);
 
-    (useVerifyLink as vi.Mock).mockReturnValue({
+    (useVerifyLink as unknown as Mock).mockReturnValue({
       mutate: mockMutate,
       isPending: false,
       data: {

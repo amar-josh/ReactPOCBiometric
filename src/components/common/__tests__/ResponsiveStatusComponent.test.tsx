@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import ResponseStatusComponent, {
   IResponseStatusComponentProps,
@@ -39,9 +39,7 @@ describe("ResponseStatusComponent", () => {
 
   it("renders request number section when requestNumber prop is provided", () => {
     render(<ResponseStatusComponent {...baseProps} requestNumber="REQ12345" />);
-    expect(
-      screen.getByText("mobileNumberUpdate.requestNumber")
-    ).toBeInTheDocument();
+    expect(screen.getByText("requestNumber")).toBeInTheDocument();
     expect(screen.getByText("REQ12345")).toBeInTheDocument();
   });
 

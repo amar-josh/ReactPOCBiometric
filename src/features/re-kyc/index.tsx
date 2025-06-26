@@ -29,7 +29,7 @@ import {
   useCustomerSearch,
   useUpdateKYC,
   useValidateFingerprint,
-} from "./hooks";
+} from "./hooks/useRekyc";
 import {
   useFormDetails,
   useHasDormantAccount,
@@ -69,8 +69,8 @@ const ReKYC = () => {
 
   const [actionCode, setActionCode] = useState<string | undefined>("");
 
-  const updateStep = (isCompleteSuccess = true) => {
-    setCompleted((prev) => ({ ...prev, [currentStep]: isCompleteSuccess }));
+  const updateStep = () => {
+    setCompleted((prev) => ({ ...prev, [currentStep]: true }));
     setCurrentStep((step) => step + 1);
   };
 

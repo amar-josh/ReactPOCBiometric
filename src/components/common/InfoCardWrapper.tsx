@@ -51,7 +51,9 @@ const CardWrapper = ({
             )}
           </div>
           <div className="pl-6 font-normal text-sm">
-            <span className="text-primary-gray font-normal">{subTitle}</span>
+            <span className="text-primary-gray font-normal">
+              {subTitle} &nbsp;
+            </span>
             <span className="text-black"> {subTitleInfo}</span>
           </div>
         </CardHeader>

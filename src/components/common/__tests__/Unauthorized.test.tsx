@@ -1,6 +1,11 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  getSessionStorageData,
+  setSessionStorageData,
+} from "@/lib/sessionStorage";
+
 import Unauthorized from "../Unauthorized";
 
 // ✅ Mock dependencies
@@ -33,7 +38,7 @@ vi.mock("../AccessErrorCard", () => ({
 
 describe("Unauthorized", () => {
   beforeEach(() => {
-    sessionStorage.setItem("token", "dummy-token");
+    setSessionStorageData("token", "dummy-token");
     mockNavigate.mockClear();
   });
 
@@ -52,7 +57,7 @@ describe("Unauthorized", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Back to login" }));
 
-    expect(sessionStorage.getItem("token")).toBeNull();
+    expect(getSessionStorageData<string>("token")).toBeNull();
     expect(mockNavigate).toHaveBeenCalledWith("/login");
   });
 });

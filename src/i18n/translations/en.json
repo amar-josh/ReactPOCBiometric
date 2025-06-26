@@ -12,7 +12,13 @@
   },
   "home": {
     "welcome": "Welcome",
-    "subTitle": "What do you want to do today?"
+    "subTitle": "What do you want to do today?",
+    "instaServices": {
+      "reKYCTitle": "Re-KYC",
+      "reKYCDescription": "Simplified & Aadhar-linked address update based Re-KYC Journey for Individual Customers",
+      "mobileNumberUpdateTitle": "Mobile Number Update",
+      "mobileNumberUpdateDescription": "Mobile number update Journey for Individual Customers"
+    }
   },
   "reKyc": {
     "title": "Re-KYC",
@@ -38,6 +44,10 @@
     "accountRelatedToCif": "Accounts associated to CIF Id:",
     "agreeAddressUpdate": "I agree that this address will be updated across all accounts.",
     "customerName": "Customer Name:",
+    "updateKYCMessage": {
+      "success": "Re-KYC update request will be processed within 24 hrs.",
+      "failure": "Re-KYC Update failed. Please try again or continue with form based process."
+    },
     "placeholder": {
       "mobileNumber": "Type mobile number e.g. 1234567890",
       "cif": "Type 9 digit CIF Id e.g. 123456789",
@@ -53,21 +63,21 @@
       "updateCommunicationAddressPopUpMessage": "The Customer has verified the existing KYC information present in the bank records and intends to update communication address only, confirming that there is no change in remaining KYC information. Further, the customer hereby, has agreed to indemnify and keep the Bank indemnified at all times from and against any and all losses, expenses, damages, claims and/or costs that may be incurred by the Bank with regard to acceptance of this declaration. In case any of the above information is found to be false or untrue or misleading or misrepresenting, the customer has been made aware that he/she/they may be held liable for it. In the event of further change in KYC information, the customer has agreed to intimate the bank about the same. Also, the customer has been made aware that he/she/they accept the above declaration by agreeing to verify his/her/their identity using Aadhaar biometric authentication for the purpose of Re-KYC and communication address update.",
       "proceedWithAadhaarBiometricPopUpMessage": "Customer states that, I/We hereby state that I/we have no objection in authenticating myself/ourselves with Aadhaar based authentication system and consent to providing my/our Aadhaar Number and(One Time Pin) OTP data (and/or any similar authentication mechanism) to Bandhan Bank for Aadhaar based authentication for the purposes of availing banking service from Bandhan Bank.",
       "proceedWithAadhaarBiometricPopUpMessage2": "I/We understand that my/our information submitted to  Bandhan Bank herewith shall not be used for any purpose other than mentioned hereinabove. I/We hereby declare that all the above information voluntarily furnished by me/us is true, correct and complete. I/We understand and agree that Bandhan Bank may disclose information about my/our account(s), with or without notice/intimation, if required or permitted by law, rule or regulations, or at the request of any public or regulatory authority or if such disclosure is required for the purposes of preventing frauds or in public interest, without requiring further specific permission from me/us and I/we hereby provide unconditional consent for the same.",
-      "dormantAccount": "KYC update required for dormant account. 'No change in KYC details' option not allowed."
+      "dormantAccount": "'Dormant' accounts are not eligible for Insta Services, please proceed with form-based request."
     },
     "errorMessages": {
       "occupationRequired": "Occupation is required",
       "residenceTypeRequired": "Resident Type is required",
       "annualIncomeRequired": "Gross Annual Income is required",
       "somethingWentWrong": "Something went wrong!",
+      "oops": "Oops",
       "tryAgain": "Try Again"
     },
     "biometric": {
       "confirmUsingFingerprint": "Confirm Using Your Fingerprint",
       "touchFingerprintSensor": "Touch the fingerprint sensor",
       "connectBiometricDevice": "Please connect bio-metric device",
-      "biometricServiceChcek": "Searching for RD service... Please wait...",
-      "biometricServiceNotFoundMessage": "RD service not found. Please ensure the RD service is running and try again.",
+      "deviceUsedByOtherAppMessage": "Device begin used by another application",
       "aadhaarAuthFailed": "Aadhaar authentication failed",
       "aadhaarAuthFailedOnce": "Aadhaar verification failed. Only 2 attempts left",
       "aadhaarAuthFailedTwice": "Aadhaar verification failed. Only 1 attempts left",
@@ -76,7 +86,14 @@
       "verifiedSuccess": "Verified successfully!",
       "previousAddress": "Previous Address (as per bank records)",
       "newAddress": "New Communication Address (to be updated)",
-      "confirmAddress": "Confirm Communication Address and Re-KYC"
+      "confirmAddress": "Confirm Communication Address and Re-KYC",
+      "searchingRDService": "Searching RD Service",
+      "searchingRDServiceMessage": "Searching for RD service... Please wait...",
+      "rdServiceNotFound": "RD Service Not Available",
+      "rdServiceNotFoundMessage": "RD service not found. Please ensure the RD service is running and try again.",
+      "deviceNotFound": "Device Not Found",
+      "noFingerFound": "No Finger found",
+      "noFingerFoundMessage": "No finger is placed on device, Please make sure to place your finger on the device"
     },
     "reKycSuccessTitle": "Re-KYC Successful",
     "reKycSuccessText": "Your Re-KYC process has been successfully completed"
@@ -104,7 +121,6 @@
     "tryWithFormBasedProcess": "Please try again or continue with form based process.",
     "oldMobileNumber": "Old Mobile Number:",
     "newMobileNumber": "New Mobile Number:",
-    "requestNumber": "Request Number:",
     "linkVerification": "Link Verification",
     "maximumThreeAttempts": "Maximum 3 attempts",
     "tryAgainIn": "Try again in",
@@ -209,5 +225,6 @@
     "title": "Page Not Found",
     "message": "The requested URL was not found on this server."
   },
+  "requestNumber": "Request Number:",
   "footer": "© 2025 Bandhan Bank. All Rights Reserved"
 }

@@ -2,7 +2,6 @@ import aadhaarIcon from "@/assets/images/aadhaar.svg";
 import AadhaarConsentModal from "@/components/common/AadhaarConsentModal";
 import AlertDialogComponent from "@/components/common/AlertDialogComponent";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { MASKED_KEY } from "@/constants/globalConstant";
 import { IBiometricCardDetails } from "@/features/re-kyc/types";
 import translator from "@/i18n/translator";
@@ -44,15 +43,12 @@ const BiometricVerificationComponent = ({
         <span>{translator("reKyc.verifyAadhaarInformation")}</span>
       </div>
       <div>
-        <label className="block text-sm font-medium text-blue-900 mb-1">
+        <label className="block text-sm font-medium text-primary-gray mb-1">
           {translator("reKyc.aadhaarNumber")}
         </label>
-        <Input
-          value={maskedAadhaarNumber}
-          readOnly
-          autoComplete="off"
-          className="bg-gray-100 cursor-not-allowed text-gray-600"
-        />
+        <div className="text-base text-primary-gray font-normal border rounded-sm px-4 py-2 bg-gray-200">
+          {maskedAadhaarNumber}
+        </div>
       </div>
       <div className="flex gap-4">
         <Button onClick={handleAadhaarConsentModal} variant="primary">

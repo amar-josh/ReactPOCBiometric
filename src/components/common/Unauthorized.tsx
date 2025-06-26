@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router";
 
-import { SESSION_STORAGE_KEY } from "@/constants/globalConstant";
 import { ROUTES } from "@/routes/constants";
+import { clearToken } from "@/services/api.service";
 
 import AccessErrorCard from "./AccessErrorCard";
 
 const Unauthorized = () => {
   const navigate = useNavigate();
   const redirectToLogin = () => {
-    sessionStorage.removeItem(SESSION_STORAGE_KEY.TOKEN);
+    clearToken();
     navigate(ROUTES.LOGIN);
   };
 

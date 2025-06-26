@@ -9,7 +9,7 @@ import {
   useGetOtherDropdownDetails,
   useUpdateKYC,
   useValidateFingerprint,
-} from "@/features/re-kyc/hooks";
+} from "@/features/re-kyc/hooks/useRekyc";
 import * as services from "@/features/re-kyc/services";
 
 import otherDetailsMockData from "./../mocks/otherDetails.json";
@@ -54,7 +54,7 @@ describe("Re-KYC Custom Hooks", () => {
       wrapper: createWrapper(),
     });
 
-    const payload = { customerID: 123 };
+    const payload = { customerID: "123" };
     await act(() => result.current.mutateAsync(payload));
 
     await waitFor(() => expect(result.current.data).toEqual(mockResponse));

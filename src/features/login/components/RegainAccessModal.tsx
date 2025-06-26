@@ -25,8 +25,8 @@ const RegainAccessModal = ({
             {translator("login.regainAccountAccess")}
           </DialogTitle>
         </DialogHeader>
-        <p className="text-4xl font-bold text-blue-700 mt-2">1234-567-0000</p>
-        <div className="mt-6 flex justify-center">
+        <p className="text-2xl font-bold text-blue-700">1234-567-0000</p>
+        <div className="flex justify-center">
           <DialogClose asChild>
             <Button variant="primary" onClick={() => setShowModal(false)}>
               {translator("button.close")}

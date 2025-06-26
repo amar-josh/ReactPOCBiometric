@@ -78,9 +78,9 @@ const AddressUpdateCard = ({
           {translator("reKyc.agreeAddressUpdate")}
         </Label>
       </div>
-      <div>
+      <div className="flex flex-col md:flex-row gap-4">
         <Button
-          className="mr-3 border-b-info"
+          className="border-b-info"
           variant="primary"
           onClick={handleAddressConfirmed}
           disabled={!agreed}

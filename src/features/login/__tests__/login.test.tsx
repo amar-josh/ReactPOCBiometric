@@ -1,6 +1,7 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useNavigate } from "react-router";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 
 import Login from "..";
 
@@ -19,22 +20,39 @@ vi.mock("@/hooks/useAlertMessage", () => ({
   }),
 }));
 
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+function renderWithQueryClient(ui: React.ReactElement) {
+  return render(
+    <QueryClientProvider client={createTestQueryClient()}>
+      {ui}
+    </QueryClientProvider>
+  );
+}
+
 describe("Login Page", () => {
   const mockNavigate = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useNavigate as vi.Mock).mockReturnValue(mockNavigate);
+    (useNavigate as Mock).mockReturnValue(mockNavigate);
   });
 
   it("renders email input and Next button", () => {
-    render(<Login />);
+    renderWithQueryClient(<Login />);
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /next/i })).toBeInTheDocument();
   });
 
   it("shows validation error for empty email", async () => {
-    render(<Login />);
+    renderWithQueryClient(<Login />);
     fireEvent.click(screen.getByRole("button", { name: /next/i }));
 
     await waitFor(() => {
@@ -45,7 +63,7 @@ describe("Login Page", () => {
   });
 
   it("shows validation error for invalid email", async () => {
-    render(<Login />);
+    renderWithQueryClient(<Login />);
     fireEvent.change(screen.getByPlaceholderText(/email/i), {
       target: { value: "invalid" },
     });
@@ -60,7 +78,7 @@ describe("Login Page", () => {
   });
 
   it("navigates to home on valid email submission", async () => {
-    render(<Login />);
+    renderWithQueryClient(<Login />);
     fireEvent.change(screen.getByPlaceholderText(/email/i), {
       target: { value: "test@example.com" },
     });

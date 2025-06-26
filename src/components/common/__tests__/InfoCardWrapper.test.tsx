@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RadioGroup } from "@/components/ui/radio-group";
 
@@ -122,11 +122,7 @@ describe("CardWrapper", () => {
 
   it("does not render CardHeader and Separator when neither withRadio nor title are provided", () => {
     render(
-      <CardWrapper
-        {...defaultProps}
-        withRadio={false}
-        title={undefined as any}
-      />
+      <CardWrapper {...defaultProps} withRadio={false} title={undefined} />
     );
     // CardHeader should not exist
     expect(screen.queryByText(defaultProps.title)).not.toBeInTheDocument();

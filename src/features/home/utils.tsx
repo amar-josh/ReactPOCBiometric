@@ -16,7 +16,7 @@ export const getIconBasedOnModuleKey = (moduleKey: string) => {
     case DASHBOARD_KEYS.RE_KYC:
       return kyc;
     default:
-      return "";
+      return kyc;
   }
 };
 

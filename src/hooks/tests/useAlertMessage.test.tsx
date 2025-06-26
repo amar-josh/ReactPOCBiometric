@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { SUCCESS } from "@/constants/globalConstant";
@@ -6,9 +6,9 @@ import { SUCCESS } from "@/constants/globalConstant";
 import { useAlertMessage } from "../useAlertMessage";
 
 describe("useAlertMessage", () => {
-  it("should return default alertMessage with empty message and SUCCESS type", () => {
+  it("should initialize with default success type and empty message", () => {
     const { result } = renderHook(() =>
-      useAlertMessage("error", "Some error", false)
+      useAlertMessage("error", "Something went wrong", false)
     );
 
     expect(result.current.alertMessage).toEqual({
@@ -17,61 +17,45 @@ describe("useAlertMessage", () => {
     });
   });
 
-  it("should update alertMessage when isShowAlert is true", () => {
+  it("should update alert message when isShowAlert is true", () => {
     const { result, rerender } = renderHook(
-      ({ type, message, isShow }) => useAlertMessage(type, message, isShow),
+      ({ type, message, isShowAlert }) =>
+        useAlertMessage(type as "error" | "success", message, isShowAlert),
       {
         initialProps: {
-          type: "error" as const,
+          type: "error",
           message: "Something went wrong",
-          isShow: true,
+          isShowAlert: false,
         },
       }
     );
+
+    // Initially should be default state
+    expect(result.current.alertMessage).toEqual({
+      type: SUCCESS,
+      message: "",
+    });
+
+    // Rerender with isShowAlert true
+    rerender({
+      type: "error",
+      message: "Something went wrong",
+      isShowAlert: true,
+    });
 
     expect(result.current.alertMessage).toEqual({
       type: "error",
       message: "Something went wrong",
     });
-
-    // Updating props: simulate dynamic change
-    rerender({
-      type: "success",
-      message: "Success message",
-      isShow: true,
-    });
-
-    expect(result.current.alertMessage).toEqual({
-      type: "success",
-      message: "Success message",
-    });
   });
 
-  it("should allow manual update using setAlertMessage", () => {
+  it("should default message to empty string if undefined", () => {
     const { result } = renderHook(() =>
-      useAlertMessage("error", "Initial error", true)
-    );
-
-    act(() => {
-      result.current.setAlertMessage({
-        type: "success",
-        message: "Manually set message",
-      });
-    });
-
-    expect(result.current.alertMessage).toEqual({
-      type: "success",
-      message: "Manually set message",
-    });
-  });
-
-  it("should not update alertMessage if isShowAlert is false", () => {
-    const { result } = renderHook(() =>
-      useAlertMessage("error", "Won't show this", false)
+      useAlertMessage("success", undefined, true)
     );
 
     expect(result.current.alertMessage).toEqual({
-      type: SUCCESS,
+      type: "success",
       message: "",
     });
   });

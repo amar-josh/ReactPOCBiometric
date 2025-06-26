@@ -106,7 +106,7 @@ const aesGcmUtil = new AesGcmUtil(AES_ENCRYPTION_KEY_BASE64);
 // encrypt function
 export async function encrypt(data: string): Promise<string | undefined> {
   try {
-    const encrypted = await aesGcmUtil.encrypt(JSON.stringify(data));
+    const encrypted = await aesGcmUtil.encrypt(data);
     return encrypted;
   } catch (error) {
     console.error("Encryption failed:", error);
@@ -117,8 +117,7 @@ export async function encrypt(data: string): Promise<string | undefined> {
 export async function decrypt(data: string): Promise<string | undefined> {
   try {
     const decrypted = await aesGcmUtil.decrypt(data);
-    const response = JSON.parse(decrypted);
-    return response;
+    return decrypted;
   } catch (error) {
     console.error("Decryption failed:", error);
   }

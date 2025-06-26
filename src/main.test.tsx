@@ -21,7 +21,7 @@ const createTestClient = () =>
     },
   });
 
-describe("App Component", () => {
+describe("Main Component", () => {
   const renderWithProviders = () =>
     render(
       <QueryClientProvider client={createTestClient()}>

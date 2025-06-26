@@ -42,11 +42,6 @@ export const BIOMETRIC_OPERATIONS = {
   DEFAULT: "default",
 };
 
-export const BIOMETRIC_DEVICE_STATUS = {
-  NOT_READY: "NOTREADY",
-  READY: "READY",
-};
-
 export const BIOMETRIC_MODAL_ACTIONS = {
   RETRY_RD_SERVICE: "retryRDService",
   RETRY_DEVICE: "retryDevice",

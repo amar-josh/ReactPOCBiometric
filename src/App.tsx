@@ -2,34 +2,22 @@ import "./App.css";
 
 import { useEffect } from "react";
 
+import { SESSION_STORAGE_KEY } from "./constants/globalConstant";
+import useDisableDevTool from "./hooks/useDisableDevTool";
+import { getSessionStorageData } from "./lib/sessionStorage";
 import RoutesComponent from "./routes/RoutesComponent";
+import { updateTokenValue } from "./services/api.service";
 
 function App() {
   // Below code prevent user opening dev tools
-  // Prevent right-click on web page
-  useEffect(() => {
-    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
-    document.addEventListener("contextmenu", handleContextMenu);
-    return () => document.removeEventListener("contextmenu", handleContextMenu);
-  }, []);
+  useDisableDevTool();
 
-  // Prevent F12 and Ctrl+Shift+I/C/J and Ctrl+U
+  // Check if token exists in session storage and update the token value once reloaded in authorization header
   useEffect(() => {
-    const blockDevTools = (e: KeyboardEvent) => {
-      if (
-        e.key === "F12" ||
-        (e.ctrlKey && ["R"].includes(e.key.toUpperCase())) ||
-        (e.ctrlKey &&
-          e.shiftKey &&
-          ["I", "C", "J", "R"].includes(e.key.toUpperCase())) ||
-        (e.ctrlKey && e.key === "U")
-      ) {
-        e.preventDefault();
-      }
-    };
-
-    document.addEventListener("keydown", blockDevTools);
-    return () => document.removeEventListener("keydown", blockDevTools);
+    const token = getSessionStorageData<string>(SESSION_STORAGE_KEY.TOKEN);
+    if (token) {
+      updateTokenValue(token);
+    }
   }, []);
 
   return (

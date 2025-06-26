@@ -2,6 +2,11 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { SESSION_STORAGE_KEY } from "@/constants/globalConstant";
+import {
+  getSessionStorageData,
+  removeSessionStorageData,
+  setSessionStorageData,
+} from "@/lib/sessionStorage";
 import { PRIVATE_ROUTES, ROUTES } from "@/routes/constants";
 
 export const useHandleProtectedRefreshPage = () => {
@@ -17,7 +22,7 @@ export const useHandleProtectedRefreshPage = () => {
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isProtectedRoute(location.pathname)) {
-        sessionStorage.setItem(
+        setSessionStorageData(
           SESSION_STORAGE_KEY.RELOAD_PROTECTED_ROUTE,
           SESSION_STORAGE_KEY.RELOAD_PROTECTED_ROUTE_VALUE
         );
@@ -35,11 +40,12 @@ export const useHandleProtectedRefreshPage = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (
-      sessionStorage.getItem(SESSION_STORAGE_KEY.RELOAD_PROTECTED_ROUTE) ===
-      SESSION_STORAGE_KEY.RELOAD_PROTECTED_ROUTE_VALUE
-    ) {
-      sessionStorage.removeItem(SESSION_STORAGE_KEY.RELOAD_PROTECTED_ROUTE);
+    const reloadFlag = getSessionStorageData<string>(
+      SESSION_STORAGE_KEY.RELOAD_PROTECTED_ROUTE
+    );
+
+    if (reloadFlag === SESSION_STORAGE_KEY.RELOAD_PROTECTED_ROUTE_VALUE) {
+      removeSessionStorageData(SESSION_STORAGE_KEY.RELOAD_PROTECTED_ROUTE);
       navigate(ROUTES.HOME, { replace: true });
     }
   }, [navigate]);

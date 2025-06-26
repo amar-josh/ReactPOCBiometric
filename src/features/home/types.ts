@@ -24,7 +24,7 @@ export interface IInstaServicesData {
 
 export interface IInstaServicesResponse {
   message: string;
-  statusCode: string;
+  statusCode: number;
   status: string;
   data: IInstaServicesData;
 }
@@ -32,4 +32,10 @@ export interface IInstaServicesResponse {
 export interface IInstaServicesRequest {
   userId: string;
   userRole: string;
+}
+
+export interface IInstaServiceCards {
+  moduleKey: string;
+  moduleName: string;
+  moduleDesc: string;
 }

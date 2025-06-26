@@ -1,6 +1,6 @@
 import { Dispatch, RefObject, SetStateAction } from "react";
 
-import infoIcon from "@/assets/images/info-black.svg";
+import infoIcon from "@/assets/images/info.svg";
 import AlertMessage from "@/components/common/AlertMessage";
 import InfoMessage from "@/components/common/InfoMessage";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { SUCCESS } from "@/constants/globalConstant";
 import AccountInfoCard from "@/features/re-kyc/components/AccountInfoCard";
 import CustomerSearchForm from "@/features/re-kyc/components/CustomerSearchForm";
-import PersonalDetailsCard from "@/features/re-kyc/components/PersonalDetailsCard";
 import {
-  ICif,
+  ICustomerSearchResponse,
   IGetCustomerSearchRequest,
-  IPersonalDetails,
 } from "@/features/re-kyc/types";
 import translator from "@/i18n/translator";
 import { IAlertMessage } from "@/types";
@@ -27,8 +25,7 @@ interface ICustomerSearchProps {
   handleResetCustomerSearchAPI: () => void;
   isCustomerSearchSuccess: boolean;
   fetchRecordsErrorMessage: IAlertMessage;
-  personalDetails: IPersonalDetails | undefined;
-  accountDetails: ICif[] | undefined;
+  accountDetails: ICustomerSearchResponse[] | undefined;
   selected: string | undefined;
   setSelected: Dispatch<SetStateAction<string | undefined>>;
   handleNext: () => void;
@@ -44,7 +41,6 @@ const CustomerSearch = ({
   isCustomerSearchSuccess,
   customerSearchAlertMessage,
   fetchRecordsErrorMessage,
-  personalDetails,
   accountDetails,
   setFetchRecordsErrorMessage,
   handleNext,
@@ -58,15 +54,12 @@ const CustomerSearch = ({
   return (
     <div className="gap-6 flex flex-col">
       <CustomerSearchForm
+        showInfoMessage
         ref={customerSearchRef}
         onSearch={handleSearch}
         onReset={handleResetSearch}
         onResetCustomerSearchAPI={handleResetCustomerSearchAPI}
         isSuccess={isCustomerSearchSuccess}
-      />
-      <InfoMessage
-        icon={infoIcon}
-        message={"mobileNumberUpdate.errorMessages.aadharMustLinked"}
       />
 
       <Separator />
@@ -77,13 +70,14 @@ const CustomerSearch = ({
         />
       )}
 
-      {personalDetails && (
+      {/* TODO:Remove below component if not needed */}
+      {/* {personalDetails && (
         <PersonalDetailsCard
           name={personalDetails.fullName}
           email={personalDetails.emailId}
           mobile={personalDetails.mobileNo}
         />
-      )}
+      )} */}
 
       {accountDetails && (
         <>

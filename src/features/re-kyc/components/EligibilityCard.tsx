@@ -7,7 +7,7 @@ import translator from "@/i18n/translator";
 
 const EligibilityCard = () => {
   return (
-    <Card className="flex flex-col md:flex-row items-center md:items-start justify-between p-11 border-none bg-gray-100">
+    <Card className="flex flex-col md:flex-row items-center md:items-start justify-between px-11 py-8 border-none bg-gray-100">
       <CardContent className="flex flex-col space-y-4 w-full p-0">
         <h2 className="text-xl font-semibold text-black">
           {translator("instaServiceEligibilityCard.title")}

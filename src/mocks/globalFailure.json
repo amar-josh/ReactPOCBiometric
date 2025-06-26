@@ -1,6 +1,6 @@
 {
   "message": "The requested resource was not found.",
-  "statusCode": "401",
+  "statusCode": 402,
   "status": "error",
   "data": null
 }

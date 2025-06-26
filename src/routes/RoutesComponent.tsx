@@ -1,26 +1,49 @@
+import { Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 
-import Layout from "@/layout";
+import ErrorBoundaryWrapper from "@/components/common/ErrorBoundaryWrapper";
+import FullScreenLoader from "@/components/common/FullScreenLoader";
+import Login from "@/features/login";
+import PrivateLayout from "@/layout/PrivateLayout";
+import PublicLayout from "@/layout/PublicLayout";
 
 import PrivateRoute from "./components/PrivateRoutes";
+import { ROUTES } from "./constants";
 import { privateRoutes, publicRoute } from "./routesConfig";
+
 const RoutesComponent = () => {
   return (
     <BrowserRouter basename={import.meta.env.VITE_BASE_URL}>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          {publicRoute.map((route) => (
-            <Route path={route.path} element={route.element} />
-          ))}
-          {privateRoutes.map((route) => (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={<PrivateRoute element={route.element} />}
-            />
-          ))}
-        </Route>
-      </Routes>
+      <Suspense fallback={<FullScreenLoader />}>
+        <Routes>
+          <Route
+            path={ROUTES.LOGIN}
+            element={
+              <ErrorBoundaryWrapper>
+                <Login />
+              </ErrorBoundaryWrapper>
+            }
+          />
+          <Route path="/" element={<PublicLayout />}>
+            {publicRoute.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.element}
+              />
+            ))}
+          </Route>
+          <Route path="/" element={<PrivateLayout />}>
+            {privateRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={<PrivateRoute element={route.element} />}
+              />
+            ))}
+          </Route>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

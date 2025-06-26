@@ -1,10 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import RadioGroupComponent from "../RadioGroupComponent";
 
 describe("RadioGroupComponent", () => {
-  let mockOnChange: vi.Mock;
+  let mockOnChange: Mock;
 
   const options = [
     { label: "Admin", value: "admin" },

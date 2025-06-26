@@ -1,7 +1,7 @@
 // CommonFormComponent.test.tsx
 import { fireEvent, render, screen } from "@testing-library/react";
-import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { describe, expect, it } from "vitest";
 // Mock translator to return the key directly
 import { vi } from "vitest";
 

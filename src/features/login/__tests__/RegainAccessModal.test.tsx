@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import RegainAccessModal from "../components/RegainAccessModal";
 

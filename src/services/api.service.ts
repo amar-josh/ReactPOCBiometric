@@ -1,8 +1,10 @@
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
 
+import { SESSION_STORAGE_KEY } from "@/constants/globalConstant";
 import { STATUS_CODE } from "@/constants/statusCodes";
 import { decrypt, encrypt } from "@/lib/encryptionDecryption";
+import { removeSessionStorageData } from "@/lib/sessionStorage";
 import { ROUTES } from "@/routes/constants";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -12,7 +14,7 @@ export const axiosInstance = axios.create({
 });
 
 const updateTokenValueClosure = () => {
-  let isTokenSet = true;
+  let isTokenSet = false;
   return {
     updateTokenValue: (token: string) => {
       isTokenSet = true;
@@ -21,6 +23,7 @@ const updateTokenValueClosure = () => {
     getIsTokenSet: () => isTokenSet,
     clearToken: () => {
       isTokenSet = false;
+      removeSessionStorageData(SESSION_STORAGE_KEY.TOKEN); // clear token from session storage
       delete axiosInstance.defaults.headers.common.Authorization;
     },
   };
@@ -45,6 +48,11 @@ export async function POST<RequestBody, Response>(
       config
     );
 
+    // Decrypt response
+    console.log("API Response", response);
+    console.log("API Response.Data", response.data);
+    console.log("API Response.Data.Data", response.data.data);
+
     const encryptedResponseData = response.data?.data;
     if (!encryptedResponseData)
       throw new Error("Missing encrypted response data");
@@ -56,22 +64,28 @@ export async function POST<RequestBody, Response>(
 
     return JSON.parse(decrypted) as Response;
   } catch (err: any) {
-    const isEncryptedError =
-      err?.response?.data?.data && typeof err.response.data.data === "string";
+    // Check for encrypted error response
+    console.log("Response error", err);
+    console.log("Response error.response", err?.response);
+    console.log("Response error.response.data", err?.response?.data);
+    console.log("Response error.response.data.data", err?.response?.data?.data);
 
-    if (isEncryptedError) {
+    const encryptedError = err?.response?.data?.data;
+
+    if (encryptedError && typeof encryptedError === "string") {
       try {
-        const decryptedError = await decrypt(err.response.data.data);
+        const decryptedError = await decrypt(encryptedError);
         if (typeof decryptedError !== "string") {
           throw new Error("Decrypted error is not a string");
         }
-        const parsedError = JSON.parse(decryptedError);
+        const error = JSON.parse(decryptedError);
 
-        console.error("Decrypted error:", parsedError);
+        console.error("Decrypted error:", error);
 
-        throw new Error(
-          parsedError?.message || parsedError?.error || "Decrypted server error"
-        );
+        if (error?.statusCode === STATUS_CODE.UNAUTHORIZED) {
+          handleUnauthorized();
+        }
+        return error;
       } catch (decryptionError) {
         console.error("Error decrypting error response:", decryptionError);
         throw new Error("Failed to decrypt error response");
@@ -79,18 +93,11 @@ export async function POST<RequestBody, Response>(
     }
 
     console.error("Request failed:", err);
-    handleApiError(err);
+    return err;
   }
 }
 
-export const handleApiError = (err: unknown) => {
-  const axiosError = err;
-
-  if (axiosError?.statusCode === STATUS_CODE.UNAUTHORIZED) {
-    clearToken();
-
-    window.location.href = `${import.meta.env.VITE_BASE_URL}${ROUTES.UNAUTHORIZED}`;
-    return;
-  }
-  throw err;
+export const handleUnauthorized = () => {
+  clearToken();
+  window.location.href = `${import.meta.env.VITE_BASE_URL}${ROUTES.UNAUTHORIZED}`;
 };

@@ -1,8 +1,8 @@
 import alertIcon from "@/assets/images/alert.svg";
 import translator from "@/i18n/translator";
 
-import { IMobileNumberUpdateFailureCheckpointElement } from "./types";
-export const mobileNumberUpdateFailureCheckpoints: IMobileNumberUpdateFailureCheckpointElement =
+import { IMobileNumberUpdateFailureCheckpoints } from "./types";
+export const mobileNumberUpdateFailureCheckpoints: IMobileNumberUpdateFailureCheckpoints =
   {
     AADHAR_NOT_AVAILABLE: {
       title: translator("checkpoints.notEligibleForInstaTitle"),

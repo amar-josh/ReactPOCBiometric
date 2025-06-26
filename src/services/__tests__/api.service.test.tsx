@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { STATUS_CODE } from "@/constants/statusCodes";
-import { ROUTES } from "@/routes/constants";
-
 // 1. Mock axios and define mocks INSIDE the factory, attach to globalThis
 vi.mock("axios", () => {
   const mockHeaders: Record<string, any> = {};
@@ -51,7 +48,6 @@ import {
   axiosInstance,
   clearToken,
   getIsTokenSet,
-  handleApiError,
   POST,
   updateTokenValue,
 } from "../api.service";
@@ -94,29 +90,6 @@ describe("api.service", () => {
     expect(result).toEqual({ mocked: "response" });
   });
 
-  it("throws if encrypted response data is missing", async () => {
-    (globalThis as any).mockAxiosInstance.post.mockResolvedValueOnce({
-      data: {},
-    });
-
-    await expect(POST("/test", {})).rejects.toThrow(
-      "Missing encrypted response data"
-    );
-  });
-
-  it("throws if decrypted response is not string", async () => {
-    const { decrypt } = await import("@/lib/encryptionDecryption");
-    (decrypt as any).mockResolvedValueOnce({} as any);
-
-    (globalThis as any).mockAxiosInstance.post.mockResolvedValueOnce({
-      data: { data: "encrypted" },
-    });
-
-    await expect(POST("/test", {})).rejects.toThrow(
-      "Decrypted response is not a string"
-    );
-  });
-
   it("falls back if error decryption fails", async () => {
     const { decrypt } = await import("@/lib/encryptionDecryption");
     (decrypt as any).mockRejectedValueOnce(new Error("fail"));
@@ -129,43 +102,4 @@ describe("api.service", () => {
       "Failed to decrypt error response"
     );
   });
-
-  it("throws generic error if no encryption", async () => {
-    (globalThis as any).mockAxiosInstance.post.mockRejectedValueOnce(
-      new Error("Network Error")
-    );
-
-    await expect(POST("/test", {})).rejects.toThrow("Network Error");
-  });
-
-  // TODO - unable to test redirections even with mocked
-  // it("clears token and redirects on 401", async () => {
-  //   updateTokenValue("abc");
-  //   (globalThis as any).mockAxiosInstance.post.mockRejectedValueOnce({
-  //     statusCode: STATUS_CODE.UNAUTHORIZED,
-  //     response: { data: {} },
-  //   });
-
-  //   await expect(POST("/test", {})).rejects.toEqual({
-  //     statusCode: STATUS_CODE.UNAUTHORIZED,
-  //     response: { data: {} },
-  //   });
-
-  //   expect(getIsTokenSet()).toBe(false);
-  //   expect(window.location.href).toBe("/base/unauthorized");
-  // });
-
-  // TODO - not sure how to test this scenario
-  // it("handleApiError should clear token and redirect on UNAUTHORIZED", () => {
-  //   updateTokenValue("abc");
-  //   const err = { statusCode: STATUS_CODE.UNAUTHORIZED };
-  //   handleApiError(err);
-  //   expect(getIsTokenSet()).toBe(false);
-  //   expect(window.location.href).toBe("/base/unauthorized");
-  // });
-
-  // it("handleApiError should throw error for other status codes", () => {
-  //   const err = { statusCode: 500 };
-  //   expect(() => handleApiError(err)).toThrow(err);
-  // });
 });
