@@ -16,7 +16,7 @@ const RoutesComponent = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/re-kyc" element={<ReKYC />} />
+        <Route path="/" element={<ReKYC />} />
       </Routes>
       {/* <Suspense fallback={<FullScreenLoader />}>
         <Routes>
