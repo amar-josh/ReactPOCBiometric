@@ -1,5 +1,4 @@
-const AES_ENCRYPTION_KEY_BASE64 =
-  "mZygpLJhMzFzqfKxA+YUYReosbswBr2lEfG7ViCGuAM=";
+const AES_ENCRYPTION_KEY_BASE64 = import.meta.env.VITE_ENCRYPTION_KEY;
 
 class AesDecryptionException extends Error {
   constructor(message: string, originalError?: Error) {
