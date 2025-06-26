@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { Link } from "react-router";
 import * as yup from "yup";
 
 import AlertMessage from "@/components/common/AlertMessage";
@@ -55,6 +56,7 @@ const LoginComponent = ({
         <Card className="w-[32rem] px-10 py-16 flex flex-col items-center border-none outline-0">
           <div className="w-full h-full flex flex-col justify-center items-center">
             <div className="flex flex-col mb-10">
+              <Link to={"/re-kyc"} />
               <img src={logo} alt="Bandhan Bank" className="w-52 h-14" />
             </div>
             <h3 className="text-2xl text-center font-bold text-dark-gray mb-4">
