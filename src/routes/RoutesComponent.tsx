@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import ErrorBoundaryWrapper from "@/components/common/ErrorBoundaryWrapper";
 import FullScreenLoader from "@/components/common/FullScreenLoader";
 import Login from "@/features/login";
+import ReKYC from "@/features/re-kyc";
 import PrivateLayout from "@/layout/PrivateLayout";
 import PublicLayout from "@/layout/PublicLayout";
 
@@ -13,9 +14,10 @@ import { privateRoutes, publicRoute } from "./routesConfig";
 
 const RoutesComponent = () => {
   return (
-    <BrowserRouter basename={import.meta.env.VITE_BASE_URL}>
+    <BrowserRouter>
       <Suspense fallback={<FullScreenLoader />}>
         <Routes>
+          <Route path={"/re-kyc"} element={<ReKYC />} />
           <Route
             path={ROUTES.LOGIN}
             element={
