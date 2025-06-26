@@ -1,4 +1,5 @@
 import { ENDPOINTS } from "@/constants/endPoints";
+import { fetchFakeData } from "@/lib/utils";
 import { POST } from "@/services/api.service";
 
 import { IGenerateTokenResponse } from "./types";
@@ -9,5 +10,15 @@ export const logout = () => {
 };
 
 export const generateToken = (): Promise<IGenerateTokenResponse> => {
-  return POST<void, IGenerateTokenResponse>(ENDPOINTS.GENERATE_TOKEN);
+  // return POST<void, IGenerateTokenResponse>(ENDPOINTS.GENERATE_TOKEN);
+  return fetchFakeData({
+    message: "string;",
+    statusCode: 200,
+    status: "success",
+    data: {
+      accessToken: "afdsf",
+      tokenType: "adfdsaf",
+      expiresIn: "number;",
+    },
+  });
 };
