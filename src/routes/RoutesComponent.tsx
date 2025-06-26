@@ -13,7 +13,7 @@ import { privateRoutes, publicRoute } from "./routesConfig";
 
 const RoutesComponent = () => {
   return (
-    <BrowserRouter basename={import.meta.env.VITE_BASE_URL}>
+    <BrowserRouter basename={"/diy"}>
       <Suspense fallback={<FullScreenLoader />}>
         <Routes>
           <Route

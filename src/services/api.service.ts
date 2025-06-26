@@ -14,7 +14,7 @@ export const axiosInstance = axios.create({
 });
 
 const updateTokenValueClosure = () => {
-  let isTokenSet = false;
+  let isTokenSet = true;
   return {
     updateTokenValue: (token: string) => {
       isTokenSet = true;
