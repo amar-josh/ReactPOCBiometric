@@ -1,11 +1,9 @@
 import { Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
 import ErrorBoundaryWrapper from "@/components/common/ErrorBoundaryWrapper";
 import FullScreenLoader from "@/components/common/FullScreenLoader";
-import Home from "@/features/home";
 import Login from "@/features/login";
-import ReKYC from "@/features/re-kyc";
 import PrivateLayout from "@/layout/PrivateLayout";
 import PublicLayout from "@/layout/PublicLayout";
 
@@ -15,14 +13,10 @@ import { privateRoutes, publicRoute } from "./routesConfig";
 
 const RoutesComponent = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/re-kyc" element={<ReKYC />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
-      {/* <Suspense fallback={<FullScreenLoader />}>
+    <BrowserRouter basename={import.meta.env.VITE_BASE_URL}>
+      <Suspense fallback={<FullScreenLoader />}>
         <Routes>
+          <Route path="/" element={<Navigate to={ROUTES.LOGIN} replace />} />
           <Route
             path={ROUTES.LOGIN}
             element={
@@ -50,7 +44,7 @@ const RoutesComponent = () => {
             ))}
           </Route>
         </Routes>
-      </Suspense> */}
+      </Suspense>
     </BrowserRouter>
   );
 };
