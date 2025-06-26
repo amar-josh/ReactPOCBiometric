@@ -13,7 +13,7 @@ import { privateRoutes, publicRoute } from "./routesConfig";
 
 const RoutesComponent = () => {
   return (
-    <BrowserRouter basename={"/diy"}>
+    <BrowserRouter basename={"/stp"}>
       <Suspense fallback={<FullScreenLoader />}>
         <Routes>
           <Route
