@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 
 import ErrorBoundaryWrapper from "@/components/common/ErrorBoundaryWrapper";
 import FullScreenLoader from "@/components/common/FullScreenLoader";
+import Home from "@/features/home";
 import Login from "@/features/login";
 import ReKYC from "@/features/re-kyc";
 import PrivateLayout from "@/layout/PrivateLayout";
@@ -18,6 +19,7 @@ const RoutesComponent = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/re-kyc" element={<ReKYC />} />
+        <Route path="/home" element={<Home />} />
       </Routes>
       {/* <Suspense fallback={<FullScreenLoader />}>
         <Routes>
