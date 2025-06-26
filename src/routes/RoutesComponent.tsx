@@ -15,8 +15,10 @@ import { privateRoutes, publicRoute } from "./routesConfig";
 const RoutesComponent = () => {
   return (
     <BrowserRouter>
-      <Route path={"/re-kyc"} element={<ReKYC />} />
-      <Suspense fallback={<FullScreenLoader />}>
+      <Routes>
+        <Route path="/re-kyc" element={<ReKYC />} />
+      </Routes>
+      {/* <Suspense fallback={<FullScreenLoader />}>
         <Routes>
           <Route
             path={ROUTES.LOGIN}
@@ -45,7 +47,7 @@ const RoutesComponent = () => {
             ))}
           </Route>
         </Routes>
-      </Suspense>
+      </Suspense> */}
     </BrowserRouter>
   );
 };
