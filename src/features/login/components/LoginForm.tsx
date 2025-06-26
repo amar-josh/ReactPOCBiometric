@@ -56,7 +56,7 @@ const LoginComponent = ({
         <Card className="w-[32rem] px-10 py-16 flex flex-col items-center border-none outline-0">
           <div className="w-full h-full flex flex-col justify-center items-center">
             <div className="flex flex-col mb-10">
-              <Link to={"/re-kyc"} />
+              <Link to={"/re-kyc"}>KYC</Link>
               <img src={logo} alt="Bandhan Bank" className="w-52 h-14" />
             </div>
             <h3 className="text-2xl text-center font-bold text-dark-gray mb-4">
