@@ -62,15 +62,17 @@ export const ACCOUNT_STATUS_LABELS = {
 };
 
 export const CIF_LENGTH = 9;
-
-export const INITIAL_STEP_STATUS = {
-  1: false,
-  2: false,
-  3: false,
-};
+export const MAX_BIOMETRIC_ATTEMPT = 3;
 
 export const INITIAL_OTHER_DETAILS_DATA = {
   occupation: { label: "", value: "" },
   residentType: { label: "", value: "" },
   incomeRange: { label: "", value: "" },
+};
+
+export const BIOMETRIC_DEVICE_STATUS_CODES = {
+  "720": BIOMETRIC_OPERATIONS.DEVICE_NOT_READY,
+  "700": BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
+  "730": BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
+  "710": BIOMETRIC_OPERATIONS.DEVICE_USED_BY_ANOTHER_APPLICATION,
 };

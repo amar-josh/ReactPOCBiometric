@@ -14,17 +14,22 @@ import {
 import { useDeviceDetection } from "@/hooks/useDeviceDetection";
 
 import BiometricVerificationComponent from "./components/BiometricVerification";
-import { BIOMETRIC_MODAL_ACTIONS, BIOMETRIC_OPERATIONS } from "./constants";
+import {
+  BIOMETRIC_DEVICE_STATUS_CODES,
+  BIOMETRIC_MODAL_ACTIONS,
+  BIOMETRIC_OPERATIONS,
+  MAX_BIOMETRIC_ATTEMPT,
+} from "./constants";
 import { getBiometricCardDetails } from "./utils";
 
 interface IBiometricFlowProps {
   onCancel: () => void;
   updateStep: () => void;
   aadhaarNumber: string;
-  isAddressUpdate: boolean;
+  isAddressUpdate?: boolean;
   requestNumber: string;
   handleValidateFingerPrint: (payload: IValidateFingerPrintRequest) => void;
-  handleAddressConfirmed: () => void;
+  handleUpdateJourney: () => void;
   serviceRequestNumber?: string;
   isValidateFingerPrintError: boolean;
   isValidateFingerPrintLoading: boolean;
@@ -43,23 +48,23 @@ const BiometricFlow = ({
   isValidateFingerPrintLoading,
   requestNumber,
   handleValidateFingerPrint,
-  handleAddressConfirmed,
+  handleUpdateJourney,
   validateFingerPrintReset,
   isAadhaarVerificationComplete,
 }: IBiometricFlowProps) => {
   const { isAndroidWebView } = useDeviceDetection();
-  const [attemptCount, setAttemptCount] = useState(3);
-  const [isBiometricModalOpen, setIsBiometricModalOpen] = useState(false);
-  const [hasAttemptFailed, setHasAttemptFailed] = useState(false);
-  const [isAadhaarConsentOpen, setIsAadhaarConsentOpen] = useState(false);
   const initialBiometricModalState = isAndroidWebView
     ? BIOMETRIC_OPERATIONS.DEVICE_NOT_READY
     : BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS;
+  const [attemptCount, setAttemptCount] = useState(MAX_BIOMETRIC_ATTEMPT);
+  const [isBiometricModalOpen, setIsBiometricModalOpen] = useState(false);
+  const [hasAttemptFailed, setHasAttemptFailed] = useState(false);
+  const [isAadhaarConsentOpen, setIsAadhaarConsentOpen] = useState(false);
   const [biometricModalDetails, setBiometricModalDetails] =
     useState<IBiometricCardDetails | null>(
       getBiometricCardDetails({
         statusKey: initialBiometricModalState,
-        count: attemptCount,
+        count: MAX_BIOMETRIC_ATTEMPT,
       }) as IBiometricCardDetails
     );
 
@@ -209,9 +214,12 @@ const BiometricFlow = ({
   const onClose = () => {
     setIsBiometricModalOpen(false);
     updateStep();
-    updateBiometricModalDetails(initialBiometricModalState, 3);
+    updateBiometricModalDetails(
+      initialBiometricModalState,
+      MAX_BIOMETRIC_ATTEMPT
+    );
     if (!isAddressUpdate) {
-      handleAddressConfirmed();
+      handleUpdateJourney();
     }
   };
 
@@ -243,12 +251,8 @@ const BiometricFlow = ({
 
   const processCaptureError = useCallback(
     (code: string) => {
-      const operationMap: Record<string, string> = {
-        "720": BIOMETRIC_OPERATIONS.DEVICE_NOT_READY,
-        "700": BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
-        "730": BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
-        "710": BIOMETRIC_OPERATIONS.DEVICE_USED_BY_ANOTHER_APPLICATION,
-      };
+      const operationMap: Record<string, string> =
+        BIOMETRIC_DEVICE_STATUS_CODES;
       updateBiometricModalDetails(
         operationMap[code] || BIOMETRIC_OPERATIONS.DEFAULT,
         attemptCount
