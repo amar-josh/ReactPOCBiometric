@@ -119,6 +119,7 @@ const ReKYC = () => {
     isSuccess: isUpdateKYCSuccess,
     isPending: isUpdateKYCLoading,
     isError: isUpdateKYCError,
+    reset: updateKYCReset,
   } = useUpdateKYC();
 
   const {
@@ -271,6 +272,8 @@ const ReKYC = () => {
   const onCancel = () => {
     setOpen(false);
     handleResetSearch();
+    updateKYCReset();
+    validateFingerPrintReset();
   };
 
   const backToHome = () => {
