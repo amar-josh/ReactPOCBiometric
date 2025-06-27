@@ -5,8 +5,15 @@ import homeIcon from "@/assets/images/home.svg";
 import FullScreenLoader from "@/components/common/FullScreenLoader";
 import ResponseStatusComponent from "@/components/common/ResponseStatusComponent";
 import { Separator } from "@/components/ui/separator";
-import { ERROR, SUCCESS } from "@/constants/globalConstant";
-import { useScrollToContentTop } from "@/context/scroll-context";
+import {
+  ERROR,
+  INITIAL_STEP_STATUS,
+  SUCCESS,
+} from "@/constants/globalConstant";
+import {
+  IScrollContextType,
+  useScrollToContentTop,
+} from "@/context/scroll-context";
 import { useAlertMessage } from "@/hooks/useAlertMessage";
 import translator from "@/i18n/translator";
 import { ROUTES } from "@/routes/constants";
@@ -21,7 +28,6 @@ import ReKYCDetails from "./components/ReKYCDetails";
 import {
   BIOMETRIC_OPERATIONS,
   INITIAL_OTHER_DETAILS_DATA,
-  INITIAL_STEP_STATUS,
   STEPS,
 } from "./constants";
 import {
@@ -48,11 +54,11 @@ const ReKYC = () => {
   const customerSearchRef = useRef<{ resetForm: () => void }>(null);
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [completed, setCompleted] = useState<{ [k: number]: boolean }>(
+  const [completed, setCompleted] = useState<{ [key: number]: boolean }>(
     INITIAL_STEP_STATUS
   );
 
-  const { scrollToContentTop } = useScrollToContentTop();
+  const { scrollToContentTop } = useScrollToContentTop() as IScrollContextType;
 
   const [open, setOpen] = useState(false);
   const [isOtherDetailsChange, setIsOtherDetailsChange] = useState(false);
@@ -271,7 +277,7 @@ const ReKYC = () => {
     navigate(ROUTES.HOME);
   };
 
-  const handleAddressConfirmed = () => {
+  const handleKYCUpdate = () => {
     if (!customerDetailResponse?.data.rekycDetails) return;
 
     const payload = {
@@ -391,7 +397,7 @@ const ReKYC = () => {
               updateStep={updateStep}
               isAddressUpdate={isWithAddressUpdate}
               requestNumber={requestNumber}
-              handleAddressConfirmed={handleAddressConfirmed}
+              handleUpdateJourney={handleKYCUpdate}
               handleValidateFingerPrint={handleValidateFingerPrint}
               isValidateFingerPrintError={isValidateFingerPrintError}
               validateFingerPrintError={validateFingerPrintError}
@@ -412,7 +418,7 @@ const ReKYC = () => {
                 (reKYCDetailsResponse as IReKYCData)?.rekycDetails
                   ?.communicationAddress
               }
-              handleAddressConfirmed={handleAddressConfirmed}
+              handleAddressConfirmed={handleKYCUpdate}
               validateFingerPrintResponse={validateFingerPrintResponse}
               onCancel={onCancel}
             />

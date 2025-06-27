@@ -34,3 +34,9 @@ export const BIOMETRIC_SERVICE_AND_DEVICE_STATUS = {
 };
 export const CAPTURE_FINGERPRINT_REQUEST_BODY = `<PidOptions ver="1.0"><Opts env="PP" fCount="1" fType="0" iCount="" iType="" pCount="" pType="" format="0" pidVer="2.0" timeout="120000" otp="" wadh="" posh=""/></PidOptions>`;
 // Biometric service constants end
+
+export const INITIAL_STEP_STATUS = {
+  1: false,
+  2: false,
+  3: false,
+};

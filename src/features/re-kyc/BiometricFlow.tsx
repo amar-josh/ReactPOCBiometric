@@ -206,6 +206,7 @@ const BiometricFlow = ({
         onCancel();
         break;
       default:
+        console.log(`Unhandled biometric modal action: ${action}`);
         break;
     }
   };
