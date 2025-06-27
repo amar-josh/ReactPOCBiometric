@@ -52,12 +52,13 @@ const BiometricFlow = ({
   const [isBiometricModalOpen, setIsBiometricModalOpen] = useState(false);
   const [hasAttemptFailed, setHasAttemptFailed] = useState(false);
   const [isAadhaarConsentOpen, setIsAadhaarConsentOpen] = useState(false);
+  const initialBiometricModalState = isAndroidWebView
+    ? BIOMETRIC_OPERATIONS.DEVICE_NOT_READY
+    : BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS;
   const [biometricModalDetails, setBiometricModalDetails] =
     useState<IBiometricCardDetails | null>(
       getBiometricCardDetails({
-        statusKey: isAndroidWebView
-          ? BIOMETRIC_OPERATIONS.DEVICE_NOT_READY
-          : BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS,
+        statusKey: initialBiometricModalState,
         count: attemptCount,
       }) as IBiometricCardDetails
     );
@@ -208,6 +209,7 @@ const BiometricFlow = ({
   const onClose = () => {
     setIsBiometricModalOpen(false);
     updateStep();
+    updateBiometricModalDetails(initialBiometricModalState, 3);
     if (!isAddressUpdate) {
       handleAddressConfirmed();
     }
