@@ -31,7 +31,9 @@ describe("AadhaarConsentModal", () => {
     setup({ isConsentRequired: true });
 
     const checkbox = screen.getByRole("checkbox");
-    const proceedBtn = screen.getByRole("button", { name: "button.proceed" });
+    const proceedBtn = screen.getByRole("button", {
+      name: "button.proceedToEsign",
+    });
 
     expect(proceedBtn).toBeDisabled();
     fireEvent.click(checkbox);
@@ -42,7 +44,9 @@ describe("AadhaarConsentModal", () => {
     setup({ isConsentRequired: true });
 
     fireEvent.click(screen.getByRole("checkbox"));
-    fireEvent.click(screen.getByRole("button", { name: "button.proceed" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "button.proceedToEsign" })
+    );
 
     expect(handleProceed).toHaveBeenCalled();
   });
@@ -52,40 +56,5 @@ describe("AadhaarConsentModal", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "button.cancel" }));
     expect(onClose).toHaveBeenCalled();
-  });
-
-  test("renders modal for address update without checkbox", () => {
-    setup({ isWithAddressUpdate: true });
-
-    expect(
-      screen.getByText("reKyc.modal.reKYCWithAddressUpdate")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("reKyc.modal.updateCommunicationAddressPopUpMessage")
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
-  });
-
-  test("renders modal for no KYC change without checkbox", () => {
-    setup();
-
-    expect(
-      screen.getByText("reKyc.modal.noChangeInKYCDetails")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("reKyc.modal.noChangeInKYCDetailsPopUpMessage")
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
-  });
-
-  test("calls handleProceed directly when consent is not required", () => {
-    setup();
-
-    const proceedBtn = screen.getByRole("button", {
-      name: "reKyc.modal.proceedWithAadhaarBiometric",
-    });
-
-    fireEvent.click(proceedBtn);
-    expect(handleProceed).toHaveBeenCalled();
   });
 });

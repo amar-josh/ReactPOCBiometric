@@ -1,62 +1,77 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
-import homeIcon from "@/assets/images/home.svg";
+// import warningIcon from "@/assets/images/warning.svg";
+// import AbortJourneyConfirmationModal from "@/components/common/AbortJourneyConfirmationModal";
 import AlertDialogComponent from "@/components/common/AlertDialogComponent";
 import FullScreenLoader from "@/components/common/FullScreenLoader";
+import PageHeader from "@/components/common/PageHeader";
 import ResponseStatusComponent from "@/components/common/ResponseStatusComponent";
+import ResponsiveStepper from "@/components/common/ResponsiveStepper";
 import { Separator } from "@/components/ui/separator";
-import { ERROR, MASKED_KEY, SUCCESS } from "@/constants/globalConstant";
 import {
-  ICheckpointFailure,
-  IGetCustomerSearchRequest,
-} from "@/features/re-kyc/types";
+  ERROR,
+  INITIAL_STEP_STATUS,
+  JOURNEY_TYPE,
+  POPUP,
+  SUCCESS,
+} from "@/constants/globalConstant";
+import {
+  IScrollContextType,
+  useScrollToContentTop,
+} from "@/context/scroll-context";
+import { IGetCustomerSearchRequest } from "@/features/re-kyc/types";
 import { useAlertMessage } from "@/hooks/useAlertMessage";
-import translator from "@/i18n/translator";
-import { maskData } from "@/lib/maskData";
 import { ROUTES } from "@/routes/constants";
+import BiometricFlow from "@/shared/biometric";
+import { IValidateFingerPrintRequest } from "@/shared/biometric/types";
+import CustomerSearch from "@/shared/customerSearch";
+import { CUSTOMER_SEARCH_OPTIONS } from "@/shared/customerSearch/constants";
 
-import Stepper from "../../components/common/Stepper";
-import BiometricFlow from "../re-kyc/BiometricFlow";
-import { BIOMETRIC_OPERATIONS } from "../re-kyc/constants";
+import { useEmpInfo } from "../adfs-login/hooks";
 import alertIcon from "./../../assets/images/alert.svg";
-import CustomerSearch from "./components/CustomerSearch";
-import MobileStepper from "./components/MobileStepper";
 import UpdateDetails from "./components/UpdateDetails";
-import { STEPS } from "./constants";
 import {
-  useBioMetricVerification,
+  BRANCH,
+  BU,
+  EMERGING_ENTREPRENEURS_BUSINESS,
+  STEP,
+  STEPS,
+} from "./constants";
+import {
   useCustomerSearch,
   useFetchRecords,
   useUpdateNumber,
+  useValidateFingerprint,
 } from "./hooks";
 import { mobileNumberUpdateFailureCheckpoints } from "./utils";
 
 const MobileNumberUpdate = () => {
+  const empInfo = useEmpInfo();
+
   const navigate = useNavigate();
   const customerSearchRef = useRef<{ resetForm: () => void }>(null);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAadhaarRequired, setIsAadhaarRequired] = useState(false);
-  const [biometricStatus, setBiometricStatus] = useState(
-    BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_ERROR
-  );
+  const { scrollToContentTop } = useScrollToContentTop() as IScrollContextType;
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [completed, setCompleted] = useState<{ [k: number]: boolean }>({
-    1: false,
-    2: false,
-    3: false,
-  });
-  const [selected, setSelected] = useState<string | undefined>("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [currentStep, setCurrentStep] = useState<number>(STEP.SEARCH_CUSTOMER);
+  const [completed, setCompleted] = useState<{ [key: number]: boolean }>(
+    INITIAL_STEP_STATUS
+  );
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [newMobileNumber, setNewMobileNumber] = useState<string | undefined>(
     ""
   );
 
   const [actionCode, setActionCode] = useState<string | undefined>("");
 
-  const [isUpdateNumberSuccess, setIsUpdateNumberSuccess] =
-    useState<boolean>(false);
+  // TODO:Uncommment below code in phase 2
+  // const [
+  //   showAbortJourneyConfirmationModal,
+  //   setShowAbortJourneyConfirmationModal,
+  // ] = useState<boolean>(false);
 
   const updateStep = () => {
     setCompleted((prev) => ({ ...prev, [currentStep]: true }));
@@ -64,12 +79,8 @@ const MobileNumberUpdate = () => {
   };
 
   const resetStep = () => {
-    setCompleted({
-      1: false,
-      2: false,
-      3: false,
-    });
-    setCurrentStep(1);
+    setCompleted(INITIAL_STEP_STATUS);
+    setCurrentStep(STEP.SEARCH_CUSTOMER);
   };
 
   const {
@@ -85,16 +96,20 @@ const MobileNumberUpdate = () => {
   const {
     mutate: updateNumber,
     data: updateNumberResponse,
+    error: updateNumberErrorResponse,
+    isSuccess: isUpdateNumberSuccess,
+    isError: isUpdateNumberError,
     isPending: isUpdateNumberLoading,
   } = useUpdateNumber();
 
   const {
-    mutate: bioMetricVerificationMutation,
-    isPending: isBioMetricVerificationLoading,
-    data: bioMetricVerificationResponse,
-    error: bioMetricVerificationError,
-    isError: isBioMetricVerificationError,
-  } = useBioMetricVerification();
+    mutate: validateFingerPrintMutate,
+    isPending: isValidateFingerPrintLoading,
+    error: validateFingerPrintError,
+    data: validateFingerPrintResponse,
+    isError: isValidateFingerPrintError,
+    reset: validateFingerPrintReset,
+  } = useValidateFingerprint();
 
   const {
     data: getRecordsData,
@@ -114,39 +129,62 @@ const MobileNumberUpdate = () => {
     isCustomerSearchError
   );
 
-  const requestNumber = Array.isArray(getRecordsData?.data)
-    ? getRecordsData?.data[0]?.requestNumber || ""
-    : "";
+  const handleValidateFingerPrint = useCallback(
+    (payload: IValidateFingerPrintRequest) => {
+      validateFingerPrintMutate(payload);
+    },
+    [validateFingerPrintMutate]
+  );
 
-  const personalDetails = Array.isArray(getRecordsData?.data)
-    ? getRecordsData?.data[0] || {}
-    : {};
+  const { requestNumber, personalDetails, aadhaarNumber } = useMemo(() => {
+    const firstRecord = Array.isArray(getRecordsData?.data)
+      ? getRecordsData.data[0]
+      : undefined;
 
-  const aadhaarNumber = Array.isArray(getRecordsData?.data)
-    ? getRecordsData?.data[0]?.custDetails?.aadharNumber || ""
-    : "";
+    return {
+      requestNumber: firstRecord?.requestNumber || "",
+      personalDetails: firstRecord || {},
+      aadhaarNumber: firstRecord?.custDetails?.aadhaarNumber || "",
+    };
+  }, [getRecordsData?.data]);
 
-  const maskedAadhaarNumber = maskData(aadhaarNumber, MASKED_KEY.AADHAAR);
+  const numberUpdateData = useMemo(
+    () => updateNumberResponse?.data,
+    [updateNumberResponse?.data]
+  );
 
-  const numberUpdateData = updateNumberResponse?.data;
+  // Move the focus at top when new step start
+  useEffect(() => {
+    scrollToContentTop();
+  }, [scrollToContentTop, completed]);
+
+  // TODO:Uncommment below code in phase 2
+  // const handleShowCancelModal = useCallback(() => {
+  //   setShowAbortJourneyConfirmationModal(true);
+  // }, []);
+
+  // TODO:Uncommment below code in phase 2
+  // const handleConfirmAbortJourney = () => {
+  //   handleResetSearch();
+  //   setFetchRecordsErrorMessage({ type: SUCCESS, message: "" });
+  //   setShowAbortJourneyConfirmationModal(false);
+  // };
+
+  // TODO:Uncommment below code in phase 2
+  // const handleCloseCancelModal = () => {
+  //   setShowAbortJourneyConfirmationModal(false);
+  // };
 
   // Handle customer search success and default cif selection
   useEffect(() => {
     if (isCustomerSearchSuccess) {
-      setCustomerSearchAlertMessage({
-        type: SUCCESS,
-        message: customerDetailsResponse.message,
-      });
-
       if (customerDetailsResponse?.data?.length > 0) {
         const enabledCifDetails = customerDetailsResponse?.data?.find(
-          (cifDetails) => !cifDetails?.custDetails?.isIndividual
+          (cifDetails) => cifDetails?.custDetails?.isIndividual
         );
-        setSelected(
-          enabledCifDetails
-            ? String(enabledCifDetails.custDetails?.customerId)
-            : undefined
-        );
+        if (enabledCifDetails) {
+          setSelectedCustomerId(enabledCifDetails.custDetails.customerId);
+        }
       }
     }
   }, [
@@ -157,11 +195,12 @@ const MobileNumberUpdate = () => {
 
   const handleSearch = (data: IGetCustomerSearchRequest) => {
     customerSearchMutate(data);
+    setCustomerSearchAlertMessage({ type: SUCCESS, message: "" });
   };
 
   const handleResetSearch = () => {
     resetStep();
-    setSelected("");
+    setSelectedCustomerId("");
     customerSearchReset();
     setCustomerSearchAlertMessage({ type: SUCCESS, message: "" });
     customerSearchRef.current?.resetForm();
@@ -171,16 +210,6 @@ const MobileNumberUpdate = () => {
     alertMessage: fetchRecordsErrorMessage,
     setAlertMessage: setFetchRecordsErrorMessage,
   } = useAlertMessage(ERROR, fetchRecordsError?.message, isFetchRecordsError);
-
-  const onCancel = () => {
-    setIsOpen(false);
-    handleResetSearch();
-  };
-
-  const handleCloseAadhaarRequired = () => {
-    setIsAadhaarRequired(false);
-    navigate(ROUTES.HOME);
-  };
 
   const handleResetCustomerSearchAPI = useCallback(() => {
     customerSearchReset();
@@ -194,29 +223,38 @@ const MobileNumberUpdate = () => {
     setFetchRecordsErrorMessage,
   ]);
 
+  const onCancel = useCallback(() => {
+    setIsOpen(false);
+    handleResetSearch();
+    handleResetCustomerSearchAPI();
+    scrollToContentTop();
+  }, [handleResetCustomerSearchAPI, handleResetSearch, scrollToContentTop]);
+
   // Get account details from customerDetailsResponse
   const accountDetails = useMemo(
     () => customerDetailsResponse?.data,
     [customerDetailsResponse]
   );
 
+  const customerName = useMemo(
+    () => getRecordsData?.data?.custDetails?.customerName,
+    [getRecordsData?.data?.custDetails?.customerName]
+  );
+
   const handleUpdateMobileNumber = () => {
-    if (!selected || !newMobileNumber) {
+    if (!selectedCustomerId || !newMobileNumber) {
       return;
     }
     const payload = {
-      customerId: selected,
+      customerID: selectedCustomerId,
       custUpdatedMobileNumber: newMobileNumber,
-      branchCode: "12354",
-      customerName: "Jhon Doe",
+      branchCode: empInfo?.branchCode || "10001",
+      customerName,
       requestNumber: requestNumber,
-      type: "XYZ",
+      type:
+        empInfo?.department === EMERGING_ENTREPRENEURS_BUSINESS ? BU : BRANCH,
     };
-    updateNumber(payload, {
-      onSuccess: () => {
-        setIsUpdateNumberSuccess(true);
-      },
-    });
+    updateNumber(payload);
   };
 
   const backToHome = () => {
@@ -224,103 +262,57 @@ const MobileNumberUpdate = () => {
   };
 
   const handleNext = () => {
-    // TODO: Replace with actual aadhaar number from API
-    fetchRecordsMutate(
-      {
-        // TODO: Replace hardcoded values from API
-        branchCode: "2541",
-        employeeId: "281688",
-        employeeName: "piyush jain",
-        cif: selected || "",
-      },
-      {
-        // TODO:check success or error response
-        onSuccess: () => {
+    const payload = {
+      branchCode: empInfo?.branchCode || "10001",
+      employeeId: empInfo?.empId || "222222",
+      employeeName: empInfo?.empName || "VENDOR TESTING",
+      customerID: selectedCustomerId,
+    };
+    fetchRecordsMutate(payload, {
+      onSuccess: (res) => {
+        if (res?.data?.action === POPUP) {
+          setIsOpen(true);
+          setActionCode(res?.data?.actionCode);
+        } else {
           updateStep();
-        },
-        onError: (error: Error) => {
-          // Type guard to check if error is ICheckpointFailure
-          const checkpointError = error as unknown as ICheckpointFailure;
-          if (checkpointError?.data?.action === "pop-up") {
-            setIsOpen(true);
-            setActionCode(checkpointError?.data?.actionCode);
-          }
-        },
-      }
-    );
+        }
+      },
+    });
   };
 
-  useEffect(() => {
-    if (
-      !isBioMetricVerificationLoading &&
-      bioMetricVerificationResponse?.data
-    ) {
-      if (
-        bioMetricVerificationResponse?.data?.aadhaarVerification ==
-        BIOMETRIC_OPERATIONS.SUCCESS
-      ) {
-        setBiometricStatus(BIOMETRIC_OPERATIONS.SUCCESS);
-      } else {
-        setBiometricStatus(BIOMETRIC_OPERATIONS.ATTEMPT_FAILED);
-      }
-    }
-  }, [bioMetricVerificationResponse, isBioMetricVerificationLoading]);
-
   return (
-    <div className="p-6">
+    <div className="px-6 py-3">
       {(isCustomerSearchLoading ||
         isUpdateNumberLoading ||
         isFetchRecordsLoading) && <FullScreenLoader />}
-      <div className="flex items-center mb-3">
-        <h2 className="text-xl font-semibold">
-          {translator("mobileNumberUpdate.title")}
-        </h2>
-      </div>
+      <PageHeader title="mobileNumberUpdate.title" />
       <Separator />
-      <div className="flex gap-10 mt-5">
-        <div className="w-1/4 hidden lg:block">
-          <Stepper
-            steps={STEPS}
-            currentStep={currentStep}
-            completed={completed}
-          />
-        </div>
+      <div className="flex flex-col lg:flex-row gap-10 mt-5">
+        <ResponsiveStepper
+          steps={STEPS}
+          currentStep={currentStep}
+          completed={completed}
+        />
         <div className="flex flex-col gap-6 w-full">
-          <div
-            onClick={backToHome}
-            className="text-sm text-gray-700 inline-flex cursor-pointer w-fit"
-          >
-            <img src={homeIcon} alt="Home Icon" className="w-5" />
-            <p className="text-primary-gray font-bold text-base ml-1">
-              {translator("reKyc.home")}
-            </p>
-          </div>
-
-          <div className="block lg:hidden">
-            <MobileStepper
-              steps={STEPS}
-              currentStep={currentStep}
-              completed={completed}
-            />
-          </div>
-
-          {currentStep === 1 && (
+          {currentStep === STEP.SEARCH_CUSTOMER && (
             <CustomerSearch
               handleNext={handleNext}
               customerSearchRef={customerSearchRef}
               handleSearch={handleSearch}
+              handleShowCancelModal={onCancel}
               handleResetSearch={handleResetSearch}
-              fetchRecordsErrorMessage={fetchRecordsErrorMessage}
-              setFetchRecordsErrorMessage={setFetchRecordsErrorMessage}
               handleResetCustomerSearchAPI={handleResetCustomerSearchAPI}
               isCustomerSearchSuccess={isCustomerSearchSuccess}
               customerSearchAlertMessage={customerSearchAlertMessage}
               accountDetails={accountDetails}
-              selected={selected}
-              setSelected={setSelected}
+              customerDetailsErrorMessage={fetchRecordsErrorMessage}
+              selectedCustomerId={selectedCustomerId}
+              setSelectedCustomerId={setSelectedCustomerId}
+              journeyType={JOURNEY_TYPE.MOBILE_NUMBER_UPDATE}
+              searchOptions={CUSTOMER_SEARCH_OPTIONS}
             />
           )}
-          {currentStep === 2 && (
+          {currentStep === STEP.UPDATE_DETAILS && (
             <UpdateDetails
               updateStep={updateStep}
               setNewMobileNumber={setNewMobileNumber}
@@ -328,73 +320,68 @@ const MobileNumberUpdate = () => {
               personalDetails={personalDetails}
             />
           )}
-          {currentStep === 3 && (
+          {currentStep === STEP.ESIGN && (
             <BiometricFlow
-              // TODO:Replace with actual aadhaar number from API
-              aadhaarNumber={maskedAadhaarNumber}
+              aadhaarNumber={aadhaarNumber}
               onCancel={onCancel}
               updateStep={updateStep}
               isAddressUpdate={false}
               requestNumber={requestNumber}
-              biometricStatus={biometricStatus}
-              setBiometricStatus={setBiometricStatus}
-              handleAddressConfirmed={handleUpdateMobileNumber}
-              validateFingerPrintMutate={bioMetricVerificationMutation}
-              isValidateFingerPrintError={isBioMetricVerificationError}
-              validateFingerPrintError={bioMetricVerificationError}
-              isValidateFingerPrintLoading={isBioMetricVerificationLoading}
+              validateFingerPrintResponse={validateFingerPrintResponse}
+              handleUpdateJourney={handleUpdateMobileNumber}
+              handleValidateFingerPrint={handleValidateFingerPrint}
+              isValidateFingerPrintError={isValidateFingerPrintError}
+              validateFingerPrintError={validateFingerPrintError}
+              isValidateFingerPrintLoading={isValidateFingerPrintLoading}
+              validateFingerPrintReset={validateFingerPrintReset}
+              aadhaarVerificationStatus={
+                validateFingerPrintResponse?.data?.aadhaarVerification
+              }
             />
           )}
-          {currentStep === 4 && !isUpdateNumberLoading && (
-            <ResponseStatusComponent
-              status={isUpdateNumberSuccess ? "success" : "failure"}
-              title={
-                (isUpdateNumberSuccess
-                  ? "reKyc.thankYou"
-                  : "reKyc.rekycUpdateFailed") as string
-              }
-              message={
-                isUpdateNumberSuccess
-                  ? "mobileNumberUpdate.numberWillUpdate"
-                  : "mobileNumberUpdate.tryWithFormBasedProcess"
-              }
-              // TODO: Replace with actual request number from API
-              requestNumber={numberUpdateData?.requestNumber || ""}
-              newMobileNumber={
-                isUpdateNumberSuccess ? numberUpdateData?.newMobileNumber : ""
-              }
-              oldMobileNumber={numberUpdateData?.oldMobileNumber || ""}
-              backToHome={backToHome}
-            />
-          )}
+          {currentStep === STEP.SUCCESS_FAILURE &&
+            (isUpdateNumberError || isUpdateNumberSuccess) && (
+              <ResponseStatusComponent
+                isSuccess={isUpdateNumberSuccess}
+                title={
+                  isUpdateNumberSuccess
+                    ? "thankYou"
+                    : "mobileNumberUpdate.mobileNumberUpdateFailed"
+                }
+                message={
+                  (isUpdateNumberSuccess
+                    ? updateNumberResponse?.message
+                    : updateNumberErrorResponse?.message) as string
+                }
+                requestNumber={numberUpdateData?.requestNumber || ""}
+                newMobileNumber={
+                  isUpdateNumberSuccess ? numberUpdateData?.newMobileNumber : ""
+                }
+                oldMobileNumber={numberUpdateData?.oldMobileNumber || ""}
+                backToHome={backToHome}
+              />
+            )}
         </div>
       </div>
-      <AlertDialogComponent
-        title={
-          actionCode
-            ? mobileNumberUpdateFailureCheckpoints[actionCode]?.title
-            : ""
-        }
-        message={
-          actionCode
-            ? mobileNumberUpdateFailureCheckpoints[actionCode]?.message
-            : ""
-        }
-        icon={alertIcon}
-        onConfirm={onCancel}
-        open={isOpen}
-        confirmButtonText={translator("button.ok")}
-      />
-      <AlertDialogComponent
-        title={translator("mobileNumberUpdate.errorMessages.aadhaarRequired")}
-        message={translator(
-          "mobileNumberUpdate.errorMessages.aadhaarRequiredMessage"
-        )}
-        icon={alertIcon}
-        onConfirm={handleCloseAadhaarRequired}
-        open={isAadhaarRequired}
-        confirmButtonText={translator("button.ok")}
-      />
+      {actionCode && (
+        <AlertDialogComponent
+          title={mobileNumberUpdateFailureCheckpoints[actionCode]?.title}
+          message={mobileNumberUpdateFailureCheckpoints[actionCode]?.message}
+          icon={alertIcon}
+          onConfirm={onCancel}
+          open={isOpen}
+          confirmButtonText="button.ok"
+        />
+      )}
+      {/* {showAbortJourneyConfirmationModal && (
+        <AbortJourneyConfirmationModal
+          open={showAbortJourneyConfirmationModal}
+          onCancel={handleCloseCancelModal}
+          onConfirm={handleConfirmAbortJourney}
+          description={"reKyc.modal.confirmationText"}
+          icon={warningIcon}
+        />
+      )} */}
     </div>
   );
 };

@@ -10,24 +10,24 @@ export interface IAddressUpdateData {
 }
 
 export interface IResponseStatusComponentProps {
-  status: "success" | "failure";
-  title: string;
   message: string;
+  title: string;
   requestNumber?: string;
   oldMobileNumber?: string;
   newMobileNumber?: string;
   backToHome: () => void;
+  isSuccess: boolean;
 }
+
 const ResponseStatusComponent = ({
-  status,
-  title,
   message,
   requestNumber,
   oldMobileNumber,
   newMobileNumber,
   backToHome,
+  isSuccess,
+  title,
 }: IResponseStatusComponentProps) => {
-  const isSuccess = status === "success";
   const Icon = isSuccess ? success : error;
 
   return (
@@ -38,9 +38,9 @@ const ResponseStatusComponent = ({
             <img src={Icon} className="text-white " />
           </div>
           <h2 className="font-semibold text-xl">{translator(title)}</h2>
-          <p className="font-semibold text-lg">{translator(message)}</p>
+          <p className="font-semibold text-lg">{message}</p>
           {requestNumber && (
-            <p className="text-sm">
+            <p className="text-sm flex flex-col md:flex-row items-center">
               <span className="text-primary text-lg">
                 {translator("requestNumber")}
               </span>
@@ -49,17 +49,17 @@ const ResponseStatusComponent = ({
           )}
           {oldMobileNumber && newMobileNumber && (
             <>
-              <p className="text-sm">
+              <p className="text-sm flex flex-col md:flex-row items-center">
                 <span className="text-primary text-lg">
                   {translator("mobileNumberUpdate.oldMobileNumber")}
                 </span>
-                <span className="text-gray-500">{oldMobileNumber}</span>
+                <span className="text-gray-500 md:ml-2">{oldMobileNumber}</span>
               </p>
-              <p className="text-sm">
+              <p className="text-sm flex flex-col md:flex-row items-center">
                 <span className="text-primary text-lg">
                   {translator("mobileNumberUpdate.newMobileNumber")}
                 </span>
-                <span className="text-gray-500">{newMobileNumber}</span>
+                <span className="text-gray-500 md:ml-2">{newMobileNumber}</span>
               </p>
             </>
           )}
@@ -67,7 +67,7 @@ const ResponseStatusComponent = ({
       </Card>
       <div className="mt-4">
         <Button variant="primary" onClick={backToHome}>
-          Back to home
+          {translator("button.backToHome")}
         </Button>
       </div>
     </div>

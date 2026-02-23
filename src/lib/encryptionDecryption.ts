@@ -1,7 +1,4 @@
-const AES_ENCRYPTION_KEY_BASE64 =
-  "mZygpLJhMzFzqfKxA+YUYReosbswBr2lEfG7ViCGuAM=";
-
-class AesDecryptionException extends Error {
+export class AesDecryptionException extends Error {
   constructor(message: string, originalError?: Error) {
     super(message);
     this.name = "AesDecryptionException";
@@ -17,14 +14,13 @@ class AesGcmUtil {
   static IV_LENGTH = 12; // bytes
   static TAG_LENGTH = 128; // bits
 
-  private keyPromise: Promise<CryptoKey>;
+  private keyPromise: Promise<CryptoKey> | null = null;
 
-  constructor(base64Key: string) {
+  setKey(base64Key: string) {
     if (!window.crypto?.subtle) {
       throw new Error("Web Cryptography API not supported.");
     }
     const keyBytes = base64ToArrayBuffer(base64Key);
-    // TODO - Unable to find window.crypto
     this.keyPromise = window.crypto.subtle.importKey(
       "raw",
       keyBytes,
@@ -35,6 +31,9 @@ class AesGcmUtil {
   }
 
   async encrypt(plainText: string): Promise<string> {
+    if (!this.keyPromise) {
+      throw new Error("Encryption key not set.");
+    }
     const key = await this.keyPromise;
     const iv = window.crypto.getRandomValues(
       new Uint8Array(AesGcmUtil.IV_LENGTH)
@@ -60,6 +59,9 @@ class AesGcmUtil {
   }
 
   async decrypt(encryptedBase64: string): Promise<string> {
+    if (!this.keyPromise) {
+      throw new Error("Decryption key not set.");
+    }
     try {
       const key = await this.keyPromise;
       const combined = base64ToArrayBuffer(encryptedBase64);
@@ -101,7 +103,7 @@ class AesGcmUtil {
   }
 }
 
-const aesGcmUtil = new AesGcmUtil(AES_ENCRYPTION_KEY_BASE64);
+export const aesGcmUtil = new AesGcmUtil();
 
 // encrypt function
 export async function encrypt(data: string): Promise<string | undefined> {

@@ -31,26 +31,34 @@ const callFlutterMethod = async (serviceId: string) => {
 
 export const getBiometricDeviceStatusInAndroid = async () => {
   try {
+    console.log("Checking biometric device status in Android...");
     const response = await callFlutterMethod("DEVICE_STATUS");
     const xmlText = response.data;
     const jsonData = convertXML(xmlText);
+    console.log("Biometric device status response:", jsonData);
     if (jsonData?.DeviceInfo?.dpId && jsonData?.DeviceInfo?.rdsId) {
+      console.log("Biometric device is ready.");
       return BIOMETRIC_SERVICE_AND_DEVICE_STATUS.READY;
     } else {
+      console.log("Biometric device is not ready.");
       return BIOMETRIC_SERVICE_AND_DEVICE_STATUS.NOT_READY;
     }
   } catch (err) {
+    console.error("Error checking biometric device status in Android:", err);
     return err;
   }
 };
 
-export const captureFingerPrintInAndroid = async () => {
+export const captureFingerPrintInAndroid = async (): Promise<any> => {
   try {
     const response = await callFlutterMethod("CAPTURE_FINGERPRINT");
+    console.log("Fingerprint capture response from Android:", response);
     const xmlText = response.data;
     const jsonData = convertXML(xmlText);
-    return jsonData;
+    console.log("Parsed fingerprint capture response:", jsonData);
+    return { jsonData, xmlText };
   } catch (err) {
+    console.error("Error capturing fingerprint in Android:", err);
     return err;
   }
 };

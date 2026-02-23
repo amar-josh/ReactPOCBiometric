@@ -39,6 +39,7 @@ interface ICommonFromComponentProps {
   >;
   selectOptions?: { [key: string]: ILabelValue[] };
   isDisabled?: boolean;
+  isRequired?: boolean;
 }
 
 const CommonFormComponent = ({
@@ -46,6 +47,7 @@ const CommonFormComponent = ({
   control,
   selectOptions,
   isDisabled = false,
+  isRequired = false,
 }: ICommonFromComponentProps) => {
   const options = selectOptions?.[field.value] ?? [];
 
@@ -56,8 +58,13 @@ const CommonFormComponent = ({
       name={field.value}
       render={({ field: formField, fieldState }) => (
         <FormItem className={field?.className ?? ""}>
-          <FormLabel className="!text-primary-gray">
-            {translator(field.label)}
+          <FormLabel className="!text-dark-gray">
+            <span>
+              {translator(field.label)}
+              {isRequired && (
+                <span className="text-xl text-destructive">*</span>
+              )}
+            </span>
           </FormLabel>
           <FormControl>
             {["text", "email", "number"].includes(field.type) ? (
@@ -68,7 +75,7 @@ const CommonFormComponent = ({
                 autoComplete="off"
                 className={cn(
                   {
-                    "bg-gray-100 text-gray-500 cursor-not-allowed":
+                    "bg-gray-100 text-dark-gray border-dark-gray cursor-not-allowed":
                       field.readOnly,
                   },
                   {
@@ -82,9 +89,9 @@ const CommonFormComponent = ({
                 {...formField}
                 disabled={field.readOnly}
                 className={cn(
-                  "w-full max-h-fit border rounded-md resize-none",
+                  "w-full min-h-[6.125rem] border rounded-md resize-none",
                   {
-                    "bg-gray-100 text-gray-500 cursor-not-allowed":
+                    "bg-gray-100 text-dark-gray border-dark-gray cursor-not-allowed":
                       field.readOnly,
                   },
                   {
@@ -106,7 +113,7 @@ const CommonFormComponent = ({
               >
                 <SelectTrigger
                   data-testid="select-trigger"
-                  className={cn("w-full", {
+                  className={cn("w-full border-input", {
                     "border-red-500 focus:ring-red-500": fieldState.error,
                   })}
                 >
@@ -133,7 +140,9 @@ const CommonFormComponent = ({
               />
             ) : null}
           </FormControl>
-          <FormMessage />
+          <div className="min-h-3">
+            <FormMessage />
+          </div>
         </FormItem>
       )}
     />

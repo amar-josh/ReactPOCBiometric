@@ -8,7 +8,7 @@ import { CommunicationAddressComponent } from "../components/CommunicationAddres
 // Mock formatAddress util
 vi.mock("../utils", () => ({
   formatAddress: (address: IAddress) =>
-    `${address.addressLine1}, ${address.city}, ${address.state} - ${address.pincode}`,
+    `${address.addressLine1}, ${address.city}, ${address.state} - ${address.pinCode}`,
 }));
 
 describe("CommunicationAddressComponent", () => {
@@ -19,7 +19,7 @@ describe("CommunicationAddressComponent", () => {
     city: "Mumbai",
     state: "Maharashtra",
     country: "India",
-    pincode: 400001,
+    pinCode: 400001,
   };
 
   it("renders the title and formatted address", () => {
@@ -33,13 +33,7 @@ describe("CommunicationAddressComponent", () => {
 
     expect(screen.getByText("Previous Address")).toBeInTheDocument();
     expect(
-      screen.getByText(
-        (content) =>
-          content.includes("123 Main Street") &&
-          content.includes("Mumbai") &&
-          content.includes("Maharashtra") &&
-          content.includes("400001")
-      )
+      screen.getByText("Mumbai, Maharashtra, India, 400001")
     ).toBeInTheDocument();
   });
 
@@ -52,7 +46,9 @@ describe("CommunicationAddressComponent", () => {
       />
     );
 
-    const card = container.querySelector(".border-blue-500.bg-blue-50");
+    const card = container.querySelector(
+      ".border-1.border-blue.bg-blue-50.mb-4"
+    );
     expect(card).toBeTruthy();
   });
 
@@ -67,5 +63,42 @@ describe("CommunicationAddressComponent", () => {
 
     const card = container.querySelector(".border-blue-500.bg-blue-50");
     expect(card).toBeNull();
+  });
+
+  it("returns null when address is undefined", () => {
+    const { container } = render(
+      <CommunicationAddressComponent
+        title="Empty Address"
+        address={undefined}
+        isSelected={false}
+      />
+    );
+
+    expect(container.firstChild).toBeNull();
+  });
+
+  it("renders correctly without addressLine2 and addressLine3", () => {
+    const partialAddress: IAddress = {
+      addressLine1: "456 Elm Street",
+      addressLine2: "",
+      addressLine3: "",
+      city: "Pune",
+      state: "Maharashtra",
+      country: "India",
+      pinCode: 411001,
+    };
+
+    render(
+      <CommunicationAddressComponent
+        title="Partial Address"
+        address={partialAddress}
+        isSelected={false}
+      />
+    );
+
+    expect(screen.getByText("456 Elm Street")).toBeInTheDocument();
+    expect(
+      screen.getByText("Pune, Maharashtra, India, 411001")
+    ).toBeInTheDocument();
   });
 });

@@ -7,63 +7,56 @@ import {
   IOtherDetailsResponse,
   IUpdateKYCRequest,
   IUpdateKYCResponse,
-  IValidateFingerPrintRequest,
-  IValidateFingerPrintResponse,
 } from "@/features/re-kyc/types";
 import { fetchFakeData } from "@/lib/utils";
+import {
+  IValidateFingerPrintRequest,
+  IValidateFingerPrintResponse,
+} from "@/shared/biometric/types";
 
 import { POST } from "../../services/api.service";
-import {
-  addressUpdateFailure,
-  biometricApiFailure,
-  biometricApiSuccess,
-} from "./mocks/biometricMocks";
-import mockData from "./mocks/customerDetails.json";
-import mockOtherDetailsData from "./mocks/otherDetails.json";
-import mockReKYCData from "./mocks/reKYCDetails.json";
+import customerDetails from "./mocks/customerDetails";
+import reKYCDetails from "./mocks/reKYCDetails";
 
 export const getCustomerSearchService = (
   payload: IGetCustomerSearchRequest
-): Promise<IGetCustomerSearchResponse> => {
-  // return POST<IGetCustomerSearchRequest, IGetCustomerSearchResponse>(
-  //   ENDPOINTS.GET_CUSTOMER_SEARCH,
-  //   payload
-  // );
-  return fetchFakeData(mockData);
+): any => {
+  return fetchFakeData(customerDetails);
+  return POST<IGetCustomerSearchRequest, IGetCustomerSearchResponse>(
+    ENDPOINTS.GET_CUSTOMER_SEARCH,
+    payload
+  );
 };
 
 export const getCustomerDetailsService = (
   payload: IGetCustomerDetailsRequest
-): Promise<IGetCustomerDetailsResponse> => {
-  // return POST<IGetCustomerDetailsRequest, IGetCustomerDetailsResponse>(
-  //   ENDPOINTS.GET_CUSTOMER_DETAILS,
-  //   payload
-  // );
-  return fetchFakeData(mockReKYCData);
+): any => {
+  return fetchFakeData(reKYCDetails);
+  return POST<IGetCustomerDetailsRequest, IGetCustomerDetailsResponse>(
+    ENDPOINTS.GET_CUSTOMER_DETAILS,
+    payload
+  );
 };
 
 export const validateFingerprint = (
   payload: IValidateFingerPrintRequest
 ): Promise<IValidateFingerPrintResponse> => {
-  // return POST<IValidateFingerPrintRequest, IValidateFingerPrintResponse>(
-  //   ENDPOINTS.VERIFY_CUSTOMER_BIOMETRIC,
-  //   payload
-  // );
-  return fetchFakeData(biometricApiSuccess);
+  return POST<IValidateFingerPrintRequest, IValidateFingerPrintResponse>(
+    ENDPOINTS.VERIFY_CUSTOMER_BIOMETRIC,
+    payload
+  );
 };
 
 export const updateKYC = (
   payload: IUpdateKYCRequest
 ): Promise<IUpdateKYCResponse> => {
-  // return POST<IUpdateKYCRequest, IUpdateKYCResponse>(
-  //   ENDPOINTS.UPDATE_KYC,
-  //   payload
-  // );
-  return fetchFakeData(addressUpdateFailure);
+  return POST<IUpdateKYCRequest, IUpdateKYCResponse>(
+    ENDPOINTS.UPDATE_KYC,
+    payload
+  );
 };
 
 export const getOtherDetailsDropdownService =
   (): Promise<IOtherDetailsResponse> => {
-    // return POST(ENDPOINTS.GET_OTHER_DETAILS);
-    return fetchFakeData(mockOtherDetailsData);
+    return POST(ENDPOINTS.GET_OTHER_DETAILS);
   };

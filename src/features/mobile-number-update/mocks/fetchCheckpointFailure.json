@@ -1,7 +1,7 @@
 {
-  "statusCode": 422,
+  "statusCode": 200,
   "message": "",
-  "status": "failed",
+  "status": "success",
   "data": {
     "action": "pop-up",
     "actionCode": "ACCOUNT_INACTIVE_OR_BLOCKED"

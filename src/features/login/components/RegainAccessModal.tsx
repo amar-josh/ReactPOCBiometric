@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { SUPPORT_EMAIL } from "@/constants/globalConstant";
 import translator from "@/i18n/translator";
 
 interface IRegainAccessModalProps {
@@ -19,13 +20,15 @@ const RegainAccessModal = ({
 }: IRegainAccessModalProps) => {
   return (
     <Dialog open={showModal} onOpenChange={setShowModal}>
-      <DialogContent className="text-center">
+      <DialogContent className="[&>button]:hidden w-100 text-center gap-0">
         <DialogHeader>
-          <DialogTitle className="text-center">
+          <DialogTitle className=" text-base font-medium text-center mb-2">
             {translator("login.regainAccountAccess")}
           </DialogTitle>
         </DialogHeader>
-        <p className="text-2xl font-bold text-blue-700">1234-567-0000</p>
+        <p className="text-base font-semibold text-primary mb-6">
+          {SUPPORT_EMAIL}
+        </p>
         <div className="flex justify-center">
           <DialogClose asChild>
             <Button variant="primary" onClick={() => setShowModal(false)}>

@@ -3,7 +3,7 @@
 // below is refer as example
 export const ALPHANUMERIC_UNDERSCORE_HYPHEN = /^[a-zA-Z0-9_-]+$/;
 
-export const MOBILE_NUMBER_REGEX = /^\d{10}$/;
+export const MOBILE_NUMBER_REGEX = /^[6-9]\d{9}$/;
 
 export const CIF_LENGTH_REGEX = /^\d{9}$/;
 
@@ -11,3 +11,8 @@ export const ACCOUNT_NUMBER_REGEX = /^\d{14}$/;
 
 export const VALID_EMAIL_REGEX =
   /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+export const ALPHANUMERIC_REGEX = /^[a-zA-Z0-9]+$/;
+
+export const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}[\]|\\:;"'<>,.?/~`]).{8,}$/;

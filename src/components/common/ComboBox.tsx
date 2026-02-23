@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -40,20 +40,20 @@ export function ComboBox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between border-gray-300 hover:border-gray-300 hover:text-black text-black focus:border-gray-300",
-            error && "border-red-500 focus-visible:ring-red-500"
+            "w-full justify-between h-9 border-input hover:border-gray-300 hover:text-black text-black focus:border-gray-300",
+            { "border-red-500 focus-visible:ring-red-500": error }
           )}
         >
-          <span className={cn("truncate")}>
+          <span className={cn({ "text-muted-foreground": !value })}>
             {list.find((item) => item.value === value)?.label ??
-              "Select an option..."}
+              "Select Occupation"}
           </span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] max-h-60 overflow-y-auto p-0">
         <Command>
-          <CommandInput placeholder="Search..." className="h-9" />
+          <CommandInput placeholder="Search..." className="h-9 border-input" />
           <CommandEmpty>No result found.</CommandEmpty>
           <CommandGroup>
             {list.map((item) => (
@@ -61,17 +61,15 @@ export function ComboBox({
                 key={item.value}
                 value={item.label}
                 onSelect={() => {
-                  const isSame = value === item.value;
-                  onChange?.(isSame ? null : item); // deselect if clicked again
+                  onChange?.(item);
                   setOpen(false);
                 }}
               >
                 {item.label}
                 <Check
-                  className={cn(
-                    "ml-auto",
-                    value === item.value ? "opacity-100" : "opacity-0"
-                  )}
+                  className={cn("ml-auto opacity-0", {
+                    "opacity-100": value === item.value,
+                  })}
                 />
               </CommandItem>
             ))}

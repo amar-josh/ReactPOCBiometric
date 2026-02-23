@@ -12,7 +12,7 @@ export const biometricApiSuccess = {
       addressLine2: "Balewadi",
       city: "pune",
       state: "MH",
-      pincode: "411045",
+      pinCode: "411045",
       country: "India",
     },
   },
@@ -27,9 +27,9 @@ export const biometricApiSuccess = {
 // };
 
 export const biometricApiFailure = {
-  message: "Error",
-  statusCode: 422,
-  status: "failed",
+  message: "success",
+  statusCode: 200,
+  status: "success",
   data: {
     action: "pop-up",
     actionCode: "AADHAAR_AUTH_FAILED",

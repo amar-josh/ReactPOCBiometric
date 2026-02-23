@@ -4,6 +4,6 @@
   "message": "Verification link generated and sent SMS to user number ",
   "data": {
     "shortUrl": "https://instaservices.bandhanbank.com/verify?token=po1gKnZ",
-    "totalCicks": 1
+    "totalClicks": 1
   }
 }

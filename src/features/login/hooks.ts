@@ -1,10 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { generateToken } from "./services";
+import { loginService } from "./services";
 
-// write login hook here using tanstack query
-export const useGenerateToken = () => {
+export const useLogin = () => {
   return useMutation({
-    mutationFn: generateToken,
+    mutationFn: loginService,
   });
 };

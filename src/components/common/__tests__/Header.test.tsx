@@ -18,7 +18,6 @@ describe("Header", () => {
 
     expect(header).toBeInTheDocument();
     expect(header.className).toContain("bg-primary");
-    expect(header.className).toContain("min-h-20");
-    expect(header.className).toContain("px-12");
+    expect(header.className).toContain("h-15 flex px-7 py-3 rounded-none");
   });
 });

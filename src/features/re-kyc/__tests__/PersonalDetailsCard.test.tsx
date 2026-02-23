@@ -45,13 +45,13 @@ describe("PersonalDetailsCard", () => {
 
   it("renders the email with label", () => {
     render(<PersonalDetailsCard {...props} />);
-    expect(screen.getByText("reKyc.email:")).toBeInTheDocument();
+    expect(screen.getByText("email:")).toBeInTheDocument();
     expect(screen.getByText("john@example.com")).toBeInTheDocument();
   });
 
   it("renders the masked mobile number with label", () => {
     render(<PersonalDetailsCard {...props} />);
-    expect(screen.getByText("reKyc.mobileNumber:")).toBeInTheDocument();
+    expect(screen.getByText("mobileNumber:")).toBeInTheDocument();
     expect(screen.getByText("XXXXXX3210")).toBeInTheDocument();
   });
 

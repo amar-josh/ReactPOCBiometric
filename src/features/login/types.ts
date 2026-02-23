@@ -1,11 +1,20 @@
-export interface IGenerateTokenResponse {
-  message: string;
+export interface ILoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface ILoginResponse {
   statusCode: number;
   status: string;
-  data: IGenerateTokenData;
-}
-export interface IGenerateTokenData {
-  accessToken: string;
-  tokenType: string;
-  expiresIn: number;
+  message: string;
+  data: {
+    cognitoToken: string;
+    userAttributes: {
+      empName: string;
+      empId: string;
+      branchCode: string;
+      department: string;
+      email: string;
+    };
+  };
 }

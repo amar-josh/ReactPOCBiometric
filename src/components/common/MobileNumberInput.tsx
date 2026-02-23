@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import translator from "@/i18n/translator";
 import { cn } from "@/lib/utils";
 
 interface IMobileNumberInputProps {
@@ -33,19 +34,17 @@ export default function MobileNumberInput({
 
       <div
         className={cn(
-          "flex items-stretch border rounded-md bg-white overflow-hidden",
-          error
-            ? "border-red-500"
-            : "border-input focus-within:border-primary focus-visible:ring-[2px]"
+          "flex items-stretch border rounded-md bg-white overflow-hidden border-input focus-within:border-primary focus-visible:ring-[2px]",
+          { "border-red-500": error }
         )}
       >
         <span
           className={cn(
             "flex items-center px-3 text-sm bg-muted text-muted-foreground border-r border-border",
-            error && "border-r-red-500"
+            { "border-r-red-500": error }
           )}
         >
-          +91
+          {translator("reKyc.plusNinetyOne")}
         </span>
         <Input
           id={name}

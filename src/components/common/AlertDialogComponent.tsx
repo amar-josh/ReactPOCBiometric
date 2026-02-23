@@ -46,18 +46,15 @@ const AlertDialogComponent = ({
           <AlertDialogTitle className="text-center">
             {translator(title)}
           </AlertDialogTitle>
-          {icon && (
-            <img src={icon} alt="fingerprint" className="mx-auto mb-4" />
-          )}
+          {icon && <img src={icon} alt="image" className="mx-auto mb-4" />}
           <AlertDialogDescription
-            className={cn(
-              "text-center font-medium text-base text-black",
-              type === "info" && "text-info",
-              type === "warning" && "text-warning",
-              type === "error" && "text-danger"
-            )}
+            className={cn("text-center font-medium text-base text-black", {
+              "text-info": type === "info",
+              "text-warning": type === "warning",
+              "text-danger": type === "error",
+            })}
           >
-            {translator(message || "")}
+            {message && translator(message)}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -69,12 +66,12 @@ const AlertDialogComponent = ({
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="animate-spin" />}
-              {confirmButtonText}
+              {translator(confirmButtonText)}
             </Button>
           )}
           {onCancel && cancelButtonText && (
             <Button variant="outline" onClick={onCancel} disabled={isLoading}>
-              {cancelButtonText}
+              {translator(cancelButtonText)}
             </Button>
           )}
         </AlertDialogFooter>

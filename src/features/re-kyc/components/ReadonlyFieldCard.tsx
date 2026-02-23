@@ -17,11 +17,11 @@ const ReadonlyFieldCard = ({ title, fields }: ReadonlyFieldCardProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {fields.map((ele, idx) => (
           <div key={`${title}-${idx}`}>
-            <Label className="text-primary-gray">{translator(ele.label)}</Label>
-            <p className="text-base text-gray-900 mt-1">
+            <Label className="text-dark-gray">{translator(ele.label)}</Label>
+            <p className="text-base text-gray-900 mt-2">
               {ele.type === "textarea" ? (
                 <Textarea
-                  className="bg-gray-100 text-gray-500 cursor-not-allowed border rounded-md p-2 resize-none"
+                  className="bg-gray-100 text-dark-gray border-dark-gray cursor-not-allowed rounded-md p-2 resize-none"
                   disabled
                   value={
                     ele.defaultValue as
@@ -33,7 +33,7 @@ const ReadonlyFieldCard = ({ title, fields }: ReadonlyFieldCardProps) => {
                 />
               ) : (
                 <Input
-                  className="bg-gray-100 text-gray-500 cursor-not-allowed border rounded-md p-2"
+                  className="bg-gray-100 text-dark-gray border-dark-gray cursor-not-allowed rounded-md p-2"
                   type={ele.type}
                   disabled
                   value={

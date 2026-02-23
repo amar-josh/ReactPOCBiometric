@@ -14,7 +14,7 @@ export const axiosInstance = axios.create({
 });
 
 const updateTokenValueClosure = () => {
-  let isTokenSet = true;
+  let isTokenSet = false;
   return {
     updateTokenValue: (token: string) => {
       isTokenSet = true;
@@ -24,6 +24,7 @@ const updateTokenValueClosure = () => {
     clearToken: () => {
       isTokenSet = false;
       removeSessionStorageData(SESSION_STORAGE_KEY.TOKEN); // clear token from session storage
+      removeSessionStorageData(SESSION_STORAGE_KEY.EMP_INFO); // clear emp info from session storage
       delete axiosInstance.defaults.headers.common.Authorization;
     },
   };
@@ -48,11 +49,6 @@ export async function POST<RequestBody, Response>(
       config
     );
 
-    // Decrypt response
-    console.log("API Response", response);
-    console.log("API Response.Data", response.data);
-    console.log("API Response.Data.Data", response.data.data);
-
     const encryptedResponseData = response.data?.data;
     if (!encryptedResponseData)
       throw new Error("Missing encrypted response data");
@@ -63,41 +59,19 @@ export async function POST<RequestBody, Response>(
     }
 
     return JSON.parse(decrypted) as Response;
-  } catch (err: any) {
-    // Check for encrypted error response
-    console.log("Response error", err);
-    console.log("Response error.response", err?.response);
-    console.log("Response error.response.data", err?.response?.data);
-    console.log("Response error.response.data.data", err?.response?.data?.data);
+  } catch (error: any) {
+    const errorResponse = error?.response?.data;
 
-    const encryptedError = err?.response?.data?.data;
-
-    if (encryptedError && typeof encryptedError === "string") {
-      try {
-        const decryptedError = await decrypt(encryptedError);
-        if (typeof decryptedError !== "string") {
-          throw new Error("Decrypted error is not a string");
-        }
-        const error = JSON.parse(decryptedError);
-
-        console.error("Decrypted error:", error);
-
-        if (error?.statusCode === STATUS_CODE.UNAUTHORIZED) {
-          handleUnauthorized();
-        }
-        return error;
-      } catch (decryptionError) {
-        console.error("Error decrypting error response:", decryptionError);
-        throw new Error("Failed to decrypt error response");
-      }
+    if (errorResponse?.statusCode === STATUS_CODE.UNAUTHORIZED) {
+      handleUnauthorized();
     }
 
-    console.error("Request failed:", err);
-    return err;
+    console.error("Request failed:", errorResponse);
+    throw errorResponse;
   }
 }
 
 export const handleUnauthorized = () => {
   clearToken();
-  window.location.href = `${import.meta.env.VITE_BASE_URL}${ROUTES.UNAUTHORIZED}`;
+  window.location.href = ROUTES.UNAUTHORIZED;
 };

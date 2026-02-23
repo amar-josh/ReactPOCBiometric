@@ -1,0 +1,49 @@
+export default {
+  message: "",
+  statusCode: 200,
+  status: "success",
+  timestamp: "2025-04-17T15:45:30",
+  path: "/api/your-endpoint",
+  data: {
+    requestNumber: "BIS-REKYC-324532532",
+    metaData: {
+      isNoChange: true,
+      isUpdateAddress: false,
+      message:
+        "KYC documents have expired, please proceed with Aadhaar based 'Re-KYC with address update' option.",
+    },
+    rekycDetails: {
+      customerName: "John Doe",
+      aadhaarNumber: "89128123456",
+      aadhaarRefNumber: "123456789123",
+      customerID: "123456789",
+      accountNumber: 50180031645065,
+      mobileNo: "9876543210",
+      emailId: "john.doe@example.com",
+      nameOfOVD: "John Doe",
+      permanentAddress: {
+        addressLine1: "B-302, 3rd Floor, Shreeji Tower",
+        addressLine2: "Near Shreeji Tower",
+        addressLine3: "Near Shreeji Tower",
+        city: "Mumbai",
+        state: "Maharashtra",
+        pinCode: 400001,
+        country: "India",
+      },
+      communicationAddress: {
+        addressLine1: "C-414, 3rd Floor, Shreeji Tower",
+        addressLine2: "Near Shreeji Tower",
+        addressLine3: "Near Shreeji Tower",
+        city: "Mumbai",
+        state: "Maharashtra",
+        pinCode: 400001,
+        country: "India",
+      },
+    },
+    otherDetails: {
+      occupation: 101,
+      residentType: 1,
+      incomeRange: 1,
+    },
+  },
+};

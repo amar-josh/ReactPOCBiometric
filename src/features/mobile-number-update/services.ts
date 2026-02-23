@@ -1,9 +1,11 @@
 import { MOBILE_NUMBER_ENDPOINTS } from "@/constants/endPoints";
 import { POST } from "@/services/api.service";
+import {
+  IValidateFingerPrintRequest,
+  IValidateFingerPrintResponse,
+} from "@/shared/biometric/types";
 
 import {
-  IBioMetricVerificationRequest,
-  IBioMetricVerificationResponse,
   IGetCheckStatusRequest,
   IGetCheckStatusResponse,
   IGetCustomerSearchRequest,
@@ -14,8 +16,6 @@ import {
   IGetRecordResponse,
   IGetUpdateNumberRequest,
   IGetUpdateNumberResponse,
-  IGetVerifyLinkRequest,
-  IGetVerifyLinkResponse,
   IGetVerifyNumberRequest,
   IGetVerifyNumberResponse,
 } from "./types";
@@ -47,7 +47,7 @@ export const getUpdateNumberService = (
   );
 };
 
-export const getFetchRecordsService = (
+export const getRecordsService = (
   payload: IGetRecordRequest
 ): Promise<IGetRecordResponse> => {
   return POST<IGetRecordRequest, IGetRecordResponse>(
@@ -74,19 +74,10 @@ export const getGenerateLinkService = (
   );
 };
 
-export const getVerifyLinkService = (
-  payload: IGetVerifyLinkRequest
-): Promise<IGetVerifyLinkResponse> => {
-  return POST<IGetVerifyLinkRequest, IGetVerifyLinkResponse>(
-    MOBILE_NUMBER_ENDPOINTS.VERIFY_LINK,
-    payload
-  );
-};
-
-export const getBioMetricVerificationService = (
-  payload: IBioMetricVerificationRequest
-): Promise<IBioMetricVerificationResponse> => {
-  return POST<IBioMetricVerificationRequest, IBioMetricVerificationResponse>(
+export const validateFingerprint = (
+  payload: IValidateFingerPrintRequest
+): Promise<IValidateFingerPrintResponse> => {
+  return POST<IValidateFingerPrintRequest, IValidateFingerPrintResponse>(
     MOBILE_NUMBER_ENDPOINTS.BIOMETRIC_VERIFICATION,
     payload
   );

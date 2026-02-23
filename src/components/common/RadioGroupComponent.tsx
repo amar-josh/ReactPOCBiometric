@@ -1,5 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import translator from "@/i18n/translator";
 
 interface IRadioGroupComponentProps {
   value: string;
@@ -19,7 +20,7 @@ const RadioGroupComponent = ({
           <div key={option.value} className="flex items-center space-x-2">
             <RadioGroupItem value={option.value} id={option.value} />
             <Label className="cursor-pointer" htmlFor={option.value}>
-              {option.label}
+              {translator(option.label)}
             </Label>
           </div>
         );

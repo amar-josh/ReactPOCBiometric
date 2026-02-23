@@ -1,5 +1,7 @@
 import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import * as sessionStorageLib from "./lib/sessionStorage";
+import * as apiService from "./services/api.service";
 
 import App from "./App";
 
@@ -81,5 +83,22 @@ describe("App Component", () => {
 
     document.dispatchEvent(event);
     expect(preventDefault).not.toHaveBeenCalled();
+  });
+
+  it("updates token in api service when token exists in session storage", () => {
+    const token = "test-token-123";
+    const getSessionSpy = vi
+      .spyOn(sessionStorageLib, "getSessionStorageData")
+      .mockReturnValue(token);
+    const updateTokenSpy = vi
+      .spyOn(apiService, "updateTokenValue")
+      .mockImplementation(() => {});
+
+    render(<App />);
+
+    expect(updateTokenSpy).toHaveBeenCalledWith(token);
+
+    getSessionSpy.mockRestore();
+    updateTokenSpy.mockRestore();
   });
 });

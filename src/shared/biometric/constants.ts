@@ -1,0 +1,31 @@
+export const MAX_BIOMETRIC_ATTEMPT = 3;
+
+export const BIOMETRIC_OPERATIONS = {
+  CHECK_RD_SERVICE_STATUS: "checkRDServiceStatus",
+  CHECK_RD_SERVICE_ERROR: "checkRDServiceError",
+  DEVICE_NOT_READY: "deviceNotReady",
+  READY_TO_CAPTURE: "readyToCapture",
+  SUCCESS: "success",
+  FAILED: "failed",
+  NO_FINGER_FOUND: "notFound",
+  ATTEMPT_FAILED: "attemptFailed",
+  ATTEMPT_LIMIT_CROSSED: "attemptLimitCrossed",
+  DEVICE_USED_BY_ANOTHER_APPLICATION: "usedByOtherApplication",
+  DEFAULT: "default",
+};
+
+export const BIOMETRIC_MODAL_ACTIONS = {
+  RETRY_RD_SERVICE: "retryRDService",
+  RETRY_DEVICE: "retryDevice",
+  CLOSE: "close",
+  CAPTURE: "capture",
+  RECAPTURE: "recapture",
+  HOME: "home",
+};
+
+export const BIOMETRIC_DEVICE_STATUS_CODES = {
+  "720": BIOMETRIC_OPERATIONS.DEVICE_NOT_READY,
+  "700": BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
+  "730": BIOMETRIC_OPERATIONS.NO_FINGER_FOUND,
+  "710": BIOMETRIC_OPERATIONS.DEVICE_USED_BY_ANOTHER_APPLICATION,
+};

@@ -14,8 +14,8 @@ describe("ResponseStatusComponent", () => {
   const backToHomeMock = vi.fn();
 
   const baseProps: IResponseStatusComponentProps = {
-    status: "success",
     title: "Success Title",
+    isSuccess: true,
     message: "Operation was successful",
     backToHome: backToHomeMock,
   };
@@ -25,7 +25,7 @@ describe("ResponseStatusComponent", () => {
   });
 
   it("renders error icon when status is 'failure'", () => {
-    render(<ResponseStatusComponent {...baseProps} status="failure" />);
+    render(<ResponseStatusComponent {...baseProps} isSuccess={false} />);
     const img = screen.getByRole("img");
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute("src", expect.stringContaining("error.svg"));
@@ -64,7 +64,7 @@ describe("ResponseStatusComponent", () => {
 
   it("calls backToHome when the button is clicked", () => {
     render(<ResponseStatusComponent {...baseProps} />);
-    const button = screen.getByRole("button", { name: /Back to home/i });
+    const button = screen.getByRole("button", { name: /button.backToHome/i });
     fireEvent.click(button);
     expect(backToHomeMock).toHaveBeenCalledTimes(1);
   });

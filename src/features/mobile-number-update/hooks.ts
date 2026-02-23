@@ -1,14 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 
 import {
-  getBioMetricVerificationService,
   getCheckStatusService,
   getCustomerSearchService,
-  getFetchRecordsService,
   getGenerateLinkService,
+  getRecordsService,
   getUpdateNumberService,
-  getVerifyLinkService,
   getVerifyNumberService,
+  validateFingerprint,
 } from "./services";
 
 export const useCustomerSearch = () => {
@@ -31,7 +30,7 @@ export const useUpdateNumber = () => {
 
 export const useFetchRecords = () => {
   return useMutation({
-    mutationFn: getFetchRecordsService,
+    mutationFn: getRecordsService,
   });
 };
 
@@ -47,14 +46,8 @@ export const useGenerateLink = () => {
   });
 };
 
-export const useVerifyLink = () => {
+export const useValidateFingerprint = () => {
   return useMutation({
-    mutationFn: getVerifyLinkService,
-  });
-};
-
-export const useBioMetricVerification = () => {
-  return useMutation({
-    mutationFn: getBioMetricVerificationService,
+    mutationFn: validateFingerprint,
   });
 };

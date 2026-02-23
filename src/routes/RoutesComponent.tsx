@@ -5,6 +5,7 @@ import ErrorBoundaryWrapper from "@/components/common/ErrorBoundaryWrapper";
 import FullScreenLoader from "@/components/common/FullScreenLoader";
 import Login from "@/features/login";
 import PrivateLayout from "@/layout/PrivateLayout";
+
 import PublicLayout from "@/layout/PublicLayout";
 
 import PrivateRoute from "./components/PrivateRoutes";
@@ -13,7 +14,7 @@ import { privateRoutes, publicRoute } from "./routesConfig";
 
 const RoutesComponent = () => {
   return (
-    <BrowserRouter basename={import.meta.env.VITE_BASE_URL}>
+    <BrowserRouter>
       <Suspense fallback={<FullScreenLoader />}>
         <Routes>
           <Route path="/" element={<Navigate to={ROUTES.LOGIN} replace />} />

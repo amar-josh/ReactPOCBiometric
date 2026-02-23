@@ -1,38 +1,40 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import Home from "..";
 
-// ✅ Mock useNavigate
-// ✅ Fix: partial mock of `react-router`
-const mockNavigate = vi.fn();
+const mocks = {
+  navigate: vi.fn(),
+  setKey: vi.fn(),
+  setTransactionId: vi.fn(),
+  getConfig: vi.fn(),
+};
+let mockConfigData: any = null;
+
 vi.mock("react-router", async () => {
   const actual =
     await vi.importActual<typeof import("react-router")>("react-router");
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
+  return { ...actual, useNavigate: () => mocks.navigate };
 });
 
-// ✅ Mock translator to return key
-vi.mock("../../../i18n/translator", () => ({
+vi.mock("@/i18n/translator", () => ({
   default: (key: string) => key,
 }));
 
-// ✅ Mock HomeCard
-interface HomeCardProps {
-  label: string;
-  description: string;
-  onClick: () => void;
-}
-
-vi.mock("../../../features/home/component/HomeCard", () => ({
-  default: ({ label, description, onClick }: HomeCardProps) => (
+vi.mock("@/features/home/component/HomeCard", () => ({
+  default: ({
+    label,
+    description,
+    onClick,
+  }: {
+    label: string;
+    description: string;
+    onClick: () => void;
+  }) => (
     <div onClick={onClick} data-testid="home-card">
-      <div>{label}</div>
-      <div>{description}</div>
+      <span>{label}</span>
+      <p>{description}</p>
     </div>
   ),
 }));
@@ -42,49 +44,95 @@ vi.mock("../utils", () => ({
   getIconBasedOnModuleKey: (key: string) => `Icon-${key}`,
 }));
 
-// ✅ Stub card data
 vi.mock("../constants", () => ({
   INSTA_SERVICES_CARDS: [
     {
-      moduleKey: "re_kyc",
-      moduleName: "Re-KYC",
-      moduleDesc: "Update your KYC information",
+      key: "re_kyc",
+      icon: "Icon-re_kyc",
+      name: "home.instaServices.reKYCTitle",
+      description: "home.instaServices.reKYCDescription",
+      path: "/re-kyc",
     },
     {
-      moduleKey: "mobile_number_update",
-      moduleName: "Mobile Update",
-      moduleDesc: "Change your mobile number",
+      key: "mobile_number_update",
+      icon: "Icon-mobile_number_update",
+      name: "home.instaServices.mobileNumberUpdateTitle",
+      description: "home.instaServices.mobileNumberUpdateDescription",
+      path: "/mobile-number-update",
     },
   ],
+  NAVIGATION_ROUTES: {
+    re_kyc: "/re-kyc",
+    mobile_number_update: "/mobile-number-update",
+  },
 }));
 
+vi.mock("@/lib/encryptionDecryption", () => ({
+  aesGcmUtil: { setKey: (key: string) => mocks.setKey(key) },
+}));
+vi.mock("@/lib/utils", () => ({
+  setTransactionId: (id: string) => mocks.setTransactionId(id),
+}));
+
+vi.mock("../adfs-login/hooks", () => ({
+  useEmpInfo: () => ({ empName: "John Doe" }),
+}));
+
+vi.mock("@/hooks/useConfig", () => ({
+  useGetConfig: () => ({
+    mutate: mocks.getConfig,
+    data: mockConfigData,
+  }),
+}));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mockConfigData = null;
+});
+
 describe("Home Component", () => {
-  it("renders welcome and subtitle texts", () => {
+  it("calls getConfig on mount", async () => {
     render(<Home />, { wrapper: MemoryRouter });
 
-    expect(screen.getByText("home.subTitle")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mocks.getConfig).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it("renders all HomeCards", () => {
+  it("sets aes key and transaction ID when configData is available", async () => {
+    mockConfigData = { data: { aesKey: "dummyKey" } };
+
+    render(<Home />, { wrapper: MemoryRouter });
+
+    await waitFor(() => {
+      expect(mocks.setKey).toHaveBeenCalledWith("dummyKey");
+      expect(mocks.setTransactionId).toHaveBeenCalledWith("");
+    });
+  });
+
+  it("renders all HomeCards correctly", () => {
     render(<Home />, { wrapper: MemoryRouter });
 
     const cards = screen.getAllByTestId("home-card");
     expect(cards).toHaveLength(2);
 
-    expect(screen.getByText("Re-KYC")).toBeInTheDocument();
-    expect(screen.getByText("Update your KYC information")).toBeInTheDocument();
-    expect(screen.getByText("Mobile Update")).toBeInTheDocument();
-    expect(screen.getByText("Change your mobile number")).toBeInTheDocument();
+    expect(
+      screen.getByText("home.instaServices.reKYCTitle")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("home.instaServices.mobileNumberUpdateTitle")
+    ).toBeInTheDocument();
   });
 
-  it("navigates correctly when cards are clicked", () => {
+  it("navigates correctly on card click", () => {
     render(<Home />, { wrapper: MemoryRouter });
 
     const cards = screen.getAllByTestId("home-card");
-    fireEvent.click(cards[0]); // re_kyc
-    expect(mockNavigate).toHaveBeenCalledWith("/re-kyc");
 
-    fireEvent.click(cards[1]); // mobile_number_update
-    expect(mockNavigate).toHaveBeenCalledWith("/mobile-number-update");
+    fireEvent.click(cards[0]);
+    expect(mocks.navigate).toHaveBeenLastCalledWith("/re-kyc");
+
+    fireEvent.click(cards[1]);
+    expect(mocks.navigate).toHaveBeenLastCalledWith("/mobile-number-update");
   });
 });

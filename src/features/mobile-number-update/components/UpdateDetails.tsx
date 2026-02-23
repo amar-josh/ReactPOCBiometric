@@ -20,25 +20,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ERROR, SUCCESS } from "@/constants/globalConstant";
-import { MOBILE_NUMBER_REGEX } from "@/constants/regex";
 import { ICustomerSearchResponse } from "@/features/re-kyc/types";
 import { useAlertMessage } from "@/hooks/useAlertMessage";
 import translator from "@/i18n/translator";
 
 import { useCheckStatus, useGenerateLink, useVerifyNumber } from "../hooks";
+import { IGetCheckStatusResponse } from "../types";
+import { mobileNumberUpdateFormSchema } from "../utils";
 
-const formSchema = yup.object().shape({
-  searchBy: yup.string(),
-  mobileNumber: yup
-    .string()
-    .required(translator("validations.mobileNumber.matchesRegex"))
-    .matches(
-      MOBILE_NUMBER_REGEX,
-      translator("validations.mobileNumber.matchesRegex")
-    ),
-});
-
-type FormSchemaType = yup.InferType<typeof formSchema>;
+type FormSchemaType = yup.InferType<typeof mobileNumberUpdateFormSchema>;
 
 interface IUpdateDetailsProps {
   setNewMobileNumber: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -50,9 +40,6 @@ interface IUpdateDetailsProps {
 const UpdateDetails = (props: IUpdateDetailsProps) => {
   const { setNewMobileNumber, updateStep, personalDetails, requestNumber } =
     props;
-
-  const nameFirstLetter =
-    personalDetails?.custDetails?.customerName?.charAt(0).toUpperCase() || "";
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isProceedToAadhar, setIsProceedToAadhar] = useState<boolean>(false);
@@ -87,8 +74,7 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
   );
 
   const form = useForm<FormSchemaType>({
-    // @ts-expect-error: yupResolver type mismatch with react-hook-form expected resolver, safe to ignore as per project setup
-    resolver: yupResolver(formSchema),
+    resolver: yupResolver(mobileNumberUpdateFormSchema),
     defaultValues: {
       mobileNumber: undefined,
     },
@@ -105,7 +91,7 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
   const isFormEmpty = !watch("mobileNumber");
 
   const handleGenerateLinkSuccess = (data: any) => {
-    if (data?.data?.totalCicks > 3) {
+    if (data?.data?.totalClicks > 3) {
       setAlertMessage({
         type: ERROR,
         message: translator("mobileNumberUpdate.maximumAttemptsExceeded"),
@@ -154,14 +140,21 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
     }
   };
 
-  const handleCheckStatusSuccess = () => {
-    setTimer(0);
-    setIsShowCheckStatus(false);
-    setIsProceedToAadhar((prev) => !prev);
-    setAlertMessage({
-      message: translator("mobileNumberUpdate.successfulVerified"),
-      type: SUCCESS,
-    });
+  const handleCheckStatusSuccess = (response: IGetCheckStatusResponse) => {
+    if (response?.data?.isVerified) {
+      setTimer(0);
+      setIsShowCheckStatus(false);
+      setIsProceedToAadhar((prev) => !prev);
+      setAlertMessage({
+        message: translator("mobileNumberUpdate.successfulVerified"),
+        type: SUCCESS,
+      });
+    } else {
+      setAlertMessage({
+        message: translator("mobileNumberUpdate.verificationFailed"),
+        type: ERROR,
+      });
+    }
   };
 
   const handleCheckStatus = () => {
@@ -170,7 +163,7 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
         requestNumber,
       },
       {
-        onSuccess: handleCheckStatusSuccess,
+        onSuccess: (response) => handleCheckStatusSuccess(response),
       }
     );
   };
@@ -232,23 +225,20 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
   return (
     <div>
       {isLoading && <FullScreenLoader />}
-      <h4 className="text-primary text-2xl font-medium pb-5">
+      <h4 className="text-primary text-2xl font-medium pb-4">
         {translator("mobileNumberUpdate.updateDetails")}
       </h4>
-      <CardWrapper backgroundColor="bg-light-gray pt-0 px-2">
+      <CardWrapper className="bg-light-gray pt-0 px-2">
         <div className="flex items-center gap-6">
-          <div className="flex flex-col gap-y-1.5 lg:flex-row  w-full">
+          <div className="flex flex-col gap-y-0 md:gap-y-1.5 md:flex-row w-full">
             <div className="flex flex-row gap-7">
-              <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center text-3xl font-bold">
-                {nameFirstLetter}
-              </div>
               <div>
-                <h3 className="font-semibold">
+                <h3 className="font-medium">
                   {personalDetails?.custDetails?.customerName || ""}
                 </h3>
                 <div className="flex gap-2">
                   <p className="text-md">
-                    {translator("mobileNumberUpdate.cif")}
+                    {translator("formFields.customerID")} :
                   </p>
                   <p className="text-muted-foreground text-md">
                     {personalDetails?.custDetails?.customerId || ""}
@@ -257,7 +247,7 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
               </div>
             </div>
             <div className="flex gap-2 px-0 md:px-16 items-center">
-              <p className="text-md">{translator("reKyc.mobileNumber")}:</p>
+              <p className="text-md">{translator("mobileNumber")}:</p>
               <p className="text-muted-foreground text-md">
                 {personalDetails?.custDetails?.mobileNumber}
               </p>
@@ -266,16 +256,12 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
         </div>
       </CardWrapper>
 
-      <h4 className="text-xl text-primary py-4">
+      <h4 className="text-lg text-primary pt-4 pb-2">
         {translator("mobileNumberUpdate.enterMobileNumber")}
       </h4>
       <Form {...form}>
-        {/* TODO:Fix control type issue
-         @ts-expect-error:fixes */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
           <FormField
-            // TODO:Fix control type issue
-            // @ts-expect-error:fixes
             control={control}
             name="mobileNumber"
             render={({ field }) => (
@@ -284,7 +270,7 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
                   <MobileNumberInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder={translator("reKyc.placeholder.mobileNumber")}
+                    placeholder={translator("placeholder.mobileNumber")}
                   />
                 </FormControl>
                 <FormMessage />
@@ -363,12 +349,12 @@ const UpdateDetails = (props: IUpdateDetailsProps) => {
       )}
 
       <AlertDialogComponent
-        title={translator("mobileNumberUpdate.verifyMobile")}
-        message={translator("mobileNumberUpdate.verificationLinkSend")}
+        title={"mobileNumberUpdate.verifyMobile"}
+        message={"mobileNumberUpdate.verificationLinkSend"}
         icon={warning}
         onConfirm={onCancel}
         open={isOpen}
-        confirmButtonText={translator("button.close")}
+        confirmButtonText="button.close"
       />
     </div>
   );

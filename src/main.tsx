@@ -1,5 +1,5 @@
 import "./index.css";
-import "../src/i18n/i18n.ts";
+import "@/i18n/i18n.ts";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";

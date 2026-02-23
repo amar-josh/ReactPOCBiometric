@@ -8,27 +8,22 @@ import {
   addressUpdateSuccess,
   biometricApiSuccess,
 } from "@/features/re-kyc/mocks/biometricMocks";
-import { fetchFakeData } from "@/lib/utils";
 import { POST } from "@/services/api.service";
-
-import otherDetailsMockData from "../mocks/otherDetails.json";
-import mockReKYCData from "../mocks/reKYCDetails.json";
-import * as services from "../services";
 import {
   captureFingerPrint,
   getBiometricDeviceStatus,
   getRDServiceStatus,
-} from "../services";
+} from "@/services/biometricForWeb";
+
+import otherDetailsMockData from "../mocks/otherDetails";
+import mockReKYCData from "../mocks/reKYCDetails";
+import * as services from "../services";
 
 vi.mock("axios");
 vi.mock("simple-xml-to-json", () => ({
   convertXML: vi.fn(),
 }));
-vi.mock("@/lib/utils", () => ({
-  fetchFakeData: vi.fn(),
-}));
 
-// 🔁 Mock POST function
 vi.mock("@/services/api.service", () => ({
   POST: vi.fn(),
 }));
@@ -63,24 +58,29 @@ describe("Biometric Services", () => {
   });
 
   describe("getBiometricDeviceStatus", () => {
-    it("should throw error if device check fails", async () => {
-      (axios as any).mockRejectedValue(new Error("Failed"));
+    it("should return error if device check fails", async () => {
+      const error = new Error("Failed");
+      (axios as any).mockRejectedValue(error);
 
-      await expect(getBiometricDeviceStatus()).rejects.toThrow(
-        "Device status check failed"
-      );
+      const result = await getBiometricDeviceStatus();
+      expect(result).toBe(error);
     });
   });
 
   describe("captureFingerPrint", () => {
-    it("should return data from fetchFakeData", async () => {
-      const mockJson = { PidData: { resp: "OK" } };
-      (axios as any).mockResolvedValue({ data: "<xml>" });
-      (convertXML as any).mockReturnValue(mockJson);
-      (fetchFakeData as any).mockResolvedValue(mockJson);
+    it("should return parsed JSON and raw XML", async () => {
+      const mockXML = "<Capture><Status>Success</Status></Capture>";
+      const mockParsed = { Capture: { Status: "Success" } };
+
+      (axios as any).mockResolvedValue({ data: mockXML });
+      (convertXML as any).mockReturnValue(mockParsed);
 
       const result = await captureFingerPrint();
-      expect(result).toEqual(mockJson);
+
+      expect(result).toEqual({
+        jsonData: mockParsed,
+        xmlText: mockXML,
+      });
     });
 
     it("should return error if axios fails", async () => {
@@ -112,6 +112,11 @@ describe("Biometric Services", () => {
   it("getCustomerDetailsService", async () => {
     const payload = {
       customerID: "BR1234",
+      makerDetails: {
+        initiatedBy: "John Doe",
+        empId: "EMP00123",
+        empBranchCode: "BR1234",
+      },
     };
     mockPost.mockResolvedValueOnce(mockReKYCData);
     const response = await services.getCustomerDetailsService(payload);
@@ -144,7 +149,7 @@ describe("Biometric Services", () => {
           addressLine2: "Near City Park",
           addressLine3: "Near City Park",
           landmark: "Opp. Police Station",
-          pincode: 400001,
+          pinCode: 400001,
           country: "India",
           state: "Maharashtra",
           district: "Mumbai",
@@ -155,7 +160,7 @@ describe("Biometric Services", () => {
           addressLine2: "Linking Road",
           addressLine3: "Linking Road",
           landmark: "Next to ABC Mall",
-          pincode: 400050,
+          pinCode: 400050,
           country: "India",
           state: "Maharashtra",
           district: "Mumbai Suburban",
@@ -166,7 +171,7 @@ describe("Biometric Services", () => {
           addressLine2: "MG Road",
           addressLine3: "MG Road",
           landmark: "Near Central Plaza",
-          pincode: 400054,
+          pinCode: 400054,
           country: "India",
           state: "Maharashtra",
           district: "Mumbai Suburban",
@@ -178,6 +183,12 @@ describe("Biometric Services", () => {
           residentType: 1,
         },
       },
+      filteredAccountDetails: [
+        {
+          accountId: "1231",
+          accountType: "abc",
+        },
+      ],
     };
 
     mockPost.mockResolvedValueOnce(addressUpdateSuccess);

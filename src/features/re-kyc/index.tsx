@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
-import homeIcon from "@/assets/images/home.svg";
+// TODO:Uncommment below code in phase 2
+// import warningIcon from "@/assets/images/warning.svg";
+// import AbortJourneyConfirmationModal from "@/components/common/AbortJourneyConfirmationModal";
 import FullScreenLoader from "@/components/common/FullScreenLoader";
+import PageHeader from "@/components/common/PageHeader";
 import ResponseStatusComponent from "@/components/common/ResponseStatusComponent";
+import ResponsiveStepper from "@/components/common/ResponsiveStepper";
 import { Separator } from "@/components/ui/separator";
 import {
   ERROR,
   INITIAL_STEP_STATUS,
+  JOURNEY_TYPE,
+  POPUP,
   SUCCESS,
 } from "@/constants/globalConstant";
 import {
@@ -15,45 +21,38 @@ import {
   useScrollToContentTop,
 } from "@/context/scroll-context";
 import { useAlertMessage } from "@/hooks/useAlertMessage";
-import translator from "@/i18n/translator";
 import { ROUTES } from "@/routes/constants";
+import BiometricFlow from "@/shared/biometric";
+import { IValidateFingerPrintRequest } from "@/shared/biometric/types";
+import CustomerSearch from "@/shared/customerSearch";
+import { CUSTOMER_SEARCH_OPTIONS } from "@/shared/customerSearch/constants";
 
 import AlertDialogComponent from "../../components/common/AlertDialogComponent";
-import Stepper from "../../components/common/Stepper";
-import MobileStepper from "../mobile-number-update/components/MobileStepper";
-import BiometricFlow from "./BiometricFlow";
+import { useEmpInfo } from "../adfs-login/hooks";
 import AddressUpdateCard from "./components/AddressUpdateCard";
-import CustomerSearch from "./components/CustomerSearch";
 import ReKYCDetails from "./components/ReKYCDetails";
-import {
-  BIOMETRIC_OPERATIONS,
-  INITIAL_OTHER_DETAILS_DATA,
-  STEPS,
-} from "./constants";
+import { STEP, STEPS } from "./constants";
 import {
   useCustomerDetails,
   useCustomerSearch,
   useUpdateKYC,
   useValidateFingerprint,
 } from "./hooks/useRekyc";
+import { useFormDetails, usePersonalDetails } from "./hooks/useRekycHelpers";
 import {
-  useFormDetails,
-  useHasDormantAccount,
-  usePersonalDetails,
-} from "./hooks/useRekycHelpers";
-import {
-  ICheckpointFailure,
+  IGetCustomerDetailsResponse,
   IGetCustomerSearchRequest,
-  IOtherDetailsValues,
+  // IOtherDetailsValues,
   IReKYCData,
-  IValidateFingerPrintRequest,
 } from "./types";
 import { reKYCFailureCheckpoints } from "./utils";
 
 const ReKYC = () => {
+  const empInfo = useEmpInfo();
+
   const customerSearchRef = useRef<{ resetForm: () => void }>(null);
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState<number>(STEP.SEARCH_CUSTOMER);
   const [completed, setCompleted] = useState<{ [key: number]: boolean }>(
     INITIAL_STEP_STATUS
   );
@@ -65,30 +64,35 @@ const ReKYC = () => {
 
   const [isWithAddressUpdate, setIsWithAddressUpdate] =
     useState<boolean>(false); // which button is clicked no change or address update
-  const [otherDetails, setOtherDetails] = useState<IOtherDetailsValues>(
-    INITIAL_OTHER_DETAILS_DATA
-  );
+  // const [otherDetails, setOtherDetails] = useState<IOtherDetailsValues>(
+  //   INITIAL_OTHER_DETAILS_DATA
+  // );
 
-  const [selected, setSelected] = useState<string | undefined>(""); // selected CIF
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
 
   const [steps, setSteps] = useState(STEPS);
 
-  const [actionCode, setActionCode] = useState<string | undefined>("");
+  const [actionCode, setActionCode] = useState<string | undefined>();
 
-  const updateStep = () => {
+  // const [
+  //   showAbortJourneyConfirmationModal,
+  //   setShowAbortJourneyConfirmationModal,
+  // ] = useState<boolean>(false);
+
+  const updateStep = useCallback(() => {
     setCompleted((prev) => ({ ...prev, [currentStep]: true }));
     setCurrentStep((step) => step + 1);
-  };
+  }, [currentStep]);
 
   const resetStep = () => {
     setCompleted(INITIAL_STEP_STATUS);
-    setCurrentStep(1);
+    setCurrentStep(STEP.SEARCH_CUSTOMER);
     setSteps(STEPS);
   };
 
   const {
     mutate: customerSearchMutate,
-    data: customerDetailsResponse,
+    data: customerSearchResponse,
     isSuccess: isCustomerSearchSuccess,
     error: customerSearchError,
     isError: isCustomerSearchError,
@@ -98,7 +102,7 @@ const ReKYC = () => {
 
   const {
     mutate: customerDetailsMutate,
-    data: customerDetailResponse,
+    data: customerDetailsResponse,
     reset: customerDetailsReset,
     error: customerDetailsError,
     isError: isCustomerDetailsError,
@@ -117,8 +121,10 @@ const ReKYC = () => {
   const {
     mutate: updateKYC,
     isSuccess: isUpdateKYCSuccess,
+    data: updateKycResponse,
     isPending: isUpdateKYCLoading,
     isError: isUpdateKYCError,
+    error: updateKycErrorResponse,
     reset: updateKYCReset,
   } = useUpdateKYC();
 
@@ -131,22 +137,22 @@ const ReKYC = () => {
     isCustomerSearchError
   );
 
-  // Get reKYC details from customerDetailResponse
+  // Get reKYC details from customerDetailsResponse
   const reKYCDetailsResponse = useMemo(
-    () => customerDetailResponse?.data,
-    [customerDetailResponse]
-  );
-
-  // Get account details from customerDetailsResponse
-  const accountDetails = useMemo(
     () => customerDetailsResponse?.data,
     [customerDetailsResponse]
   );
 
-  const personalDetails = usePersonalDetails(customerDetailResponse);
-  const formDetails = useFormDetails(otherDetails, reKYCDetailsResponse);
-  // Check if any of the accounts is dormant
-  const hasDormantAccount = useHasDormantAccount(accountDetails);
+  // Get account details from customerSearchResponse
+  const accountDetails = useMemo(
+    () => customerSearchResponse?.data,
+    [customerSearchResponse]
+  );
+
+  const personalDetails = usePersonalDetails(customerDetailsResponse);
+  //  Other details are not available in the ESB yet, so we are hiding them until they become available
+  // const formDetails = useFormDetails(otherDetails, reKYCDetailsResponse);
+  const formDetails = useFormDetails(reKYCDetailsResponse);
 
   const handleValidateFingerPrint = useCallback(
     (payload: IValidateFingerPrintRequest) => {
@@ -167,30 +173,24 @@ const ReKYC = () => {
   }, [isCustomerDetailsLoading, isCustomerSearchLoading, isUpdateKYCLoading]);
 
   const requestNumber = useMemo(() => {
-    return customerDetailResponse?.data?.requestNumber || "";
-  }, [customerDetailResponse?.data?.requestNumber]);
+    return customerDetailsResponse?.data?.requestNumber || "";
+  }, [customerDetailsResponse?.data?.requestNumber]);
 
   // Handle customer search success and default cif selection
   useEffect(() => {
     if (isCustomerSearchSuccess) {
-      setCustomerSearchAlertMessage({
-        type: SUCCESS,
-        message: customerDetailsResponse.message,
-      });
       // Select the first CIF number if available
-      if (customerDetailsResponse?.data?.length > 0) {
-        const enabledCifDetails = customerDetailsResponse.data?.find(
-          (cifDetails) => !cifDetails.custDetails.isIndividual
+      if (customerSearchResponse?.data?.length > 0) {
+        const enabledCifDetails = customerSearchResponse.data?.find(
+          (cifDetails) => cifDetails.custDetails.isIndividual
         );
-        setSelected(
-          enabledCifDetails
-            ? String(enabledCifDetails.custDetails?.customerId)
-            : undefined
-        );
+        if (enabledCifDetails) {
+          setSelectedCustomerId(enabledCifDetails.custDetails.customerId);
+        }
       }
     }
   }, [
-    customerDetailsResponse,
+    customerSearchResponse,
     isCustomerSearchSuccess,
     setCustomerSearchAlertMessage,
   ]);
@@ -202,38 +202,39 @@ const ReKYC = () => {
 
   const handleSearch = (data: IGetCustomerSearchRequest) => {
     customerSearchMutate(data);
-  };
-
-  const handleReKYCNext = () => {
-    customerDetailsMutate(
-      {
-        customerID: selected || "",
-      },
-      {
-        // TODO:check success or error response
-        onSuccess: () => {
-          updateStep();
-        },
-        onError: (error: Error) => {
-          // Type guard to check if error is ICheckpointFailure
-          const checkpointError = error as unknown as ICheckpointFailure;
-          if (checkpointError?.data?.action === "pop-up") {
-            setOpen(true);
-            setActionCode(checkpointError?.data?.actionCode || "");
-          }
-        },
-      }
-    );
-  };
-
-  const handleResetSearch = () => {
-    resetStep();
-    setSelected("");
-    customerSearchReset();
-    customerDetailsReset();
     setCustomerSearchAlertMessage({ type: SUCCESS, message: "" });
-    customerSearchRef.current?.resetForm();
   };
+
+  const handleCustomerDetailsSuccess = useCallback(
+    (res: IGetCustomerDetailsResponse) => {
+      if (res?.data?.action === POPUP) {
+        setOpen(true);
+        setActionCode(res?.data?.actionCode);
+      } else {
+        updateStep();
+      }
+    },
+    [updateStep]
+  );
+
+  const handleReKYCNext = useCallback(() => {
+    const payload = {
+      customerID: selectedCustomerId,
+      makerDetails: {
+        initiatedBy: empInfo?.empName,
+        empId: empInfo?.empId,
+        empBranchCode: empInfo?.branchCode,
+      },
+    };
+    customerDetailsMutate(payload, {
+      onSuccess: handleCustomerDetailsSuccess,
+    });
+  }, [
+    customerDetailsMutate,
+    handleCustomerDetailsSuccess,
+    selectedCustomerId,
+    empInfo,
+  ]);
 
   const {
     alertMessage: customerDetailsErrorMessage,
@@ -256,65 +257,94 @@ const ReKYC = () => {
     setCustomerDetailsErrorAlertMessage,
   ]);
 
-  const handleContinueToEsign = () => {
+  const handleResetSearch = useCallback(() => {
+    resetStep();
+    setSelectedCustomerId("");
+    customerSearchReset();
+    handleResetCustomerSearchAPI();
+    customerDetailsReset();
+    setCustomerSearchAlertMessage({ type: SUCCESS, message: "" });
+    customerSearchRef.current?.resetForm();
+  }, [
+    customerDetailsReset,
+    customerSearchReset,
+    setCustomerSearchAlertMessage,
+    handleResetCustomerSearchAPI,
+  ]);
+
+  const handleContinueToEsign = useCallback(() => {
     setIsWithAddressUpdate(false);
     updateStep();
-  };
+  }, [updateStep]);
 
-  const handleUpdateCommunicationAddress = () => {
+  const handleUpdateCommunicationAddress = useCallback(() => {
     setIsWithAddressUpdate(true);
     updateStep();
     setSteps((prev) => {
       return [...prev, "reKyc.updateCommunicationAddress"];
     });
-  };
+  }, [updateStep]);
 
-  const onCancel = () => {
+  const onCancel = useCallback(() => {
     setOpen(false);
     handleResetSearch();
     updateKYCReset();
     validateFingerPrintReset();
-  };
+    scrollToContentTop();
+  }, [
+    handleResetSearch,
+    updateKYCReset,
+    validateFingerPrintReset,
+    scrollToContentTop,
+  ]);
 
   const backToHome = () => {
     navigate(ROUTES.HOME);
   };
 
+  // filteredAccountDetails is not usefull at all for FE side. It comes from BE in getUserDetails API and we are sending this details while kyc update and ovd update API in request body.
+  const filteredAccountDetails = useMemo(
+    () => customerDetailsResponse?.data?.filteredAccountDetails || [],
+    [customerDetailsResponse?.data?.filteredAccountDetails]
+  );
+
   const handleKYCUpdate = () => {
-    if (!customerDetailResponse?.data.rekycDetails) return;
+    if (!customerDetailsResponse?.data.rekycDetails) return;
 
     const payload = {
       requestNumber: requestNumber,
       isOtherDetailsChange,
-      // TODO - replace below 3 fields (maker details)  once api response for login is fixed
       makerDetails: {
-        initiatedBy: "employee",
-        empId: "12345",
-        empBranchCode: "ABC1232",
+        initiatedBy: empInfo?.empName,
+        empId: empInfo?.empId,
+        empBranchCode: empInfo?.branchCode,
       },
       kycNoChange: isWithAddressUpdate ? false : true,
       rekycDetails: {
-        customerName: customerDetailResponse.data.rekycDetails.customerName,
-        aadhaarNumber: customerDetailResponse.data.rekycDetails.aadhaarNumber,
+        customerName: customerDetailsResponse.data.rekycDetails.customerName,
+        aadhaarNumber: customerDetailsResponse.data.rekycDetails.aadhaarNumber,
         aadhaarRefNumber:
-          customerDetailResponse.data.rekycDetails.aadhaarRefNumber,
-        customerID: customerDetailResponse.data.rekycDetails.customerID,
-        mobileNo: customerDetailResponse.data.rekycDetails.mobileNo,
-        emailId: customerDetailResponse.data.rekycDetails.emailId,
+          customerDetailsResponse.data.rekycDetails.aadhaarRefNumber,
+        customerID: customerDetailsResponse.data.rekycDetails.customerID,
+        mobileNo: customerDetailsResponse.data.rekycDetails.mobileNo,
+        emailId: customerDetailsResponse.data.rekycDetails.emailId,
+        kycStatus: customerDetailsResponse.data.rekycDetails.kycStatus,
         permanentAddress:
-          customerDetailResponse.data.rekycDetails.permanentAddress,
+          customerDetailsResponse.data.rekycDetails.permanentAddress,
         communicationAddress:
-          customerDetailResponse.data.rekycDetails.communicationAddress,
+          customerDetailsResponse.data.rekycDetails.communicationAddress,
         ...(isWithAddressUpdate && {
           aadhaarCommunicationAddress:
             validateFingerPrintResponse?.data?.aadhaarAddress,
         }),
-        otherDetails: {
-          occupation: Number(otherDetails.occupation.value),
-          residentType: Number(otherDetails.residentType.value),
-          incomeRange: Number(otherDetails.incomeRange.value),
-        },
+        // TODO - These details are not available in the ESB yet, so we are hiding them until they become available.
+        // otherDetails: {
+        //   occupation: Number(otherDetails.occupation.value),
+        //   residentType: Number(otherDetails.residentType.value),
+        //   incomeRange: Number(otherDetails.incomeRange.value),
+        // },
       },
+      filteredAccountDetails,
     };
     updateKYC(payload, {
       onSuccess: () => updateStep(),
@@ -323,77 +353,69 @@ const ReKYC = () => {
   };
 
   const aadhaarNumber = useMemo(() => {
-    return customerDetailResponse?.data?.rekycDetails?.aadhaarNumber || "";
-  }, [customerDetailResponse?.data?.rekycDetails?.aadhaarNumber]);
+    return customerDetailsResponse?.data?.rekycDetails?.aadhaarNumber || "";
+  }, [customerDetailsResponse?.data?.rekycDetails?.aadhaarNumber]);
+
+  // const handleShowCancelModal = useCallback(() => {
+  //   setShowAbortJourneyConfirmationModal(true);
+  // }, []);
+
+  // const handleConfirmAbortJourney = () => {
+  //   handleResetSearch();
+  //   setCustomerDetailsErrorAlertMessage({
+  //     type: SUCCESS,
+  //     message: "",
+  //   });
+  //   setShowAbortJourneyConfirmationModal(false);
+  // };
+
+  // const handleCloseCancelModal = () => {
+  //    setShowAbortJourneyConfirmationModal(false);
+  // };
 
   return (
-    <div className="p-6">
+    <div className="px-6 py-3">
       {isLoading && <FullScreenLoader />}
-      <div className="flex items-center mb-3">
-        <h2 className="text-xl font-semibold">{translator("reKyc.title")}</h2>
-      </div>
+      <PageHeader title="reKyc.title" />
       <Separator />
-      <div className="flex gap-10 mt-5">
-        <div className="w-1/4 hidden lg:block">
-          <Stepper
-            steps={steps}
-            currentStep={currentStep}
-            completed={completed}
-          />
-        </div>
+      <div className="flex flex-col lg:flex-row gap-10 mt-5">
+        <ResponsiveStepper
+          steps={steps}
+          currentStep={currentStep}
+          completed={completed}
+        />
         <div className="flex flex-col gap-4 w-full">
-          <div
-            onClick={backToHome}
-            className="text-sm text-gray-700 inline-flex cursor-pointer w-fit"
-          >
-            <img src={homeIcon} alt="Home Icon" className="w-5" />
-            <p className="text-primary-gray font-bold text-base ml-1">
-              {translator("reKyc.home")}
-            </p>
-          </div>
-          <div className="block lg:hidden">
-            <MobileStepper
-              steps={steps}
-              currentStep={currentStep}
-              completed={completed}
-            />
-          </div>
-          {currentStep === 1 && (
+          {currentStep === STEP.SEARCH_CUSTOMER && (
             <CustomerSearch
-              customerSearchAlertMessage={customerSearchAlertMessage}
-              customerDetailsErrorMessage={customerDetailsErrorMessage}
-              setCustomerDetailsErrorAlertMessage={
-                setCustomerDetailsErrorAlertMessage
-              }
-              customerDetailsReset={customerDetailsReset}
-              setSelected={setSelected}
-              selected={selected}
-              handleReKYCNext={handleReKYCNext}
-              isCustomerSearchSuccess={isCustomerSearchSuccess}
               customerSearchRef={customerSearchRef}
-              handleResetSearch={handleResetSearch}
-              isCustomerSearchLoading={isCustomerSearchLoading}
               handleSearch={handleSearch}
+              handleResetSearch={handleResetSearch}
+              handleShowCancelModal={onCancel}
               handleResetCustomerSearchAPI={handleResetCustomerSearchAPI}
+              isCustomerSearchSuccess={isCustomerSearchSuccess}
+              customerSearchAlertMessage={customerSearchAlertMessage}
               accountDetails={accountDetails}
-              customerDetailsError={customerDetailsError}
-              isCustomerDetailsError={isCustomerDetailsError}
-              hasDormantAccount={hasDormantAccount}
+              customerDetailsErrorMessage={customerDetailsErrorMessage}
+              selectedCustomerId={selectedCustomerId}
+              setSelectedCustomerId={setSelectedCustomerId}
+              handleNext={handleReKYCNext}
+              journeyType={JOURNEY_TYPE.REKYC}
+              searchOptions={CUSTOMER_SEARCH_OPTIONS}
             />
           )}
-          {currentStep === 2 && (
+          {currentStep === STEP.VERIFY && (
             <ReKYCDetails
-              onCancel={handleResetSearch}
+              handleShowCancelModal={onCancel}
               setIsOtherDetailsChange={setIsOtherDetailsChange}
               reKYCDetails={reKYCDetailsResponse as IReKYCData}
               handleContinueToEsign={handleContinueToEsign}
               handleUpdateCommunicationAddress={
                 handleUpdateCommunicationAddress
               }
-              setOtherDetails={setOtherDetails}
+              // setOtherDetails={setOtherDetails}
             />
           )}
-          {currentStep === 3 && (
+          {currentStep === STEP.ESIGN && (
             <BiometricFlow
               aadhaarNumber={aadhaarNumber}
               onCancel={onCancel}
@@ -406,16 +428,14 @@ const ReKYC = () => {
               validateFingerPrintError={validateFingerPrintError}
               isValidateFingerPrintLoading={isValidateFingerPrintLoading}
               validateFingerPrintReset={validateFingerPrintReset}
-              isAadhaarVerificationComplete={
-                validateFingerPrintResponse?.data?.aadhaarVerification ===
-                BIOMETRIC_OPERATIONS.SUCCESS
+              validateFingerPrintResponse={validateFingerPrintResponse}
+              aadhaarVerificationStatus={
+                validateFingerPrintResponse?.data?.aadhaarVerification
               }
             />
           )}
-          {/* // TODO: display it when the rekyc success or failed */}
-          {currentStep === 4 && isWithAddressUpdate && (
+          {currentStep === STEP.ADDRESS_UPDATE && isWithAddressUpdate && (
             <AddressUpdateCard
-              personalDetails={personalDetails}
               formDetails={formDetails}
               communicationAddress={
                 (reKYCDetailsResponse as IReKYCData)?.rekycDetails
@@ -423,21 +443,20 @@ const ReKYC = () => {
               }
               handleAddressConfirmed={handleKYCUpdate}
               validateFingerPrintResponse={validateFingerPrintResponse}
-              onCancel={onCancel}
+              handleShowCancelModal={onCancel}
             />
           )}
+          {/* display below component when the rekyc success or failed */}
           {(isUpdateKYCError || isUpdateKYCSuccess) && (
             <ResponseStatusComponent
-              status={isUpdateKYCSuccess ? "success" : "failure"}
+              isSuccess={isUpdateKYCSuccess}
               title={
-                (isUpdateKYCSuccess
-                  ? "reKyc.thankYou"
-                  : "reKyc.rekycUpdateFailed") as string
+                isUpdateKYCSuccess ? "thankYou" : "reKyc.rekycUpdateFailed"
               }
               message={
-                isUpdateKYCSuccess
-                  ? "reKyc.updateKYCMessage.success"
-                  : "reKyc.updateKYCMessage.failure"
+                (isUpdateKYCSuccess
+                  ? updateKycResponse?.message
+                  : updateKycErrorResponse?.message) as string
               }
               requestNumber={requestNumber}
               backToHome={backToHome}
@@ -445,16 +464,25 @@ const ReKYC = () => {
           )}
         </div>
       </div>
-      <AlertDialogComponent
-        title={actionCode ? reKYCFailureCheckpoints[actionCode]?.title : ""}
-        message={actionCode ? reKYCFailureCheckpoints[actionCode]?.message : ""}
-        icon={
-          actionCode ? reKYCFailureCheckpoints[actionCode]?.icon : undefined
-        }
-        onConfirm={onCancel}
-        open={open}
-        confirmButtonText={translator("button.ok")}
-      />
+      {actionCode && (
+        <AlertDialogComponent
+          title={reKYCFailureCheckpoints[actionCode]?.title}
+          message={reKYCFailureCheckpoints[actionCode]?.message}
+          icon={reKYCFailureCheckpoints[actionCode]?.icon}
+          onConfirm={onCancel}
+          open={open}
+          confirmButtonText="button.ok"
+        />
+      )}
+      {/* {showAbortJourneyConfirmationModal && (
+        <AbortJourneyConfirmationModal
+          open={showAbortJourneyConfirmationModal}
+          onCancel={handleCloseCancelModal}
+          onConfirm={handleConfirmAbortJourney}
+          description={"reKyc.modal.confirmationText"}
+          icon={warningIcon}
+        />
+      )} */}
     </div>
   );
 };

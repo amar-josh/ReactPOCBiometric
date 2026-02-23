@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 
 import { ROUTES } from "@/routes/constants";
 
@@ -17,14 +17,37 @@ vi.mock("react-router", async () => {
   };
 });
 
+vi.mock("@/lib/sessionStorage", () => ({
+  getSessionStorageData: vi.fn(),
+}));
+
+vi.mock("@/features/adfs-login/hooks", () => ({
+  useEmpInfo: () => ({
+    empName: "Sandhya",
+    branchCode: "BR001",
+  }),
+}));
+
 vi.mock("@/services/api.service", () => ({
   clearToken: vi.fn(),
   getIsTokenSet: () => true,
 }));
 
 vi.mock("@/components/common/HeaderWithAuth", () => ({
-  default: ({ handleLogout }: { handleLogout: () => void }) => (
-    <button onClick={handleLogout}>Logout</button>
+  default: ({
+    handleLogout,
+    name,
+    branch,
+  }: {
+    handleLogout: () => void;
+    name?: string | null;
+    branch?: string | null;
+  }) => (
+    <div>
+      <button onClick={handleLogout}>Logout</button>
+      <span data-testid="header-name">{name}</span>
+      <span data-testid="header-branch">{branch}</span>
+    </div>
   ),
 }));
 
@@ -83,5 +106,31 @@ describe("Private Layout", () => {
 
     expect(clearToken).toHaveBeenCalledOnce();
     expect(mockNavigate).toHaveBeenCalledWith(ROUTES.LOGIN);
+  });
+  it("redirects to login if token is not present in session storage", async () => {
+    const { getSessionStorageData } = await import("@/lib/sessionStorage");
+
+    (getSessionStorageData as Mock).mockReturnValue(null);
+
+    render(
+      <MemoryRouter>
+        <PrivateLayout />
+      </MemoryRouter>
+    );
+
+    expect(mockNavigate).toHaveBeenCalledWith(ROUTES.LOGIN);
+  });
+  it("does not redirect when token exists", async () => {
+    const { getSessionStorageData } = await import("@/lib/sessionStorage");
+
+    (getSessionStorageData as Mock).mockReturnValue("mock-token");
+
+    render(
+      <MemoryRouter>
+        <PrivateLayout />
+      </MemoryRouter>
+    );
+
+    expect(mockNavigate).not.toHaveBeenCalledWith(ROUTES.LOGIN);
   });
 });

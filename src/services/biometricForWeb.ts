@@ -65,7 +65,7 @@ export const getBiometricDeviceStatus = async () => {
   }
 };
 
-export const captureFingerPrint = async () => {
+export const captureFingerPrint = async (): Promise<any> => {
   try {
     const response = await axios({
       url: `https://localhost:${activeRDPort}/capture`,
@@ -75,7 +75,7 @@ export const captureFingerPrint = async () => {
 
     const xmlText = response.data;
     const jsonData = convertXML(xmlText);
-    return jsonData;
+    return { jsonData, xmlText };
   } catch (error) {
     return error;
   }

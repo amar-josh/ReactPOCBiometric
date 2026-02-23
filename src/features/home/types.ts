@@ -35,7 +35,9 @@ export interface IInstaServicesRequest {
 }
 
 export interface IInstaServiceCards {
-  moduleKey: string;
-  moduleName: string;
-  moduleDesc: string;
+  key: string;
+  name: string;
+  description: string;
+  icon: string;
+  path: string;
 }

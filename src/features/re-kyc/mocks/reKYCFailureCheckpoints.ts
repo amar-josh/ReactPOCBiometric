@@ -1,0 +1,11 @@
+export default {
+  message: "",
+  statusCode: 200,
+  status: "success",
+  timestamp: "2025-04-17T15:45:30",
+  path: "/api/your-endpoint",
+  data: {
+    action: "pop-up",
+    actionCode: "ACCOUNT_LOW_RISK",
+  },
+};

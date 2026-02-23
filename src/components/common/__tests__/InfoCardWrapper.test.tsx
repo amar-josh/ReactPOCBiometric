@@ -16,7 +16,7 @@ describe("CardWrapper", () => {
     subTitle: "Sub Title",
     subTitleInfo: "Sub Info",
     onSelect: vi.fn(),
-    backgroundColor: "bg-white",
+    className: "bg-white",
     selected: false,
   };
 
@@ -117,7 +117,7 @@ describe("CardWrapper", () => {
     const { container } = render(
       <CardWrapper {...defaultProps} selected={false} />
     );
-    expect(container.firstChild).toHaveClass(defaultProps.backgroundColor);
+    expect(container.firstChild).toHaveClass(defaultProps.className);
   });
 
   it("does not render CardHeader and Separator when neither withRadio nor title are provided", () => {

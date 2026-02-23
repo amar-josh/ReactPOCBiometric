@@ -6,7 +6,6 @@ import { POST } from "@/services/api.service";
 import homeCardsMockData from "../mocks/HomeCards.json";
 import * as services from "../services";
 
-// 🔁 Mock POST function
 vi.mock("@/services/api.service", () => ({
   POST: vi.fn(),
 }));

@@ -40,7 +40,7 @@ describe("AddressUpdateCard", () => {
       addressLine3: "",
       city: "Mumbai",
       state: "Maharashtra",
-      pincode: 400001,
+      pinCode: 400001,
       country: "India",
     },
     validateFingerPrintResponse: {
@@ -53,7 +53,7 @@ describe("AddressUpdateCard", () => {
           addressLine3: "",
           city: "New City",
           state: "New State",
-          pincode: 123456,
+          pinCode: 123456,
           country: "India",
         },
       },
@@ -63,6 +63,7 @@ describe("AddressUpdateCard", () => {
     },
     handleAddressConfirmed: vi.fn(),
     onCancel: vi.fn(),
+    handleShowCancelModal: vi.fn(),
     isUpdateKYCError: false,
     updateKYCError: { name: "Error", message: "" },
   };
@@ -70,19 +71,15 @@ describe("AddressUpdateCard", () => {
   it("renders all sections correctly", () => {
     render(<AddressUpdateCard {...defaultProps} />);
 
-    // Verify personal details
-    expect(screen.getByText("John Doe")).toBeInTheDocument();
-
     // Section headings
     expect(screen.getByText("reKyc.reKycDetails")).toBeInTheDocument();
-    expect(screen.getByText("reKyc.otherDetails")).toBeInTheDocument();
     expect(
       screen.getByText("formFields.communicationAddress")
     ).toBeInTheDocument();
 
     // Address sections
     expect(
-      screen.getByText("reKyc.biometric.previousAddress")
+      screen.getByText("reKyc.biometric.currentAddress")
     ).toBeInTheDocument();
     expect(screen.getByText("reKyc.biometric.newAddress")).toBeInTheDocument();
   });
@@ -115,6 +112,6 @@ describe("AddressUpdateCard", () => {
 
     // Click cancel
     fireEvent.click(screen.getByRole("button", { name: "button.cancel" }));
-    expect(defaultProps.onCancel).toHaveBeenCalled();
+    expect(defaultProps.handleShowCancelModal).toHaveBeenCalled();
   });
 });

@@ -8,7 +8,6 @@ import verifyNumberResponse from "../mocks/checkDuplicateNumber.json";
 import checkStatusMockdata from "../mocks/checkStatusSuccess.json";
 import fetchRecordsSuccess from "../mocks/fetchRecordsSuccess.json";
 import getLinkMockData from "../mocks/generateLinkSuccess.json";
-import verifyLinkFailureMockData from "../mocks/linkVerificationError.json";
 import searchCustomer from "../mocks/searchCustomerCIFsuccess.json";
 import updateNumberMockData from "../mocks/updateNumberSuccess.json";
 import * as services from "../services";
@@ -17,7 +16,6 @@ vi.mock("@/lib/utils", () => ({
   fetchFakeData: vi.fn((data) => Promise.resolve(data)),
 }));
 
-// 🔁 Mock POST function
 vi.mock("@/services/api.service", () => ({
   POST: vi.fn(),
 }));
@@ -56,7 +54,7 @@ describe("mobile-number-update/services", () => {
   it("getUpdateNumberService returns updateNumberMockData", async () => {
     const payload = {
       branchCode: "BR1234",
-      customerId: "CUST0001",
+      customerID: "CUST0001",
       customerName: "Jane Smith",
       custUpdatedMobileNumber: "9876543210",
       requestNumber: "REQ1234567890",
@@ -74,13 +72,13 @@ describe("mobile-number-update/services", () => {
   it("getFetchRecordsService returns fetchRecordsSuccess", async () => {
     const payload = {
       branchCode: "BR5678",
-      cif: "CIF0012345",
+      customerID: "CIF0012345",
       employeeId: "EMP9876",
       employeeName: "Rahul Mehta",
     };
 
     mockPost.mockResolvedValueOnce(fetchRecordsSuccess);
-    const response = await services.getFetchRecordsService(payload);
+    const response = await services.getRecordsService(payload);
     expect(mockPost).toHaveBeenCalledWith(
       MOBILE_NUMBER_ENDPOINTS.GET_CUSTOMER_RECORDS,
       payload
@@ -116,19 +114,6 @@ describe("mobile-number-update/services", () => {
     expect(response).toEqual(getLinkMockData);
   });
 
-  it("getVerifyLinkService returns verifyLinkFailureMockData", async () => {
-    const payload = {
-      shortCode: "ABC123",
-    };
-    mockPost.mockResolvedValueOnce(verifyLinkFailureMockData);
-    const response = await services.getVerifyLinkService(payload);
-    expect(mockPost).toHaveBeenCalledWith(
-      MOBILE_NUMBER_ENDPOINTS.VERIFY_LINK,
-      payload
-    );
-    expect(response).toEqual(verifyLinkFailureMockData);
-  });
-
   it("getBioMetricVerificationService returns biometricApiSuccess", async () => {
     const payload = {
       aadhaarNumber: "1234-5678-9012",
@@ -137,7 +122,7 @@ describe("mobile-number-update/services", () => {
       requestNumber: "REQ1234567890",
     };
     mockPost.mockResolvedValueOnce(biometricApiSuccess);
-    const response = await services.getBioMetricVerificationService(payload);
+    const response = await services.validateFingerprint(payload);
     expect(mockPost).toHaveBeenCalledWith(
       MOBILE_NUMBER_ENDPOINTS.BIOMETRIC_VERIFICATION,
       payload

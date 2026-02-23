@@ -17,26 +17,10 @@ export interface IFormDetailsSchema {
   className?: string;
 }
 
-export type IBiometricCardKey =
-  | "retry"
-  | "close"
-  | "capture"
-  | "recapture"
-  | "home";
-
-export interface IBiometricCardDetails {
-  title: string;
-  message: string;
-  icon: string;
-  buttonText: string;
-  key: IBiometricCardKey;
-  isError?: boolean;
-}
-
 export interface IGetCustomerSearchRequest {
   customerID?: string;
   mobileNumber?: string;
-  accountNumber?: number;
+  accountNumber?: string;
 }
 
 export interface IAccountDetail {
@@ -44,12 +28,6 @@ export interface IAccountDetail {
   productName: string;
   isAccountDormant: boolean;
   isDebitFreeze?: boolean;
-}
-
-export interface ICif {
-  cif: number;
-  accDetails: IAccountDetail[];
-  isIndividual?: boolean;
 }
 
 export interface IPersonalDetails {
@@ -72,18 +50,6 @@ export interface ICustomerSearchResponse {
   accDetails: IAccountDetail[];
 }
 
-export interface IFetchRecordError {
-  action: string;
-  actionCode: string;
-}
-
-export interface ICheckpointFailure {
-  message: string;
-  statusCode: number;
-  status: string;
-  data: IFetchRecordError;
-}
-
 export interface IGetCustomerSearchResponse {
   message: string;
   statusCode: number;
@@ -97,7 +63,7 @@ export interface IAddress {
   addressLine3: string;
   city: string;
   state: string;
-  pincode: number;
+  pinCode: number;
   country: string;
 }
 export interface IreKYCDetails {
@@ -108,6 +74,7 @@ export interface IreKYCDetails {
   accountNumber: number;
   mobileNo: string;
   emailId: string;
+  kycStatus: string;
   nameOfOVD: string;
   permanentAddress: IAddress;
   communicationAddress: IAddress;
@@ -121,19 +88,34 @@ export interface IOtherDetails {
   [key: string]: number | undefined;
 }
 
+export interface IAccountDetails {
+  accountId: string;
+  accountType: string;
+}
+
 export interface IReKYCData {
   requestNumber: string;
   metaData: {
-    noChangeEnabled: boolean;
-    updateAddressEnabled: boolean;
+    isNoChange: boolean;
+    isUpdateAddress: boolean;
     message: string;
   };
   rekycDetails: IreKYCDetails;
-  otherDetails: IOtherDetails;
+  // otherDetails: IOtherDetails;
+  action?: string;
+  actionCode?: string;
+  filteredAccountDetails: IAccountDetails[];
+}
+
+export interface IMakerDetails {
+  initiatedBy: string | null | undefined;
+  empId: string | null | undefined;
+  empBranchCode: string | null | undefined;
 }
 
 export interface IGetCustomerDetailsRequest {
   customerID: string;
+  makerDetails: IMakerDetails;
 }
 
 export interface IReKYCCheckpointFailureResponse {
@@ -169,26 +151,6 @@ export interface IreKYCFailureCheckpoints {
   [key: string]: IreKYCFailureCheckpointElement;
 }
 
-// For biometric capture finger print request
-export interface IValidateFingerPrintRequest {
-  aadhaarNumber: string;
-  rdServiceData: string;
-  requestNumber: string;
-  mobileNo?: string;
-}
-
-// For biometric capture finger print response
-export interface IBiometricApiDataSuccess {
-  message: string;
-  statusCode: number;
-  status: string;
-  data: {
-    aadhaarVerification: string;
-    requestNumber: string;
-    aadhaarAddress: IAddress;
-  };
-}
-
 export interface IBiometricApiDataFailure {
   aadhaarVerification: "failed";
 }
@@ -202,24 +164,9 @@ export interface IBiometricApiBaseResponse<T> {
   data: T;
 }
 
-export type IValidateFingerPrintResponse = {
-  message: string;
-  statusCode: number;
-  status: string;
-  data: {
-    aadhaarVerification: string;
-    requestNumber: string;
-    aadhaarAddress: IAddress;
-  };
-};
-
 export type IUpdateKYCRequest = {
   requestNumber: string;
-  makerDetails: {
-    initiatedBy: string;
-    empId: string;
-    empBranchCode: string;
-  };
+  makerDetails: IMakerDetails;
   isOtherDetailsChange: boolean;
   kycNoChange: boolean;
   rekycDetails: {
@@ -232,12 +179,14 @@ export type IUpdateKYCRequest = {
     permanentAddress: IAddress;
     communicationAddress: IAddress;
     aadhaarCommunicationAddress?: IAddress;
-    otherDetails: {
-      occupation: number;
-      incomeRange: number;
-      residentType: number;
-    };
+    // TODO - These details are not available in the ESB yet, so we are hiding them until they become available.
+    // otherDetails: {
+    //   occupation: number;
+    //   incomeRange: number;
+    //   residentType: number;
+    // };
   };
+  filteredAccountDetails: IAccountDetails[];
 };
 
 // Address update api response
@@ -274,4 +223,11 @@ export interface IOtherDetailsResponse {
     income: ISelectOptions[];
     resident: ISelectOptions[];
   };
+}
+
+export interface ICustomerSearchFormValues {
+  searchBy: "mobile" | "cif" | "account";
+  mobile?: string;
+  cif?: string;
+  account?: string;
 }

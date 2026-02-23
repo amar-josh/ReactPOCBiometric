@@ -17,7 +17,7 @@ const PersonalDetailsCard = ({
   return (
     <CardWrapper
       title={translator("reKyc.personalDetails")}
-      backgroundColor="bg-light-gray"
+      className="bg-light-gray"
     >
       <div className="flex items-center gap-6">
         <img
@@ -29,11 +29,11 @@ const PersonalDetailsCard = ({
           <h3 className="font-medium text-lg">{name}</h3>
           <div className="flex flex-col md:flex-row gap-0 md:gap-10">
             <div className="flex gap-2">
-              <p className="text-md">{translator("reKyc.email")}:</p>
+              <p className="text-md">{translator("email")}:</p>
               <p className="text-muted-foreground text-md">{email}</p>
             </div>
             <div className="flex gap-2">
-              <p className="text-md">{translator("reKyc.mobileNumber")}:</p>
+              <p className="text-md">{translator("mobileNumber")}:</p>
               <p className="text-muted-foreground text-md">
                 XXXXXX{String(mobile).slice(-4)}
               </p>

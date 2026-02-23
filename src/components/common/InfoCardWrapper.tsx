@@ -12,9 +12,10 @@ interface ICardWrapperProps {
   subTitle?: string;
   subTitleInfo?: string;
   onSelect?: () => void;
-  backgroundColor?: string;
+  className?: string;
   selectedBackgroundColor?: string; // Background when selected with radio
   selected?: boolean;
+  hideAccountNumbers?: boolean;
 }
 
 const CardWrapper = ({
@@ -25,14 +26,16 @@ const CardWrapper = ({
   subTitle,
   subTitleInfo,
   onSelect,
-  backgroundColor = "bg-white",
+  className = "bg-white",
   selected = false,
+  hideAccountNumbers = false,
 }: ICardWrapperProps) => {
   return (
     <Card
       className={cn(
         "border-1 gap-0 border-gray-200 rounded-xl p-4 transition-colors",
-        selected ? "bg-info-background border-info-bd" : backgroundColor
+        className,
+        { "bg-info-background border-info-bd": selected }
       )}
     >
       {(withRadio || title) && (
@@ -59,9 +62,11 @@ const CardWrapper = ({
         </CardHeader>
       )}
 
-      {(withRadio || title) && <Separator />}
+      {!hideAccountNumbers && (withRadio || title) && <Separator />}
 
-      <CardContent className="pt-4">{children}</CardContent>
+      {!hideAccountNumbers && (
+        <CardContent className="pt-4">{children}</CardContent>
+      )}
     </Card>
   );
 };

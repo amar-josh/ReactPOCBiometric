@@ -3,13 +3,12 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import {
-  useBioMetricVerification,
   useCheckStatus,
   useCustomerSearch,
   useFetchRecords,
   useGenerateLink,
   useUpdateNumber,
-  useVerifyLink,
+  useValidateFingerprint,
   useVerifyNumber,
 } from "../hooks"; // adjust path as needed
 import * as services from "../services"; // mocks come from this module
@@ -18,11 +17,12 @@ vi.mock("../services", () => ({
   getCustomerSearchService: vi.fn(),
   getVerifyNumberService: vi.fn(),
   getUpdateNumberService: vi.fn(),
-  getFetchRecordsService: vi.fn(),
+  getRecordsService: vi.fn(),
   getCheckStatusService: vi.fn(),
   getGenerateLinkService: vi.fn(),
   getVerifyLinkService: vi.fn(),
   getBioMetricVerificationService: vi.fn(),
+  validateFingerprint: vi.fn(),
 }));
 const wrapper = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient();
@@ -71,8 +71,8 @@ describe("Mobile number update Hooks", () => {
     const { result } = renderHook(() => useCustomerSearch(), { wrapper });
 
     const payload = {
-      cif: "CIF0012345",
-      accountNumber: 1234567890,
+      customerID: "CIF0012345",
+      accountNumber: "1234567890",
       branchCode: "BR1234",
       employeeId: "EMP5678",
       employeeName: "Anita Sharma",
@@ -132,7 +132,7 @@ describe("Mobile number update Hooks", () => {
 
     const payload = {
       branchCode: "BR1001",
-      customerId: "CUST7890",
+      customerID: "CUST7890",
       customerName: "Rajesh Kumar",
       custUpdatedMobileNumber: "9123456789",
       requestNumber: "REQ4567890123",
@@ -158,15 +158,13 @@ describe("Mobile number update Hooks", () => {
         message: "ok",
       },
     };
-    (services.getFetchRecordsService as any).mockResolvedValue(
-      fetchRecordsResponse
-    );
+    (services.getRecordsService as any).mockResolvedValue(fetchRecordsResponse);
 
     const { result } = renderHook(() => useFetchRecords(), { wrapper });
 
     const payload = {
       branchCode: "BR2025",
-      cif: "CIF789654123",
+      customerID: "CIF789654123",
       employeeId: "EMP4521",
       employeeName: "Sneha Rane",
     };
@@ -176,7 +174,7 @@ describe("Mobile number update Hooks", () => {
     await waitFor(() =>
       expect(result.current.data).toEqual(fetchRecordsResponse)
     );
-    expect(services.getFetchRecordsService).toHaveBeenCalledWith(payload);
+    expect(services.getRecordsService).toHaveBeenCalledWith(payload);
   });
 
   it("should call getCheckStatusService when useCheckStatus is triggered", async () => {
@@ -237,32 +235,10 @@ describe("Mobile number update Hooks", () => {
     expect(services.getGenerateLinkService).toHaveBeenCalledWith(payload);
   });
 
-  it("should call getVerifyLinkService when useVerifyLink is triggered", async () => {
-    const mockStatusResponse = {
-      statusCode: 200,
-      msg: "Operation completed successfully",
-    };
-
-    (services.getVerifyLinkService as any).mockResolvedValue(
-      mockStatusResponse
-    );
-
-    const { result } = renderHook(() => useVerifyLink(), { wrapper });
-
-    const payload = { shortCode: "asdf" };
-
-    await act(() => result.current.mutateAsync(payload));
-
-    await waitFor(() =>
-      expect(result.current.data).toEqual(mockStatusResponse)
-    );
-    expect(services.getVerifyLinkService).toHaveBeenCalledWith(payload);
-  });
-
   it("should call getBioMetricVerificationService when useBioMetricVerification is triggered", async () => {
     const mockAadhaarVerificationResponse = {
       message: "Aadhaar verification successful",
-      statusCode: "200",
+      statusCode: 200,
       status: "SUCCESS",
       data: {
         aadhaarVerification: "VERIFIED",
@@ -275,17 +251,17 @@ describe("Mobile number update Hooks", () => {
           city: "Pune",
           district: "Pune",
           state: "Maharashtra",
-          pincode: 411001,
+          pinCode: 411001,
           country: "India",
         },
       },
     };
 
-    (services.getBioMetricVerificationService as any).mockResolvedValue(
+    (services.validateFingerprint as any).mockResolvedValue(
       mockAadhaarVerificationResponse
     );
 
-    const { result } = renderHook(() => useBioMetricVerification(), {
+    const { result } = renderHook(() => useValidateFingerprint(), {
       wrapper,
     });
 
@@ -301,8 +277,6 @@ describe("Mobile number update Hooks", () => {
     await waitFor(() =>
       expect(result.current.data).toEqual(mockAadhaarVerificationResponse)
     );
-    expect(services.getBioMetricVerificationService).toHaveBeenCalledWith(
-      payload
-    );
+    expect(services.validateFingerprint).toHaveBeenCalledWith(payload);
   });
 });

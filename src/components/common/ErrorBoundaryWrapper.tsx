@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from "react-router";
 
-import translator from "@/i18n/translator";
+import { SESSION_STORAGE_KEY } from "@/constants/globalConstant";
+import { getSessionStorageData } from "@/lib/sessionStorage";
 import { ROUTES } from "@/routes/constants";
-import { getIsTokenSet } from "@/services/api.service";
 
 import AccessErrorCard from "./AccessErrorCard";
 import { ErrorBoundary } from "./ErrorBoundary";
@@ -11,7 +11,7 @@ const ErrorBoundaryWrapper = ({ children }: { children?: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const token = getIsTokenSet();
+  const token = getSessionStorageData<string>(SESSION_STORAGE_KEY.TOKEN);
 
   const handleClick = () => {
     navigate(token ? ROUTES.HOME : ROUTES.LOGIN, { replace: true });
@@ -22,11 +22,9 @@ const ErrorBoundaryWrapper = ({ children }: { children?: React.ReactNode }) => {
       key={location.pathname}
       fallback={
         <AccessErrorCard
-          title={translator("reKyc.errorMessages.oops")}
-          primaryButtonText={translator(
-            token ? "button.backToHome" : "button.backToLogin"
-          )}
-          description={translator("reKyc.errorMessages.somethingWentWrong")}
+          title={"reKyc.errorMessages.oops"}
+          primaryButtonText={token ? "button.backToHome" : "button.backToLogin"}
+          description={"reKyc.errorMessages.somethingWentWrong"}
           onClickPrimaryButton={handleClick}
         />
       }

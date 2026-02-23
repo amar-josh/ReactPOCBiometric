@@ -1,7 +1,3 @@
-import { ICommonSuccessResponse } from "@/types";
-
-import { IAddress } from "../re-kyc/types";
-
 export interface IGetVerifyNumberRequest {
   mobileNumber: string;
   requestNumber: string;
@@ -14,12 +10,12 @@ export interface IGetVerifyNumberResponse {
 }
 
 export interface IGetUpdateNumberRequest {
-  customerId: string;
+  customerID: string;
   custUpdatedMobileNumber: string | number;
-  branchCode: string;
-  customerName: string;
+  branchCode: string | null | undefined;
+  customerName: string | null | undefined;
   requestNumber: string;
-  type: string;
+  type: string | null | undefined;
 }
 
 export interface IGetUpdateNumberResponseData {
@@ -36,22 +32,38 @@ export interface IGetUpdateNumberResponse {
 }
 
 export interface IGetRecordRequest {
-  branchCode: string;
-  employeeId: string | number;
-  employeeName: string;
-  cif: string;
+  branchCode: string | null | undefined;
+  employeeId: string | number | null | undefined;
+  employeeName: string | null | undefined;
+  customerID: string;
+}
+
+export interface ICustDetails {
+  customerId: string;
+  customerName: string;
+  mobileNumber: string;
+  aadharNumber: string;
+}
+
+export interface IAccountDetails {
+  accountNumber: string;
+  productName: string;
+  accountStatus: string;
+  accountStatusCode: string;
+}
+
+export interface IGetRecordData {
+  custDetails: ICustDetails;
+  accDetails: IAccountDetails[];
+  action?: string;
+  actionCode?: string;
 }
 
 export interface IGetRecordResponse {
   statusCode: number;
   status: string;
   message: string;
-  data:
-    | ICommonSuccessResponse
-    | {
-        action: string;
-        actionCode: string;
-      };
+  data: IGetRecordData;
 }
 
 export interface IGetCheckStatusRequest {
@@ -61,7 +73,7 @@ export interface IGetCheckStatusRequest {
 export interface IGetCheckStatusData {
   id: string;
   requestNumber: string;
-  is_verified: boolean;
+  isVerified: boolean;
 }
 
 export interface IGetCheckStatusResponse {
@@ -89,22 +101,13 @@ export interface IGetGenerateLinkResponse {
   data: IGetGenerateResponseData;
 }
 
-export interface IGetVerifyLinkRequest {
-  shortCode: string | null;
-}
-
-export interface IGetVerifyLinkResponse {
-  statusCode: number;
-  msg: string;
-}
-
 export interface IGetCustomerSearchRequest {
   branchCode?: string;
   employeeId?: string | number;
   employeeName?: string;
-  cif?: string;
+  customerID?: string;
   mobileNumber?: string;
-  accountNumber?: number;
+  accountNumber?: string;
 }
 
 export interface ICustomerDetails {
@@ -132,23 +135,6 @@ export interface IGetCustomerSearchResponse {
   status: string;
   message: string;
   data: IGetCustomerSearchResponseData[];
-}
-
-export interface IBioMetricVerificationRequest {
-  aadhaarNumber: string;
-  rdServiceData: string;
-  requestNumber: string;
-}
-
-export interface IBioMetricVerificationResponse {
-  message: string;
-  statusCode: string;
-  status: string;
-  data: {
-    aadhaarVerification: string;
-    requestNumber: string;
-    aadhaarAddress: IAddress;
-  };
 }
 
 export interface IMobileNumberUpdateFailureCheckpointElement {

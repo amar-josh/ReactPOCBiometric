@@ -3,8 +3,14 @@ export interface IAlertMessage {
   message: string;
 }
 
-export interface ICommonSuccessResponse {
+export interface IGetConfigResponse {
   statusCode: number;
   status: string;
   message: string;
+  data: {
+    cognitoApiKey: string;
+    aesKey: string;
+  };
 }
+
+export type JourneyType = "reKyc" | "mobileNumberUpdate";

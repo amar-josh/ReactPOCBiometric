@@ -2,13 +2,12 @@ import { useMemo } from "react";
 
 import {
   IAddress,
-  ICustomerSearchResponse,
-  IOtherDetailsValues,
+  // IOtherDetailsValues,
   IReKYCData,
 } from "../types";
 import {
   formatAddress,
-  otherDetailsReadOnlySchema,
+  // otherDetailsReadOnlySchema,
   reKycFormSchema,
 } from "../utils";
 
@@ -23,20 +22,8 @@ export function usePersonalDetails(customerDetailResponse: any) {
   }, [customerDetailResponse]);
 }
 
-export function useHasDormantAccount(
-  accountDetails: ICustomerSearchResponse[] | undefined
-) {
-  return useMemo(
-    () =>
-      accountDetails?.some((account) =>
-        account.accDetails?.some((accDetail) => accDetail.isAccountDormant)
-      ),
-    [accountDetails]
-  );
-}
-
 export function useFormDetails(
-  otherDetails: IOtherDetailsValues,
+  // otherDetails: IOtherDetailsValues,
   reKYCDetailsResponse: IReKYCData | undefined
 ) {
   return useMemo(() => {
@@ -62,19 +49,19 @@ export function useFormDetails(
               : "",
       };
     });
-    const otherFields = otherDetailsReadOnlySchema.map((field) => {
-      const selectedOption =
-        otherDetails[field.value as keyof IOtherDetailsValues];
+    // const otherFields = otherDetailsReadOnlySchema.map((field) => {
+    //   const selectedOption =
+    //     otherDetails[field.value as keyof IOtherDetailsValues];
 
-      return {
-        ...field,
-        defaultValue: selectedOption?.label ?? "",
-      };
-    });
+    //   return {
+    //     ...field,
+    //     defaultValue: selectedOption?.label ?? "",
+    //   };
+    // });
 
     return {
       rekycFields: rekycFields,
-      otherFields: otherFields,
+      // otherFields: otherFields,
     };
-  }, [otherDetails, reKYCDetailsResponse?.rekycDetails]);
+  }, [reKYCDetailsResponse?.rekycDetails]);
 }

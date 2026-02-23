@@ -17,9 +17,9 @@ interface IReKYCDetailsFormProps {
 const ReKYCDetailsForm = (props: IReKYCDetailsFormProps) => {
   const { reKYCDetailsFormControl } = props;
   return (
-    <Card className="p-5 mb-4">
+    <Card className="p-5">
       <h3 className="font-bold">{translator("reKyc.reKycDetails")}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-0 gap-x-8">
         {reKycFormSchema.map((field) => (
           <CommonFormComponent
             key={field.value}

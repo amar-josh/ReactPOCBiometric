@@ -3,15 +3,14 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatAddress,
-  getBiometricCardDetails,
   getLabelBasedOnValue,
   otherDetailsFormSchema,
   otherDetailsReadOnlySchema,
-  otherDetailsValidationSchema,
+  otherDetailsValidationFormSchema,
   reKycFormSchema,
 } from "@/features/re-kyc/utils";
-
-import { BIOMETRIC_OPERATIONS } from "../constants";
+import { BIOMETRIC_OPERATIONS } from "@/shared/biometric/constants";
+import { getBiometricCardDetails } from "@/shared/biometric/utils";
 
 const dummyOptions = [
   { label: "Option A", value: "A" },
@@ -38,8 +37,7 @@ describe("getBiometricCardDetails", () => {
 
   it("returns default error object for unknown statusKey", () => {
     const result = getBiometricCardDetails({ statusKey: "UNKNOWN", count: 0 });
-    expect(result.isError).toBe(true);
-    expect(result.key).toBe("capture");
+    expect(result.key).toBe("retryDevice");
   });
 });
 
@@ -62,10 +60,13 @@ describe("formatAddress", () => {
       city: "City",
       state: "State",
       country: "Country",
-      pincode: 123456,
+      pinCode: 123456,
     });
     expect(formatted).toBe(
-      "Line 1, Line 2, Line 3, City, State, Country, 123456"
+      `Line 1
+Line 2
+Line 3
+City, State, Country, 123456`
     );
   });
 });
@@ -89,10 +90,10 @@ describe("form schemas and constants", () => {
   });
 });
 
-describe("otherDetailsValidationSchema", () => {
+describe("otherDetailsValidationFormSchema", () => {
   it("fails when required fields are empty", async () => {
     try {
-      await otherDetailsValidationSchema.validate({
+      await otherDetailsValidationFormSchema.validate({
         occupation: "",
         incomeRange: "",
         residentType: "",
@@ -113,7 +114,7 @@ describe("otherDetailsValidationSchema", () => {
 
   it("passes when all fields are filled", async () => {
     await expect(
-      otherDetailsValidationSchema.validate({
+      otherDetailsValidationFormSchema.validate({
         occupation: "Engineer",
         incomeRange: "0-5L",
         residentType: "Owned",

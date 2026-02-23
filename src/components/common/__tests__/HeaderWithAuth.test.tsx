@@ -1,19 +1,30 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import translator from "@/i18n/translator";
+
 import Header from "../HeaderWithAuth";
 
 vi.mock("@/i18n/translator", () => ({
   default: (key: string) => key,
 }));
 
-describe("Header", () => {
+describe("HeaderWithAuth", () => {
   const mockLogout = vi.fn();
+
+  const mockGetInitials = (name?: string | null): string => {
+    if (!name) return "";
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0]?.[0] ?? "";
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+    return (first + last).toUpperCase();
+  };
 
   const defaultProps = {
     name: "John Doe",
     branch: "Mumbai",
     handleLogout: mockLogout,
+    getInitials: mockGetInitials,
   };
 
   beforeEach(() => {
@@ -29,7 +40,9 @@ describe("Header", () => {
     render(<Header {...defaultProps} />);
     expect(screen.getByText(defaultProps.name)).toBeInTheDocument();
     expect(
-      screen.getByText(`header.branchOrBu:${defaultProps.branch}`)
+      screen.getByText(
+        `${translator("header.branchOrBu")}: ${defaultProps.branch}`
+      )
     ).toBeInTheDocument();
   });
 
@@ -51,5 +64,22 @@ describe("Header", () => {
   it("shows AvatarFallback initials when image src is empty", () => {
     render(<Header {...defaultProps} />);
     expect(screen.getByText("JD")).toBeInTheDocument();
+  });
+
+  it("shows correct initials for a different name", () => {
+    render(<Header {...defaultProps} name="Rahul Sharma" />);
+    expect(screen.getByText("RS")).toBeInTheDocument();
+  });
+
+  it("shows empty initials when name is null", () => {
+    render(<Header {...defaultProps} name={null} />);
+    expect(screen.queryByText("JD")).not.toBeInTheDocument();
+  });
+
+  it("displays '-' when branch is null", () => {
+    render(<Header {...defaultProps} branch={null} />);
+    expect(
+      screen.getByText(`${translator("header.branchOrBu")}: -`)
+    ).toBeInTheDocument();
   });
 });

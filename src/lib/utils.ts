@@ -1,8 +1,18 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { ILabelValue, ISelectOptions } from "@/features/re-kyc/types";
+import {
+  ALPHANUMERIC,
+  CURRENCY,
+  INDIAN_CURRENCY,
+  PADDING,
+  VALUE_IN_INDIAN_FORMAT,
+  ZERO,
+} from "@/constants/globalConstant";
+import { ISelectOptions } from "@/features/re-kyc/types";
 import translator from "@/i18n/translator";
+
+import { aesGcmUtil } from "./encryptionDecryption";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -39,37 +49,51 @@ export const getFieldErrorMessages = (
   return {};
 };
 
-// Convert select options to label and value format
-export const convertToLabelValue = (
-  list?: Array<ISelectOptions>,
-  includeOther: boolean = true
-) => {
-  const updatedList: ILabelValue[] = [];
+const formatCurrencyRange = (
+  range: string,
+  isFirst: boolean = false
+): string => {
+  if (typeof range !== "string") return "";
 
-  list?.forEach(({ name, code }) => {
-    if (code === 0 && includeOther) {
-      updatedList.push({ label: translator("formFields.other"), value: code });
-    } else {
-      updatedList.push({
-        label: name,
-        value: code,
-      });
-    }
-  });
+  const [start, end] = range.split(" to ").map(Number);
 
-  return updatedList;
+  const format = (value?: number) => {
+    if (typeof value !== "number" || isNaN(value)) return "";
+    return value.toLocaleString(VALUE_IN_INDIAN_FORMAT, {
+      style: CURRENCY,
+      currency: INDIAN_CURRENCY,
+      minimumFractionDigits: ZERO,
+    });
+  };
+
+  if (isFirst && !isNaN(end)) {
+    return `${translator("reKyc.lessThan")} ${format(end)}`;
+  }
+
+  if (!isNaN(start) && !isNaN(end)) {
+    return `${format(start)} ${translator("reKyc.to")} ${format(end)}`;
+  }
+
+  return range;
 };
 
-// example to usee field error message
-// useEffect(() => {
-//   const serverFieldErrors = getFieldErrorMessages(serverErrors);
-//   const keys = Object.keys(serverFieldErrors);
-//   if (keys.length) {
-//     keys.forEach((field) => {
-//       setFieldError(field, serverFieldErrors[field]);
-//     });
-//   }
-// }, [serverErrors]);
+// Convert select options to label and value format
+export const convertToLabelValue = ({
+  list,
+  showCurrency = false,
+}: {
+  list: ISelectOptions[];
+  showCurrency?: boolean;
+}) => {
+  return list.map(({ name, code }, index) => {
+    const label = showCurrency ? formatCurrencyRange(name, index === 0) : name;
+
+    return {
+      label,
+      value: code,
+    };
+  });
+};
 
 // services/fakeApi.ts
 export const fetchFakeData = async (mockData: any, isSuccess = true) => {
@@ -83,3 +107,41 @@ export const fetchFakeData = async (mockData: any, isSuccess = true) => {
     }, 1000); // simulate network delay
   });
 };
+
+// Generate a random alphanumeric string of length 12
+export const generateRandomTransactionId = (): string => {
+  let result = "";
+  const charactersLength = ALPHANUMERIC.length;
+
+  for (let i = 0; i < 12; i++) {
+    const randomIndex = Math.floor(Math.random() * charactersLength);
+    result += ALPHANUMERIC.charAt(randomIndex);
+  }
+  return result;
+};
+// Derive AES-256 key from transaction ID
+export const deriveAes256Key = async (transactionId: string) => {
+  const padding = PADDING;
+  const combined = transactionId + padding;
+
+  const encoder = new TextEncoder();
+  const data = encoder.encode(combined);
+
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashString = btoa(String.fromCharCode(...hashArray));
+  aesGcmUtil.setKey(hashString);
+  setTransactionId(transactionId);
+};
+// Singleton pattern to manage encryption key, and transaction ID
+const updateTransactionId = () => {
+  let transactionId = "";
+  return {
+    setTransactionId: (transactionIdValue: string) => {
+      transactionId = transactionIdValue;
+    },
+    getTransactionId: () => transactionId,
+  };
+};
+
+export const { setTransactionId, getTransactionId } = updateTransactionId();

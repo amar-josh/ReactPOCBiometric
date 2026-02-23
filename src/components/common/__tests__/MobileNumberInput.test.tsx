@@ -14,7 +14,7 @@ describe("MobileNumberInput", () => {
   test("renders with default country code +91", () => {
     render(<MobileNumberInput />);
 
-    expect(screen.getByText("+91")).toBeInTheDocument();
+    expect(screen.getByText("reKyc.plusNinetyOne")).toBeInTheDocument();
   });
 
   test("calls onChange with only digits", () => {

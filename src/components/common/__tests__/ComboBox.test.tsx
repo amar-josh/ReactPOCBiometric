@@ -14,9 +14,7 @@ const options: ILabelValue[] = [
 describe("ComboBox", () => {
   test("renders with default text when no value is selected", () => {
     render(<ComboBox list={options} />);
-    expect(screen.getByRole("combobox")).toHaveTextContent(
-      "Select an option..."
-    );
+    expect(screen.getByRole("combobox")).toHaveTextContent("Select Occupation");
   });
 
   test("renders with selected value", () => {

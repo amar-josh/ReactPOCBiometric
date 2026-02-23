@@ -3,7 +3,6 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
-  useCaptureFingerprint,
   useCustomerDetails,
   useCustomerSearch,
   useGetOtherDropdownDetails,
@@ -11,9 +10,11 @@ import {
   useValidateFingerprint,
 } from "@/features/re-kyc/hooks/useRekyc";
 import * as services from "@/features/re-kyc/services";
+import { useCaptureFingerprint } from "@/hooks/useBiometrics";
+import * as service from "@/services/biometricForWeb";
 
-import otherDetailsMockData from "./../mocks/otherDetails.json";
-import reKYCDetailMockData from "./../mocks/reKYCDetails.json";
+import otherDetailsMockData from "../mocks/otherDetails";
+import reKYCDetailMockData from "../mocks/reKYCDetails";
 
 const createWrapper = () => {
   const queryClient = new QueryClient();
@@ -29,6 +30,13 @@ vi.mock("../services", () => ({
   validateFingerprint: vi.fn(),
   getCustomerDetailsService: vi.fn(),
   getOtherDetailsDropdownService: vi.fn(),
+}));
+
+// Add this at the top of your test file, before imports that use the hook
+vi.mock("@/services/biometricForWeb", () => ({
+  captureFingerPrint: vi.fn(),
+  getBiometricDeviceStatus: vi.fn(),
+  getRDServiceStatus: vi.fn(),
 }));
 
 describe("Re-KYC Custom Hooks", () => {
@@ -98,7 +106,7 @@ describe("Re-KYC Custom Hooks", () => {
           city: "Mumbai",
           district: "Mumbai",
           state: "Maharashtra",
-          pincode: 400001,
+          pinCode: 400001,
           country: "India",
         },
         communicationAddress: {
@@ -109,7 +117,7 @@ describe("Re-KYC Custom Hooks", () => {
           city: "Pune",
           district: "Pune",
           state: "Maharashtra",
-          pincode: 411001,
+          pinCode: 411001,
           country: "India",
         },
         aadhaarCommunicationAddress: {
@@ -120,7 +128,7 @@ describe("Re-KYC Custom Hooks", () => {
           city: "Nagpur",
           district: "Nagpur",
           state: "Maharashtra",
-          pincode: 440001,
+          pinCode: 440001,
           country: "India",
         },
         otherDetails: {
@@ -129,6 +137,7 @@ describe("Re-KYC Custom Hooks", () => {
           residentType: 1,
         },
       },
+      filteredAccountDetails: [{ accountId: "123", accountType: "ABC" }],
     };
     await act(() => result.current.mutateAsync(mockReKYCRequest));
 
@@ -154,7 +163,7 @@ describe("Re-KYC Custom Hooks", () => {
 
   it("calls captureFingerPrint via useCaptureFingerprint", async () => {
     const mockResponse = { xml: "captured" };
-    (services.captureFingerPrint as any).mockResolvedValue(mockResponse);
+    (service.captureFingerPrint as any).mockResolvedValue(mockResponse);
 
     const { result } = renderHook(() => useCaptureFingerprint(), {
       wrapper: createWrapper(),
@@ -164,9 +173,10 @@ describe("Re-KYC Custom Hooks", () => {
       await result.current.mutateAsync();
     });
 
-    await waitFor(() => expect(result.current.data).toEqual(mockResponse));
-
-    expect(services.captureFingerPrint).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(result.current.data).toEqual(mockResponse);
+      expect(service.captureFingerPrint).toHaveBeenCalled();
+    });
   });
 
   it("calls validateFingerprint via useValidateFingerprint", async () => {
@@ -185,7 +195,7 @@ describe("Re-KYC Custom Hooks", () => {
           city: "Nagpur",
           district: "Nagpur",
           state: "Maharashtra",
-          pincode: 440001,
+          pinCode: 440001,
           country: "India",
         },
       },
@@ -227,6 +237,11 @@ describe("Re-KYC Custom Hooks", () => {
 
     const payload = {
       customerID: "adsfas",
+      makerDetails: {
+        initiatedBy: "John Doe",
+        empId: "EMP00123",
+        empBranchCode: "BR1234",
+      },
     };
     await act(() => result.current.mutateAsync(payload));
 

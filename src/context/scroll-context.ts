@@ -9,7 +9,9 @@ const ScrollContext = createContext<IScrollContextType | undefined>(undefined);
 export const useScrollToContentTop = () => {
   const context = useContext(ScrollContext);
   if (!context) {
-    throw new Error("Something went wrong");
+    console.log(
+      "Error: Context not found, useScrollToContentTop must be used within a ScrollProvider"
+    );
   }
   return context;
 };

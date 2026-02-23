@@ -1,0 +1,198 @@
+export default {
+  message: "Search successful with the mobile number ‘7543718890’",
+  statusCode: 200,
+  status: "success",
+  data: [
+    {
+      custDetails: {
+        customerId: 303686282,
+        customerName: "ABITABRATA  RIDHIKARI",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: true,
+      },
+      accDetails: [
+        {
+          accountNumber: "50180031645065",
+          productName: "503-SB Sanchay",
+          isAccountDormant: false,
+          isDebitFreeze: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 303937494,
+        customerName: "B001 first name B001 mid name B001 last name",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: false,
+      },
+      accDetails: [
+        {
+          accountNumber: "20500015442876",
+          productName: "7402-OD against FD",
+          isAccountDormant: true,
+        },
+        {
+          accountNumber: "20500016742874",
+          productName: "6805-Overdraft",
+          isAccountDormant: true,
+        },
+        {
+          accountNumber: "50160007314712",
+          productName: "504-SB Standard - 5000 AQB",
+          isAccountDormant: true,
+        },
+        {
+          accountNumber: "20200028261578",
+          productName: "533-SB-Advantage - 25000 AQB dummy",
+          isAccountDormant: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 305655264,
+        customerName: "EIT  NANDI",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: false,
+      },
+      accDetails: [
+        {
+          accountNumber: "50150028138652",
+          productName: "502-MB Sanchay Account",
+          isAccountDormant: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 308137087,
+        customerName: "FARIDA  BIBI",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: true,
+      },
+      accDetails: [
+        {
+          accountNumber: "20200042161543",
+          productName: "503-SB Sanchay",
+          isAccountDormant: true,
+        },
+        {
+          accountNumber: "50150004562275",
+          productName: "502-MB Sanchay Account",
+          isAccountDormant: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 313761126,
+        customerName: "RBARBANI  RIDHIKARI",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: true,
+      },
+      accDetails: [
+        {
+          accountNumber: "50160003938956",
+          productName: "504-SB Standard - 5000 AQB",
+          isAccountDormant: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 318720389,
+        customerName: "OOOOJA ASEJAS LAAKLA",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: true,
+      },
+      accDetails: [
+        {
+          accountNumber: "50210001080945",
+          productName: "505-SB-Advantage - 25000 AQB",
+          isAccountDormant: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 324203728,
+        customerName: "AMNAMIKA HAJHA OYOY",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: true,
+      },
+      accDetails: [
+        {
+          accountNumber: "20200033861589",
+          productName: "504-SB Standard - 5000 AQB",
+          isAccountDormant: true,
+        },
+        {
+          accountNumber: "52200029244430",
+          productName: "526-Elite Premium Saving",
+          isAccountDormant: true,
+        },
+        {
+          accountNumber: "20200034261547",
+          productName: "504-SB Standard - 5000 AQB",
+          isAccountDormant: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 328727566,
+        customerName: "RSARSHA AMIRAM ARHODEKAR",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: true,
+      },
+      accDetails: [
+        {
+          accountNumber: "50180012629571",
+          productName: "505-SB-Advantage - 25000 AQB",
+          isAccountDormant: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 329786736,
+        customerName: "AKAKHI  SHHOSH",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: true,
+      },
+      accDetails: [
+        {
+          accountNumber: "50220001965682",
+          productName: "502-MB Sanchay Account",
+          isAccountDormant: true,
+        },
+      ],
+    },
+    {
+      custDetails: {
+        customerId: 400364129,
+        customerName: "SAIKAT  BISWAS",
+        mobileNumber: "8373924018",
+        email: "",
+        isIndividual: true,
+      },
+      accDetails: [
+        {
+          accountNumber: "20200040361558",
+          productName: "536-PMJDY Savings Account",
+          isAccountDormant: true,
+        },
+      ],
+    },
+  ],
+};

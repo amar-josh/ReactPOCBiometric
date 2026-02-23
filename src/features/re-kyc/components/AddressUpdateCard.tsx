@@ -4,64 +4,56 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import translator from "@/i18n/translator";
+import { IValidateFingerPrintResponse } from "@/shared/biometric/types";
 
-import {
-  IAddress,
-  IFormDetailsSchema,
-  IPersonalDetails,
-  IValidateFingerPrintResponse,
-} from "../types";
+import { IAddress, IFormDetailsSchema } from "../types";
 import { CommunicationAddressComponent } from "./CommunicationAddressComponent";
-import PersonalDetailsCard from "./PersonalDetailsCard";
 import ReadonlyFieldCard from "./ReadonlyFieldCard";
 
 interface IAddressUpdateCardProps {
-  personalDetails: IPersonalDetails | undefined;
   formDetails: {
     rekycFields: IFormDetailsSchema[];
-    otherFields: IFormDetailsSchema[];
+    // otherFields: IFormDetailsSchema[];
   };
   communicationAddress: IAddress;
   validateFingerPrintResponse: IValidateFingerPrintResponse | undefined;
   handleAddressConfirmed: () => void;
-  onCancel: () => void;
+  handleShowCancelModal: () => void;
 }
 
 const AddressUpdateCard = ({
-  personalDetails,
   formDetails,
   communicationAddress,
   validateFingerPrintResponse,
   handleAddressConfirmed,
-  onCancel,
+  handleShowCancelModal,
 }: IAddressUpdateCardProps) => {
   const [agreed, setAgreed] = useState<boolean>(false);
 
   return (
     <>
-      {personalDetails && (
-        <PersonalDetailsCard
-          name={personalDetails.fullName}
-          email={personalDetails.emailId}
-          mobile={personalDetails.mobileNo}
-        />
-      )}
-
       <ReadonlyFieldCard
         title={translator("reKyc.reKycDetails")}
         fields={formDetails?.rekycFields}
       />
-      <ReadonlyFieldCard
+      {/* Other details are not available in the ESB yet, so we are hiding them
+      until they become available */}
+      {/* <ReadonlyFieldCard
         title={translator("reKyc.otherDetails")}
         fields={formDetails?.otherFields}
-      />
-
-      <h4>{translator("formFields.communicationAddress")}</h4>
+      /> */}
+      <h4 className="font-semibold">
+        {translator("formFields.communicationAddress")}
+      </h4>
+      <h4 className="text-sm">
+        {translator("reKyc.biometric.asPerBankDetails")}
+      </h4>
       <CommunicationAddressComponent
-        title={translator("reKyc.biometric.previousAddress")}
+        title={translator("reKyc.biometric.currentAddress")}
         address={communicationAddress}
         isSelected={false}
       />
+      <h4 className="text-sm">{translator("reKyc.biometric.toBeUpdated")}</h4>
       <CommunicationAddressComponent
         title={translator("reKyc.biometric.newAddress")}
         address={validateFingerPrintResponse?.data?.aadhaarAddress}
@@ -87,7 +79,7 @@ const AddressUpdateCard = ({
         >
           {translator("reKyc.biometric.confirmAddress")}
         </Button>
-        <Button variant="outline" onClick={onCancel}>
+        <Button variant="outline" onClick={handleShowCancelModal}>
           {translator("button.cancel")}
         </Button>
       </div>

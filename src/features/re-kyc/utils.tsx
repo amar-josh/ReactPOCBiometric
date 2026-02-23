@@ -1,10 +1,5 @@
 import * as yup from "yup";
 
-import fingerprintFailure from "@/assets/images/fingerPrintError.svg";
-import fingerprint from "@/assets/images/fingerPrintInfo.svg";
-import success from "@/assets/images/success.svg";
-import warning from "@/assets/images/warning.svg";
-import xicon from "@/assets/images/x-circle.svg";
 import {
   IAddress,
   IFormDetailsSchema,
@@ -15,130 +10,20 @@ import {
 import translator from "@/i18n/translator";
 
 import alertIcon from "./../../assets/images/alert.svg";
-import { BIOMETRIC_OPERATIONS } from "./constants";
 
-interface IGetBiometricCardDetailsProps {
-  statusKey: string | undefined;
-  count: number;
-}
-
-export const otherDetailsValidationSchema = yup.object().shape({
-  occupation: yup
-    .string()
-    .required(translator("reKyc.errorMessages.occupationRequired")),
-  residentType: yup
-    .string()
-    .required(translator("reKyc.errorMessages.residenceTypeRequired")),
-  incomeRange: yup
-    .string()
-    .required(translator("reKyc.errorMessages.annualIncomeRequired")),
-});
-
-export const getBiometricCardDetails = ({
-  statusKey,
-  count,
-}: IGetBiometricCardDetailsProps) => {
-  switch (statusKey) {
-    case BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_STATUS:
-      return {
-        title: "reKyc.biometric.searchingRDService",
-        message: "reKyc.biometric.searchingRDServiceMessage",
-        icon: fingerprint,
-        key: "retryRDService",
-      };
-    case BIOMETRIC_OPERATIONS.CHECK_RD_SERVICE_ERROR:
-      return {
-        title: "reKyc.biometric.rdServiceNotFound",
-        message: "reKyc.biometric.rdServiceNotFoundMessage",
-        icon: fingerprintFailure,
-        buttonText: "Retry",
-        key: "retryRDService",
-      };
-    case BIOMETRIC_OPERATIONS.DEVICE_USED_BY_ANOTHER_APPLICATION:
-      return {
-        title: "reKyc.biometric.deviceNotFound",
-        message: "reKyc.biometric.deviceUsedByOtherAppMessage",
-        icon: fingerprintFailure,
-        buttonText: "Retry",
-        key: "retryRDService",
-      };
-    case BIOMETRIC_OPERATIONS.DEVICE_NOT_READY:
-      return {
-        title: "reKyc.biometric.deviceNotFound",
-        message: "reKyc.biometric.connectBiometricDevice",
-        icon: fingerprintFailure,
-        buttonText: "Retry",
-        key: "retryDevice",
-      };
-    case BIOMETRIC_OPERATIONS.READY_TO_CAPTURE:
-      return {
-        title: "reKyc.biometric.confirmUsingFingerprint",
-        message: "reKyc.biometric.touchFingerprintSensor",
-        icon: fingerprint,
-        buttonText: "Capture",
-        key: "capture",
-      };
-    case BIOMETRIC_OPERATIONS.SUCCESS:
-      return {
-        title: "reKyc.biometric.verified",
-        message: "reKyc.biometric.verifiedSuccess",
-        icon: success,
-        buttonText: "Close",
-        key: "close",
-      };
-    case BIOMETRIC_OPERATIONS.NO_FINGER_FOUND:
-      return {
-        title: "reKyc.biometric.noFingerFound",
-        message:
-          "No finger is placed on device, Please make sure to place your finger on the device",
-        icon: fingerprintFailure,
-        buttonText: "Retry",
-        key: "retryDevice",
-      };
-    case BIOMETRIC_OPERATIONS.ATTEMPT_FAILED:
-      if (count === 2) {
-        return {
-          title: "reKyc.biometric.aadhaarAuthFailed",
-          message: "reKyc.biometric.aadhaarAuthFailedOnce",
-          icon: warning,
-          buttonText: "Re-Capture",
-          key: "recapture",
-        };
-      } else if (count === 1) {
-        return {
-          title: "reKyc.biometric.aadhaarAuthFailed",
-          message: "reKyc.biometric.aadhaarAuthFailedTwice",
-          icon: warning,
-          buttonText: "Re-Capture",
-          key: "recapture",
-        };
-      } else {
-        return {
-          title: "reKyc.biometric.aadhaarAuthFailed",
-          message: "reKyc.biometric.formBasedProcess",
-          icon: xicon,
-          buttonText: "Back to home",
-          key: "home",
-        };
-      }
-    case BIOMETRIC_OPERATIONS.ATTEMPT_LIMIT_CROSSED:
-      return {
-        title: "reKyc.biometric.aadhaarAuthFailed",
-        message: "reKyc.biometric.formBasedProcess",
-        icon: xicon,
-        buttonText: "Back to home",
-        key: "home",
-      };
-    default:
-      return {
-        title: "reKyc.errorMessages.tryAgain",
-        message: "reKyc.errorMessages.somethingWentWrong",
-        icon: xicon,
-        buttonText: "Re-capture",
-        key: "retryDevice",
-      };
-  }
-};
+export const otherDetailsValidationFormSchema: yup.ObjectSchema<any> = yup
+  .object()
+  .shape({
+    occupation: yup
+      .string()
+      .required(translator("reKyc.errorMessages.occupationRequired")),
+    residentType: yup
+      .string()
+      .required(translator("reKyc.errorMessages.residenceTypeRequired")),
+    incomeRange: yup
+      .string()
+      .required(translator("reKyc.errorMessages.annualIncomeRequired")),
+  });
 
 export const getLabelBasedOnValue = (
   optionsList: ILabelValue[],
@@ -147,6 +32,7 @@ export const getLabelBasedOnValue = (
   optionsList.find((option: ILabelValue) => option.value == value)?.label || "";
 
 export const formatAddress = (addressObj: IAddress) => {
+  if (!addressObj) return "";
   const {
     addressLine1,
     addressLine2,
@@ -154,17 +40,22 @@ export const formatAddress = (addressObj: IAddress) => {
     city,
     state,
     country,
-    pincode,
-  } = addressObj || {};
-  return [
-    addressLine1,
-    addressLine2,
-    addressLine3,
-    city,
-    state,
-    country,
-    pincode,
-  ].join(", ");
+    pinCode,
+  } = addressObj;
+
+  const lineFields = [addressLine1, addressLine2, addressLine3]
+    .filter(Boolean)
+    .map((line) => `${line}`)
+    .join("\n");
+
+  const locationFields = [city, state, country]
+    .filter(Boolean)
+    .map((field) => `${field},`)
+    .join(" ");
+
+  const inlinePart = `${locationFields} ${pinCode}`.trim();
+
+  return [lineFields, inlinePart].filter(Boolean).join("\n");
 };
 
 export const reKycFormSchema: IFormDetailsSchema[] = [
@@ -178,6 +69,34 @@ export const reKycFormSchema: IFormDetailsSchema[] = [
   {
     label: "formFields.customerID",
     value: "customerID",
+    type: "text",
+    defaultValue: "",
+    readOnly: true,
+  },
+  {
+    label: "formFields.idProofDocument",
+    value: "kycIdDocType",
+    type: "text",
+    defaultValue: "",
+    readOnly: true,
+  },
+  {
+    label: "formFields.idNumber",
+    value: "kycIdDocNumber",
+    type: "text",
+    defaultValue: "",
+    readOnly: true,
+  },
+  {
+    label: "formFields.addressProofDocument",
+    value: "addressIdDocType",
+    type: "text",
+    defaultValue: "",
+    readOnly: true,
+  },
+  {
+    label: "formFields.idNumber",
+    value: "addressIdDocNumber",
     type: "text",
     defaultValue: "",
     readOnly: true,
@@ -214,19 +133,19 @@ export const reKycFormSchema: IFormDetailsSchema[] = [
 
 export const otherDetailsFormSchema: IFormDetailsSchema[] = [
   {
-    label: "formFields.occupationRequired",
+    label: "formFields.occupation",
     value: "occupation",
     type: "combobox",
     defaultValue: null,
   },
   {
-    label: "formFields.grossAnnualIncomeRequired",
+    label: "formFields.grossAnnualIncome",
     value: "incomeRange",
     type: "select",
     defaultValue: null,
   },
   {
-    label: "formFields.residenceTypeRequired",
+    label: "formFields.residenceType",
     value: "residentType",
     type: "select",
     defaultValue: null,
@@ -258,27 +177,34 @@ export const otherDetailsReadOnlySchema: IFormDetailsSchema[] = [
 ];
 
 const commonAccountTypeError: IreKYCFailureCheckpointElement = {
-  title: translator("checkpoints.notEligibleForInstaTitle"),
-  message: translator("checkpoints.notEligibleForInstaMessage"),
+  title: "checkpoints.notEligibleForInstaTitle",
+  message: "checkpoints.notEligibleForInstaMessage",
   icon: alertIcon,
 };
 
 export const reKYCFailureCheckpoints: IreKYCFailureCheckpoints = {
-  ACCOUNT_IS_INDIVIDUAL: commonAccountTypeError,
+  IS_INDIVIDUAL: commonAccountTypeError,
   AGE_GROUP_MINOR: commonAccountTypeError,
-  ACCOUNT_LOW_RISK: commonAccountTypeError,
+  HIGH_RISK: commonAccountTypeError,
+  PAN_FORM_SIXTY_MISSING: commonAccountTypeError,
   MOBILE_NUMBER_MISSING: {
-    title: translator("checkpoints.mobileNumberMissingTitle"),
-    message: translator("checkpoints.mobileNumberUpdateNeededMessage"),
+    title: "checkpoints.notEligibleForInstaTitle",
+    message: "checkpoints.mobileNumberUpdateNeededMessage",
     icon: alertIcon,
   },
-  // TODO - Get message from Sai and update pan accordingly.
-  PAN_FORM_SIXTY_MISSING: commonAccountTypeError,
-  // TODO - update message from sai and update dormant accordingly.
-  DORMANT_ACCOUNT: commonAccountTypeError,
-  AADHAAR_MISSING_OR_INVALID: {
-    title: translator("checkpoints.aadhaarDetailsMissingTitle"),
+  ACCOUNT_DORMANCY: {
+    title: "checkpoints.notEligibleForInstaTitle",
+    message: "checkpoints.accountDormant",
+    icon: alertIcon,
+  },
+  AADHAAR_MISSING: {
+    title: "checkpoints.aadhaarDetailsMissingTitle",
     message: "",
+    icon: alertIcon,
+  },
+  AADHAAR_REFERENCE_NO_MISSING: {
+    title: "checkpoints.aadhaarReferenceNoMissing",
+    message: "checkpoints.aadhaarReferenceNoMissingMessage",
     icon: alertIcon,
   },
 };

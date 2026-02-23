@@ -32,12 +32,13 @@ const OtherDetailsForm = ({
       className={cn("p-5", { "border-danger": isOtherDropdownDetailsError })}
     >
       <h3 className="font-bold">{translator("reKyc.otherDetails")}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-0">
         {otherDetailsFormSchema?.map((field: IFormDetailsSchema) => {
           return (
             <CommonFormComponent
               key={field.value}
               field={field}
+              isRequired
               control={otherDetailsFormControl}
               selectOptions={selectOptions}
             />

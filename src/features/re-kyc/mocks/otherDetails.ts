@@ -1,0 +1,93 @@
+export default {
+  message: "",
+  statusCode: 200,
+  status: "success",
+  data: {
+    occupation: [
+      {
+        code: 108,
+        name: "Agriculture",
+      },
+      {
+        name: "Software Engineer",
+        code: 101,
+      },
+      {
+        name: "Teacher",
+        code: 102,
+      },
+      {
+        name: "Doctor",
+        code: 103,
+      },
+      {
+        name: "Architect",
+        code: 104,
+      },
+      {
+        name: "Accountant",
+        code: 105,
+      },
+    ],
+    income: [
+      {
+        code: 1,
+        name: "1 to 120000",
+      },
+      {
+        code: 2,
+        name: "120001 to 240000",
+      },
+      {
+        code: 3,
+        name: "240001 to 600000",
+      },
+      {
+        code: 4,
+        name: "600001 to 1200000",
+      },
+      {
+        code: 5,
+        name: "1200001 to 2500000",
+      },
+      {
+        code: 6,
+        name: "2500001 to 7500000",
+      },
+      {
+        code: 7,
+        name: "7500001 to 10000000",
+      },
+      {
+        code: 8,
+        name: "10000001 to 100000000",
+      },
+      {
+        code: 9,
+        name: "100000001 to 500000000",
+      },
+      {
+        code: 10,
+        name: "500000001 to 1000000000",
+      },
+    ],
+    resident: [
+      {
+        code: 3,
+        name: "Living with family",
+      },
+      {
+        name: "Resident",
+        code: 1,
+      },
+      {
+        name: "Non-Resident",
+        code: 2,
+      },
+      {
+        name: "Foreign National",
+        code: 4,
+      },
+    ],
+  },
+};

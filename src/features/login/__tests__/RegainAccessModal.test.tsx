@@ -18,7 +18,9 @@ describe("RegainAccessModal", () => {
     expect(screen.getByText("login.regainAccountAccess")).toBeInTheDocument();
 
     // Displayed phone number
-    expect(screen.getByText("1234-567-0000")).toBeInTheDocument();
+    expect(
+      screen.getByText("instaservice_support@bandhanbank.com")
+    ).toBeInTheDocument();
 
     // Close button
     expect(

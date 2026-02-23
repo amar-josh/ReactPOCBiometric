@@ -34,7 +34,7 @@ describe("AlertDialogComponent", () => {
     expect(screen.getByText("alert.title")).toBeInTheDocument();
     expect(screen.getByText("alert.message")).toBeInTheDocument();
 
-    const icon = screen.getByAltText("fingerprint") as HTMLImageElement;
+    const icon = screen.getByAltText("image") as HTMLImageElement;
     expect(icon.src).toContain("test-icon.svg");
   });
 
