@@ -111,14 +111,14 @@ const BiometricFlow = ({
 
   useEffect(() => {
     if (isFingerPrintCaptureError && fingerPrintCaptureError) {
-      console.error("Error capturing fingerprint useEffect:", fingerPrintCaptureError);
+      console.error("Error capturing fingerprint useEffect:", JSON.stringify(fingerPrintCaptureError));
       alert("Error capturing fingerprint useEffect: " + JSON.stringify(fingerPrintCaptureError));
     }
   }, [fingerPrintCaptureError]);
 
   useEffect(() => {
     if (isFingerPrintCaptureSuccess && fingerPrintData) {
-      console.log("Fingerprint captured successfully useEffect:", fingerPrintData);
+      console.log("Fingerprint captured successfully useEffect:", JSON.stringify(fingerPrintData));
       alert("Fingerprint captured successfully from useEffect: " + JSON.stringify(fingerPrintData));
     }
   }, [fingerPrintData]);
