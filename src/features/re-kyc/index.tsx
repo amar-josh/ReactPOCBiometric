@@ -128,6 +128,11 @@ const ReKYC = () => {
     reset: updateKYCReset,
   } = useUpdateKYC();
 
+  console.log("isValidateFingerPrintError:", isValidateFingerPrintError);
+  console.log("validateFingerPrintError:", validateFingerPrintError);
+
+  console.log("validateFingerPrintResponse:", validateFingerPrintResponse);
+  
   const {
     alertMessage: customerSearchAlertMessage,
     setAlertMessage: setCustomerSearchAlertMessage,
