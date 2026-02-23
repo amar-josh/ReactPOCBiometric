@@ -7,10 +7,10 @@ import { decrypt, encrypt } from "@/lib/encryptionDecryption";
 import { removeSessionStorageData } from "@/lib/sessionStorage";
 import { ROUTES } from "@/routes/constants";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+// const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const axiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: "https://instaservices-api-uat.bandhanbank.co.in",
 });
 
 const updateTokenValueClosure = () => {
