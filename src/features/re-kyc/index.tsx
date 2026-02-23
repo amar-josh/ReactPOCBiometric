@@ -161,14 +161,14 @@ const ReKYC = () => {
 
   const handleValidateFingerPrint = useCallback(
     (payload: IValidateFingerPrintRequest) => {
-      console.log("handleValidateFingerPrint payload:", JSON.stringify(payload));
+      console.log("handleValidateFingerPrint payload before:", JSON.stringify(payload));
       validateFingerPrintMutate({
         ...payload,
         ...(personalDetails?.mobileNo && {
           mobileNo: personalDetails?.mobileNo,
         }),
       });
-       console.log("handleValidateFingerPrint payload:", JSON.stringify(payload));
+       console.log("handleValidateFingerPrint payload after:", JSON.stringify(payload));
     },
     [personalDetails?.mobileNo, validateFingerPrintMutate]
   );
