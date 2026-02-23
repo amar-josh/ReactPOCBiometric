@@ -105,8 +105,23 @@ const BiometricFlow = ({
     isPending: isFingerPrintCaptureLoading,
     isSuccess: isFingerPrintCaptureSuccess,
     isError: isFingerPrintCaptureError,
+    error: fingerPrintCaptureError,
     reset: resetCaptureFingerPrint,
   } = useCaptureFingerprint();
+
+  useEffect(() => {
+    if (isFingerPrintCaptureError && fingerPrintCaptureError) {
+      console.error("Error capturing fingerprint useEffect:", fingerPrintCaptureError);
+      alert("Error capturing fingerprint useEffect: " + JSON.stringify(fingerPrintCaptureError));
+    }
+  }, [fingerPrintCaptureError]);
+
+  useEffect(() => {
+    if (isFingerPrintCaptureSuccess && fingerPrintData) {
+      console.log("Fingerprint captured successfully useEffect:", fingerPrintData);
+      alert("Fingerprint captured successfully from useEffect: " + JSON.stringify(fingerPrintData));
+    }
+  }, [fingerPrintData]);
 
   // retry to get Device Status
   const retryDeviceStatus = () => getDeviceStatus();
