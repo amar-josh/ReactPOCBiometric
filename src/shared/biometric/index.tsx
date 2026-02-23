@@ -248,6 +248,7 @@ const BiometricFlow = ({
         rdServiceData: base64FingerPrintData,
         requestNumber: requestNumber,
       };
+      console.log("handleFingerPrintCaptureSuccess payload:", JSON.stringify(payload));
       handleValidateFingerPrint(payload);
     },
     [aadhaarNumber, handleValidateFingerPrint, requestNumber]

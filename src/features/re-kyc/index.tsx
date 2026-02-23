@@ -132,7 +132,7 @@ const ReKYC = () => {
   console.log("validateFingerPrintError:", validateFingerPrintError);
 
   console.log("validateFingerPrintResponse:", validateFingerPrintResponse);
-  
+
   const {
     alertMessage: customerSearchAlertMessage,
     setAlertMessage: setCustomerSearchAlertMessage,
@@ -161,12 +161,14 @@ const ReKYC = () => {
 
   const handleValidateFingerPrint = useCallback(
     (payload: IValidateFingerPrintRequest) => {
+      console.log("handleValidateFingerPrint payload:", JSON.stringify(payload));
       validateFingerPrintMutate({
         ...payload,
         ...(personalDetails?.mobileNo && {
           mobileNo: personalDetails?.mobileNo,
         }),
       });
+       console.log("handleValidateFingerPrint payload:", JSON.stringify(payload));
     },
     [personalDetails?.mobileNo, validateFingerPrintMutate]
   );
