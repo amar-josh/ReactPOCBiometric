@@ -41,6 +41,7 @@ export const getCustomerDetailsService = (
 export const validateFingerprint = (
   payload: IValidateFingerPrintRequest
 ): Promise<IValidateFingerPrintResponse> => {
+  console.log("validateFingerprint payload Service:", JSON.stringify(payload));
   return POST<IValidateFingerPrintRequest, IValidateFingerPrintResponse>(
     ENDPOINTS.VERIFY_CUSTOMER_BIOMETRIC,
     payload
@@ -50,7 +51,6 @@ export const validateFingerprint = (
 export const updateKYC = (
   payload: IUpdateKYCRequest
 ): Promise<IUpdateKYCResponse> => {
-  console.log("updateKYC payload:", JSON.stringify(payload));
   return POST<IUpdateKYCRequest, IUpdateKYCResponse>(
     ENDPOINTS.UPDATE_KYC,
     payload

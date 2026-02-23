@@ -128,10 +128,17 @@ const ReKYC = () => {
     reset: updateKYCReset,
   } = useUpdateKYC();
 
-  console.log("isValidateFingerPrintError:", isValidateFingerPrintError);
-  console.log("validateFingerPrintError:", validateFingerPrintError);
-
-  console.log("validateFingerPrintResponse:", validateFingerPrintResponse);
+  useEffect(() => {
+    if (validateFingerPrintResponse) {
+      console.log("validateFingerPrintResponse:", JSON.stringify(validateFingerPrintResponse));
+    }
+  }, [validateFingerPrintResponse]);
+  
+  useEffect(() => {
+    if (validateFingerPrintError) {
+      console.error("validateFingerPrintError:", JSON.stringify(validateFingerPrintError));
+    }
+  }, [validateFingerPrintError]);
 
   const {
     alertMessage: customerSearchAlertMessage,
